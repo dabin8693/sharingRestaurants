@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="buttomDialog"
+            type="com.project.sharingrestaurants.custom.ButtomSheetDialog" />
+    </data>
+    <LinearLayout
+        android:id="@+id/buttomSheetParent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="56dp"
+        ><!-- behavior설정으로 뷰가 화면 아래에 생성되어 있다 -->
+
+        <!-- 클릭 시 나타나는 스피너 안의 텍스트뷰들 -->
+            <RadioGroup
+                android:id="@+id/dialog_radioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <RadioButton
+                    android:id="@+id/dialog_text1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="28dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="@color/black"
+                    android:text="제목"
+                    android:textSize="16sp"
+                    >
+
+                </RadioButton>
+                <RadioButton
+                    android:id="@+id/dialog_text2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="28dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="@color/black"
+                    android:text="제목+내용"
+                    android:textSize="16sp">
+
+                </RadioButton>
+            </RadioGroup>
+    </LinearLayout>
+</layout>

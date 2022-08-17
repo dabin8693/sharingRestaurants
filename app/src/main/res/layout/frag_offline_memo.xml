@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.project.sharingrestaurants.viewmodel.OffLineViewModel" />
+        <variable
+            name="fragmentOff"
+            type="com.project.sharingrestaurants.ui.off.FragmentOffLineMemo" />
+    </data>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15sp"
+            android:text="기록"
+            android:textColor="@color/black"
+            android:textSize="21sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"></TextView>
+
+        <ImageView
+            android:id="@+id/searchvisibility"
+            android:layout_width="24sp"
+            android:layout_height="24sp"
+            android:layout_marginEnd="24dp"
+            android:onClick="@{() -> fragmentOff.searchShow()}"
+            android:src="@drawable/ic_baseline_search_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="24sp"
+            android:layout_height="24sp"
+            android:layout_marginEnd="24dp"
+            android:onClick="@{() -> fragmentOff.loginShow()}"
+            android:src="@drawable/baseline_account_circle_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/noticeEmptyList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/if_list_empty"
+        android:textSize="16sp"
+        android:visibility="gone" />
+    <LinearLayout
+        tools:visibility="visible"
+        android:id="@+id/searchParent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+            <TextView
+                android:id="@+id/dialog_textview"
+                android:layout_width="100dp"
+                android:text="@{viewModel.spinnerName}"
+                android:onClick="@{()->fragmentOff.spinnerDialogShow()}"
+                android:gravity="end"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawableEnd="@drawable/baseline_expand_more_24">
+
+            </TextView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/searchViewLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="18dp"
+                app:cardUseCompatPadding="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/searchView"
+                    android:text="@{viewModel.searchText}"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:drawableStart="@drawable/ic_baseline_search_24"
+                    android:drawablePadding="8dp"
+                    android:maxLines="1"
+                    android:gravity="center_vertical"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:textSize="14sp" />
+
+                <ImageButton
+                    android:id="@+id/textClearButton"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:onClick="@{() -> fragmentOff.textClear()}"
+                    android:layout_marginHorizontal="12dp"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:src="@drawable/ic_baseline_cancel_24"
+                    android:visibility="gone" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="8dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/off_item" />
+
+
+</LinearLayout>
+</layout>
