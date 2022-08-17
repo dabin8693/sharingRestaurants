@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/drawable-v24/baseline_account_circle_24.xml" value="0.3615" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/drawable-v24/baseline_expand_more_24.xml" value="0.3615" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/drawable-v24/ic_baseline_add_24.xml" value="0.2395" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.3615" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.3615" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/drawable/rectangleshape.xml" value="0.3615" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/activity_main.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/activity_main2.xml" value="0.4015625" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/activity_off_item_add.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/activity_off_item_detail_show.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/adapter_off_item.xml" value="0.20238095238095238" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/bottom_dialog.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_offline_memo.xml" value="0.2828125" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_offmemo.xml" value="0.26992753623188404" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_online_memo.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_online_sub_distance.xml" value="0.2828125" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_online_sub_popularity.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_onmemo.xml" value="0.26992753623188404" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_sub_distance.xml" value="0.26992753623188404" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/frag_sub_popularity.xml" value="0.26992753623188404" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/off_item.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/spinner_inner_view.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/layout/spinner_outer_view.xml" value="0.4161458333333333" />
+        <entry key="..\:/Android Projects/Sharingrestaurants/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3615" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
