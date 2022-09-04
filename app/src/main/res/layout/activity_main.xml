@@ -43,43 +43,43 @@
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <TextView
-                android:id="@+id/off"
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:onClick="@{() -> mainActivity.offShow()}"
+                android:layout_margin="10dp"
+                android:src="@drawable/edit_24">
+
+            </ImageView>
+
+            <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="개인저장소">
-
-            </TextView>
-
-            <TextView
-                android:id="@+id/on"
                 android:onClick="@{() -> mainActivity.onShow()}"
+                android:layout_margin="10dp"
+                android:src="@drawable/globe_24">
+
+            </ImageView>
+            <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="온라인">
+                android:onClick="@{() -> mainActivity.upShow()}"
+                android:layout_margin="10dp"
+                android:src="@drawable/social_network_24">
 
-            </TextView>
-
-            <TextView
-                android:onClick="@{() -> mainActivity.chatShow()}"
+            </ImageView>
+            <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="채팅">
-
-            </TextView>
-
-            <TextView
                 android:onClick="@{() -> mainActivity.myShow()}"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="내정보">
+                android:layout_margin="10dp"
+                android:src="@drawable/user_24">
 
-            </TextView>
+            </ImageView>
 
         </LinearLayout>
 

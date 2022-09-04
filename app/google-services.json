@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "460407651528",
+    "firebase_url": "https://restaurantapp-3152b-default-rtdb.firebaseio.com",
+    "project_id": "restaurantapp-3152b",
+    "storage_bucket": "restaurantapp-3152b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460407651528:android:757524302935aaeae539fd",
+        "android_client_info": {
+          "package_name": "com.project.sharingrestaurants"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "460407651528-tfq023r2aboh6th2j4ccalj38hv9jer0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.sharingrestaurants",
+            "certificate_hash": "e14e165b9dc1017895cd20d42d0883f27a6241f0"
+          }
+        },
+        {
+          "client_id": "460407651528-c6b56i5mks2k76dslpe6b74r11i8b766.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUTfM95mPelViLb0fVYwZrF4OPXUeIvzU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "460407651528-c6b56i5mks2k76dslpe6b74r11i8b766.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

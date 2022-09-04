@@ -31,8 +31,8 @@
                     android:paddingTop="20dp"
                     android:paddingBottom="10dp"
                     android:textColor="@color/black"
-                    android:text="제목"
-                    android:textSize="16sp"
+                    android:text="@string/spinner_item_title"
+                    android:textSize="16dp"
                     >
 
                 </RadioButton>
@@ -44,8 +44,8 @@
                     android:paddingTop="20dp"
                     android:paddingBottom="10dp"
                     android:textColor="@color/black"
-                    android:text="제목+내용"
-                    android:textSize="16sp">
+                    android:text="@string/spinner_item_titleplace"
+                    android:textSize="16dp">
 
                 </RadioButton>
             </RadioGroup>

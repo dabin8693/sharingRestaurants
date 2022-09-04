@@ -13,14 +13,14 @@ data class ItemEntity(
     @ColumnInfo(name = "title")
     var title: String,
 
+    @ColumnInfo(name = "locate")
+    var locate: String,
+
     @ColumnInfo(name = "place")
     var place: String,
 
     @ColumnInfo(name = "priority")
-    var priority: Int,
-
-    @ColumnInfo(name = "nickname")
-    var nickname: String,
+    var priority: Float,
 
     @ColumnInfo(name = "body")
     var body: String,
@@ -28,7 +28,11 @@ data class ItemEntity(
     @ColumnInfo(name = "imageURL")
     var imageURL: String,
 
-    @ColumnInfo(name = "mapURL")
-    var mapURL: String,
+    @ColumnInfo(name = "latitude")
+    var latitude: Double,
+
+    @ColumnInfo(name = "longitude")
+    var longitude: Double
+
 
 ): Serializable //intent를 위한 직렬화

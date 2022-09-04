@@ -5,12 +5,50 @@
     <data>
         <variable
             name="viewModel"
-            type="com.project.sharingrestaurants.viewmodel.OffLineViewModel" />
+            type="com.project.sharingrestaurants.viewmodel.OffDetailViewModel" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context=".ui.off.OffItemDetailShowActivity">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cons"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:padding="10dp"
+                android:src="@drawable/arrow_small_left_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"></ImageView>
+
+            <ImageView
+                android:id="@+id/write"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:padding="15dp"
+                android:src="@drawable/pencil_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </ImageView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:padding="5dp"
+            android:id="@+id/recycle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 </layout>

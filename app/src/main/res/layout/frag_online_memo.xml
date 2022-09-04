@@ -7,25 +7,134 @@
         <variable
             name="viewModel"
             type="com.project.sharingrestaurants.viewmodel.OnLineViewModel" />
+        <variable
+            name="fragmentOn"
+            type="com.project.sharingrestaurants.ui.on.FragmentOnLineMemo" />
     </data>
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.MainActivity">
+    android:orientation="vertical">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:layout_gravity="center"
-        android:id="@+id/btnToggle"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:padding="10dp"
+            android:text="커뮤니티"
+            android:textColor="@color/black"
+            android:textSize="21dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"></TextView>
+
+        <ImageView
+            android:id="@+id/searchvisibility"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="24dp"
+
+            android:src="@drawable/ic_baseline_search_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="24dp"
+            android:onClick="@{() -> fragmentOn.loginShow()}"
+            android:src="@drawable/baseline_account_circle_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/searchParent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="가로로 슬라이드" />
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:layout_weight="1"
-        android:id="@+id/viewPager2"
+        <TextView
+            android:id="@+id/dialog_textview"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableEnd="@drawable/baseline_expand_more_24"
+            android:gravity="end"
+
+
+            >
+
+        </TextView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/searchViewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardCornerRadius="18dp"
+            app:cardUseCompatPadding="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/searchView"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:drawableStart="@drawable/ic_baseline_search_24"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+
+                    android:textSize="14sp" />
+
+                <ImageButton
+                    android:id="@+id/textClearButton"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="12dp"
+                    android:background="@null"
+                    android:gravity="center"
+
+                    android:src="@drawable/ic_baseline_cancel_24"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"/>
+        android:orientation="vertical">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewOn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
+    </LinearLayout>
 </LinearLayout>
 </layout>

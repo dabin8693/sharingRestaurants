@@ -24,19 +24,19 @@ class ButtomSheetDialog(val initialValue: String,val itemClick: (a: String) -> U
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(initialValue == "제목"){
+        if(initialValue == resources.getString(R.string.spinner_item_title)){
             binding.dialogText1.isChecked = true
         }else{
             binding.dialogText2.isChecked = true
         }
         binding.dialogText1.setOnClickListener{
             binding.dialogText1.isChecked = true
-            itemClick("제목")
+            itemClick(resources.getString(R.string.spinner_item_title))
             dismiss()
         }
         binding.dialogText2.setOnClickListener{
             binding.dialogText2.isChecked = true
-            itemClick("제목+내용")
+            itemClick(resources.getString(R.string.spinner_item_titleplace))
             dismiss()
         }
     }

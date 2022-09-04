@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <!-- 앱의 뷰,액션바등 기본값으로 사용  -->
-    <style name="Theme.SharingRestaurants" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.SharingRestaurants" parent="Theme.AppCompat.Light">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>

@@ -1,4 +1,11 @@
 <resources>
+    <!--다국어 지원할때 좋음-->
     <string name="app_name">Sharing restaurants</string>
     <string name="if_list_empty">아직 목록이 없습니다!</string>
+    <string name="completeDialog">작성을 완료하시겠습니까?</string>
+    <string name="spinner_item_title">제목</string>
+    <string name="spinner_item_titleplace">제목+장소</string>
+    <string name="text_move_map_set_location">지도를 움직여 위치를 설정하세요</string>
+    <string name="confirm_text">확인</string>
+    <string name="location_permission_denied_msg">권한 거부</string>
 </resources>

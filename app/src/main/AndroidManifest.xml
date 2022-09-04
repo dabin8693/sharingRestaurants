@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.project.sharingrestaurants">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -11,6 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SharingRestaurants">
         <activity
+            android:name=".ui.off.ShowMapActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="0t1amhii5n" />
+
+        <activity
             android:name=".ui.on.OnItemDetailShowActivity"
             android:exported="false" />
         <activity
@@ -18,13 +30,12 @@
             android:exported="false" />
         <activity
             android:name=".ui.on.OnItemAddActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.off.OffItemAddActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.MainActivity2"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="true">

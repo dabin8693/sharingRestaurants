@@ -7,7 +7,7 @@
     </style>
 
     <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/rectangleshape</item>
+        <item name="android:background">@drawable/toprectangleshape</item>
     </style>
 
     <!-- off item style -->

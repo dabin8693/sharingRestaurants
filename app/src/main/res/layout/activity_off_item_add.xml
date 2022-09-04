@@ -1,9 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.off.OffItemAddActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.project.sharingrestaurants.viewmodel.OffAddViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/add_const"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.off.OffItemAddActivity">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cons"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:padding="10dp"
+                android:src="@drawable/arrow_small_left_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"></ImageView>
+
+            <Button
+                android:id="@+id/completeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/rectangleshape"
+                android:text="등록"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </Button>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+            app:layout_constraintTop_toBottomOf="@+id/cons">
+
+            <LinearLayout
+                android:id="@+id/add_linear"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/edittitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="25dp"
+                    android:text="@={viewModel.itemTitle}"
+                    android:layout_margin="5dp"
+                    android:inputType="text"
+                    android:hint="제목" />
+
+                <TextView
+                    android:id="@+id/showmap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:text="@={viewModel.itemLocate}"
+                    android:padding="5dp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:background="@drawable/rectangleshape"
+                    android:inputType="textMultiLine"
+                    android:hint="주소 찾기" />
+                <EditText
+                    android:id="@+id/editplace"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:text="@={viewModel.itemPlace}"
+                    android:layout_margin="5dp"
+                    android:inputType="text"
+                    android:hint="상세 주소" />
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="43dp"
+                    android:layout_gravity="center"
+                    android:rating="@={viewModel.itemPriority}"
+                    android:numStars="5"
+                    android:stepSize="0.5" />
+
+                <EditText
+                    android:id="@+id/editbody"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:layout_margin="5dp"
+                    android:background="@null"
+                    android:inputType="textMultiLine"
+                    android:hint="내용" />
+                <!-- 여기에 동적view 들어감 -->
+                <LinearLayout
+                    android:id="@+id/focuselinear"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_height="300dp">
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+            <ImageView
+                android:id="@+id/camera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/camera_24"
+                android:padding="10dp">
+
+            </ImageView>
+            <ImageView
+                android:id="@+id/gallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/mode_landscape_24"
+                android:padding="10dp">
+
+            </ImageView>
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

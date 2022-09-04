@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class ItemRepository(application: MyApplication) {
+class ItemRepository(application: MyApplication) {//나중에 di사용 Application클래스에서 의존성 관리
     private val itemDatabase = ItemDatabase.getInstance()
     private val itemDao = itemDatabase.dao()
 
@@ -28,11 +28,21 @@ class ItemRepository(application: MyApplication) {
     }
 
     fun searchTitle(query: String?): LiveData<List<ItemEntity>>{
+        if (query != null) {
+            Log.d("초기화 쿼리타이틀",query)
+        }else{
+            Log.d("초기화 쿼리타이틀","널임")
+        }
         return itemDao.searchByTitle(query)
     }
 
     fun searchTitleOrBody(query: String?): LiveData<List<ItemEntity>>{
-        return itemDao.searchByTitleOrBody(query)
+        if (query != null) {
+            Log.d("초기화 쿼리타이틀바디",query)
+        }else{
+            Log.d("초기화 쿼리타이틀바디","널임")
+        }
+        return itemDao.searchByTitleOrPlace(query)
     }
 
     fun insert(itemEntity: ItemEntity){
