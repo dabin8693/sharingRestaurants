@@ -37,7 +37,7 @@ class OffItemAddActivity : AppCompatActivity() {
     val viewModel: OffAddViewModel by viewModels<OffAddViewModel>()
     lateinit var cameraWork: CameraWork
 
-    companion object{
+    companion object{//util패키지로 이동
         val DELIMITER: String = "@5q#2s!" //구분자
     }
     override fun onCreate(savedInstanceState: Bundle?) {

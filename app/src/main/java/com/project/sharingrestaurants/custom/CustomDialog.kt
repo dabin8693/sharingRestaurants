@@ -2,18 +2,12 @@ package com.project.sharingrestaurants.custom
 
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.util.Log
-import android.view.View
 import android.view.Window
 import android.widget.Button
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.common.SignInButton
 import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.firebase.FBAuth
-import com.project.sharingrestaurants.generated.callback.OnClickListener
+import com.project.sharingrestaurants.firebase.FBLogin
 
 class CustomDialog(activity: Activity) : Dialog(activity) {
     private val signbutton: SignInButton
@@ -27,11 +21,7 @@ class CustomDialog(activity: Activity) : Dialog(activity) {
 
         signbutton = findViewById(R.id.signInButton)
         finishbutton = findViewById(R.id.finish)
-        FBAuth.isLogin.observe(activity as FragmentActivity){
-            if (it == true){
-                dismiss()
-            }
-        }
+
     }
 
     fun signOnClick(listener: () -> Unit){

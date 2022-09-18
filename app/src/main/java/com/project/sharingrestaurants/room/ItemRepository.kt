@@ -2,15 +2,20 @@ package com.project.sharingrestaurants.room
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.google.android.gms.auth.api.Auth
+import com.google.firebase.auth.FirebaseAuth
 import com.project.sharingrestaurants.MyApplication
+import com.project.sharingrestaurants.firebase.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
 class ItemRepository(application: MyApplication) {//나중에 di사용 Application클래스에서 의존성 관리
-    private val itemDatabase = ItemDatabase.getInstance()
+    private val itemDatabase = ItemDatabase.getInstance(application)
     private val itemDao = itemDatabase.dao()
+    private val Auth: FBAuth = FBAuth.getInstance(application)
+    private val fbDatabase: FBDatabase = FBDatabase.getInstance()
 
     companion object{
         private var INSTANCE: ItemRepository? = null
@@ -64,4 +69,40 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
             Log.d("room delete에러",e.toString())
         }
     }
+
+    //room
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //firestore database
+
+    fun addFBBoard(boardMap: Map<String, Any>){
+        fbDatabase.addBoard(boardMap)
+    }
+
+    fun addFBAuth(authEntity: AuthEntity){
+        fbDatabase.addAuth(authEntity)
+    }
+
+    fun addFBComment(commentEntity: CommentEntity, boardId: String){
+        fbDatabase.addComment(commentEntity, boardId)
+    }
+
+    fun getFBList(): LiveData<List<BoardEntity>>{
+        return fbDatabase.getBoard()
+    }
+
+    fun getFBAuth(boardId: String): LiveData<List<AuthEntity>>{
+        return fbDatabase.getAuth(boardId)
+    }
+
+    fun getFBCommentList(boardId: String): LiveData<List<CommentEntity>>{
+        return fbDatabase.getComment(boardId)
+    }
+
+    //firestore database
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //fireAuth
+    fun getAuth(): FBAuth {
+        return Auth
+    }
+
 }

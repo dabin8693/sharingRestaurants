@@ -126,13 +126,15 @@
         </androidx.cardview.widget.CardView>
     </LinearLayout>
     <LinearLayout
+        android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewOn"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            tools:listitem="@layout/on_item">
 
         </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>

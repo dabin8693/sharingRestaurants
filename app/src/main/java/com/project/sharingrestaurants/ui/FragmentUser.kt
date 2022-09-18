@@ -6,12 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.databinding.FragOfflineMemoBinding
+import com.bumptech.glide.Glide
 import com.project.sharingrestaurants.databinding.FragUserBinding
-import com.project.sharingrestaurants.firebase.FBAuth
-import com.project.sharingrestaurants.util.DataTrans
-import com.project.sharingrestaurants.viewmodel.OffLineViewModel
+import com.project.sharingrestaurants.firebase.FBLogin
 import com.project.sharingrestaurants.viewmodel.UserViewModel
 
 class FragmentUser: Fragment() {
@@ -31,9 +28,15 @@ class FragmentUser: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.logoutbutton.setOnClickListener{
-            FBAuth.signOut()
+            viewmodel.signOut()
             (requireActivity() as MainActivity).offShow()
         }
+        binding.idemail.setText("dabin75783239@gmail.com")
+        binding.nickname.setText("식객")
+        Glide.with(this)
+            .load(viewmodel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+            .override(210,210)
+            .into(binding.profileimage)
     }
 
     private fun initStart(

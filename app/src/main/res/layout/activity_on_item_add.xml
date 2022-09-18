@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.project.sharingrestaurants.viewmodel.OnAddViewModel" />
+    </data>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/add_const"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.on.OnItemAddActivity">
+    tools:context=".ui.off.OffItemAddActivity">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,20 +24,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/text"
+        <ImageView
+            android:id="@+id/back"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="5dp"
+            android:layout_height="50dp"
             android:padding="10dp"
-            android:text="작성"
-            android:textColor="@color/black"
-            android:textSize="21dp"
+            android:src="@drawable/arrow_small_left_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
+            app:layout_constraintTop_toTopOf="parent"></ImageView>
 
         <Button
+            android:id="@+id/completeButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
@@ -52,41 +58,71 @@
         app:layout_constraintTop_toBottomOf="@+id/cons">
 
         <LinearLayout
+            android:id="@+id/add_linear"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/editTextTextPersonName2"
+                android:id="@+id/edittitle"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
+                android:layout_height="wrap_content"
+                android:textSize="25dp"
+                android:text="@={viewModel.itemTitle}"
                 android:layout_margin="5dp"
-                android:hint="제목"
-                android:inputType="textMultiLine" />
+                android:inputType="text"
+                android:hint="제목" />
 
+            <TextView
+                android:id="@+id/showmap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:text="@={viewModel.itemLocate}"
+                android:padding="5dp"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:background="@drawable/rectangleshape"
+                android:inputType="textMultiLine"
+                android:hint="주소 찾기" />
             <EditText
-                android:id="@+id/editTextTextPersonName3"
+                android:id="@+id/editplace"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="@={viewModel.itemPlace}"
                 android:layout_margin="5dp"
-                android:hint="장소"
-                android:inputType="textPersonName" />
-
+                android:inputType="text"
+                android:hint="상세 주소" />
             <RatingBar
                 android:id="@+id/ratingBar"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="43dp"
                 android:layout_gravity="center"
-                android:layout_margin="5dp"
+                android:rating="@={viewModel.itemPriority}"
                 android:numStars="5"
                 android:stepSize="0.5" />
 
             <EditText
+                android:id="@+id/editbody"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:layout_margin="5dp"
+                android:background="@null"
                 android:inputType="textMultiLine"
-                android:text="Name" />
+                android:hint="내용" />
+            <!-- 여기에 동적view 들어감 -->
+            <LinearLayout
+                android:id="@+id/focuselinear"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="300dp">
+
+            </LinearLayout>
         </LinearLayout>
+
     </ScrollView>
 
     <LinearLayout
@@ -96,7 +132,26 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"></LinearLayout>
+        app:layout_constraintStart_toStartOf="parent">
+        <ImageView
+            android:id="@+id/camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/camera_24"
+            android:padding="10dp">
+
+        </ImageView>
+        <ImageView
+            android:id="@+id/gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/mode_landscape_24"
+            android:padding="10dp">
+
+        </ImageView>
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

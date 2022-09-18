@@ -1,25 +1,32 @@
 package com.project.sharingrestaurants.viewmodel
 
-import android.text.TextUtils
-import android.util.Log
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.arch.core.util.Function
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.project.sharingrestaurants.MyApplication
-import com.project.sharingrestaurants.R
+import com.project.sharingrestaurants.custom.CustomDialog
+import com.project.sharingrestaurants.firebase.FBAuth
+import com.project.sharingrestaurants.firebase.FBLogin
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
+import com.project.sharingrestaurants.util.DataTrans
 
 class OffLineViewModel : ViewModel() {
-    val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
+    private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     val spinnerName: MutableLiveData<String> = MutableLiveData()
     val searchText: MutableLiveData<String> = MutableLiveData()
     val sarchTextDelay: MutableLiveData<String> = MutableLiveData()
     val currentLatitude: MutableLiveData<Double> = MutableLiveData()
     val currentLongitude: MutableLiveData<Double> = MutableLiveData()
+
+
 
     fun getItemList(spinnerItemTitle: String): LiveData<List<ItemEntity>> {
         //sarchTextDelay.value가 null이면 getList쿼리 날리고 새로 받은 Livedata를 반환 아니면 search쿼리
@@ -47,6 +54,25 @@ class OffLineViewModel : ViewModel() {
 
     fun delete(itemEntity: ItemEntity) {
         repository.delete(itemEntity)
+    }
+
+    fun getCurrentGPS(activity: Activity?): LiveData<DataTrans.gps>{
+        return DataTrans.requestLastLocation(activity!!)
+    }
+
+    fun signIn(account: GoogleSignInAccount, activity: Activity?, callback: () -> Unit){
+        FBLogin(repository.getAuth()).firebaseAuthWithGoogle(account, activity!!, callback)
+    }
+    fun getIsLogin(): Boolean {
+        return repository.getAuth().isLogin.value!!
+    }
+    fun getAuth(): FBAuth {
+        return repository.getAuth()
+    }
+
+
+    fun deleteReference(){
+
     }
 
 

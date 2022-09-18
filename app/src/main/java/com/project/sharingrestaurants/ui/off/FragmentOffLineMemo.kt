@@ -3,7 +3,11 @@ package com.project.sharingrestaurants.ui.off
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,25 +15,25 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.GoogleAuthProvider
 import com.gun0912.tedpermission.rx3.TedPermission
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OffAdapter
 import com.project.sharingrestaurants.custom.ButtomSheetDialog
 import com.project.sharingrestaurants.custom.CustomDialog
 import com.project.sharingrestaurants.databinding.FragOfflineMemoBinding
-import com.project.sharingrestaurants.firebase.FBAuth
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.ui.MainActivity
+import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.util.DataTrans
 import com.project.sharingrestaurants.viewmodel.OffLineViewModel
 import kotlinx.coroutines.*
@@ -41,9 +45,11 @@ class FragmentOffLineMemo : Fragment() {
     lateinit var viewmodel: OffLineViewModel
     lateinit var binding: FragOfflineMemoBinding
     //private val binding2 get() = binding!! null처리 필요 할 경우
+    lateinit var activity: MainActivity
     lateinit var inputMethodManager: InputMethodManager
     lateinit var offAdapter: OffAdapter
     lateinit var itemList: List<ItemEntity>
+    lateinit var loginDialog: CustomDialog
     var job: Job = CoroutineScope(Dispatchers.IO).launch {  }
 
     //ViewLifecycleOwner는 onCreateView 이전에 호출되어서 onDestroyView때 null이 된다.
@@ -127,22 +133,26 @@ class FragmentOffLineMemo : Fragment() {
         binding.viewModel = viewmodel
         binding.fragmentOff = this
         binding.lifecycleOwner = viewLifecycleOwner
-
+        activity = requireActivity() as MainActivity
         //초기값 설정
         viewmodel.spinnerName.value = resources.getString(R.string.spinner_item_title)
         requestPermissions()//위치 권한
         viewmodel.currentLatitude.value = 0.0
         viewmodel.currentLongitude.value = 0.0
-        DataTrans().requestLastLocation(requireActivity()){//비동기임
-            currentLatitude, currentLongitude ->
-            viewmodel.currentLatitude.value = currentLatitude
-            viewmodel.currentLongitude.value = currentLongitude
+        viewmodel.getCurrentGPS(activity).observe(viewLifecycleOwner){
+            viewmodel.currentLatitude.value = it.latitude
+            viewmodel.currentLongitude.value = it.longitude
             if (offAdapter != null){
-                offAdapter.distChanged(currentLatitude, currentLongitude)
+                offAdapter.distChanged(it.latitude, it.longitude)
             }
         }
-        if (FBAuth.isLogin.value == true){
-            binding.imageView.setImageResource(R.mipmap.ic_launcher)
+
+        if (viewmodel.getIsLogin() == true){
+            Log.d("url값은ㅇ",viewmodel.getAuth().photoUrl.value.toString())
+            Glide.with(this)
+                .load(viewmodel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                .into(binding.imageView)
+                .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
         }
         }
 
@@ -213,20 +223,21 @@ class FragmentOffLineMemo : Fragment() {
     }
 
     fun loginShow() {
-        if (FBAuth.isLogin.value == false) {
-            CustomDialog(requireActivity()).apply {
-                signOnClick {
-                    val signInIntent: Intent =
-                        FBAuth.getgoogleSignInClient()!!.signInIntent //구글로그인 페이지로 가는 인텐트 객체
+        if (viewmodel.getIsLogin() == false) {
+            loginDialog = CustomDialog(activity)
+            loginDialog.signOnClick {
+                val signInIntent: Intent =
+                        viewmodel.getAuth().googleSignInClient!!.signInIntent //구글로그인 페이지로 가는 인텐트 객체
 
-                    startActivityForResult(signInIntent, 100) //Google Sign In flow 시작
-
-                }
-                finshOnclick { dismiss() }
-
-            }.show()
+                    startActivityForResult(
+                        signInIntent,
+                        100
+                    ) //Google Sign In flow 시작
+            }
+            loginDialog.finshOnclick { loginDialog.dismiss() }
+            loginDialog.show()
         }else{//로그인 상태면 내정보창으로 이동
-            (requireActivity() as MainActivity).myShow()
+            activity.myShow()
         }
     }
 
@@ -239,14 +250,21 @@ class FragmentOffLineMemo : Fragment() {
             try {
                 // 구글 로그인 성공
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
-                FBAuth.firebaseAuthWithGoogle(account){//로그인 성공 콜백
-                    binding.imageView.setImageResource(R.mipmap.ic_launcher)
+                viewmodel.signIn(account, activity){
+                    Log.d("url값은",viewmodel.getAuth().photoUrl.value.toString())
+                        loginDialog.dismiss()
+                        Glide.with(this)
+                            .load(viewmodel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                            .into(binding.imageView)
+                            .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
+
                 }
             } catch (e: ApiException) {
 
             }
         }
     }
+
 
 
 }

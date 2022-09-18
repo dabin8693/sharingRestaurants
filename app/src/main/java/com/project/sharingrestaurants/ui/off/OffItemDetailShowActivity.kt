@@ -23,7 +23,7 @@ class OffItemDetailShowActivity : AppCompatActivity() {
     val viewmodel: OffDetailViewModel by viewModels<OffDetailViewModel>()
     lateinit var binding: ActivityOffItemDetailShowBinding
     lateinit var adapter: OffDetailAdapter
-    val dataTrans: DataTrans = DataTrans()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +38,7 @@ class OffItemDetailShowActivity : AppCompatActivity() {
         binding.recycle.layoutManager =
             LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)//기본값 VERTICAL
         binding.recycle.setHasFixedSize(true)
-        viewmodel.newItem = dataTrans.itemTrans(viewmodel.item)
+        viewmodel.newItem = DataTrans.itemTrans(viewmodel.item)
         adapter.setItem(viewmodel.newItem)
 
         binding.back.setOnClickListener{finish()}
@@ -53,7 +53,7 @@ class OffItemDetailShowActivity : AppCompatActivity() {
         super.onRestart()
         viewmodel.getList().observe(this){
             viewmodel.item = it.get(viewmodel.position)
-            viewmodel.newItem = dataTrans.itemTrans(viewmodel.item)
+            viewmodel.newItem = DataTrans.itemTrans(viewmodel.item)
             adapter.setItem(viewmodel.newItem)
         }
     }

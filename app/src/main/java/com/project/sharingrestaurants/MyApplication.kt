@@ -1,8 +1,11 @@
 package com.project.sharingrestaurants
 
 import android.app.Application
+import android.content.SharedPreferences
 import com.project.sharingrestaurants.room.ItemRepository
 
+
+//@HiltAndroidApp
 class MyApplication : Application() {
     init {
         INSTANCE = this////repository가 myapplication인스턴스를 사용함으로 repository보다 먼저 초기화 되어야 됨
@@ -18,8 +21,10 @@ class MyApplication : Application() {
         }
     }
 
-    override fun onCreate() {
+    override fun onCreate() {//여기서 의존성 주입됨
         super.onCreate()
         REPOSITORY = getRepository()
     }
+
+
 }

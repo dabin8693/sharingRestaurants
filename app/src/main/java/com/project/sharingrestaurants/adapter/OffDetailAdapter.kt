@@ -96,8 +96,8 @@ class OffDetailAdapter() : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
     fun setItem(items: OffDetailItem) {
         val array = ArrayList<String>()
         array.add(items.title)
-        array.add(items.place)
         array.add(items.locate)
+        array.add(items.place)
         array.add(items.priority.toString())
         for (i in 0..items.body.size - 1) {
             array.add(items.body.get(i))
