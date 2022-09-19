@@ -16,12 +16,14 @@ import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
+import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.custom.CustomDialog
 import com.project.sharingrestaurants.data.BitmapImageItem
@@ -35,16 +37,22 @@ import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.util.DataTrans
 
 import com.project.sharingrestaurants.viewmodel.MainViewModel
+import com.project.sharingrestaurants.viewmodel.OnLineViewModel
+import com.project.sharingrestaurants.viewmodel.UserViewModel
+import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    val mainViewModel: MainViewModel by viewModels<MainViewModel>()
+    val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this, ViewModelFactory(MyApplication.REPOSITORY)).get(
+            MainViewModel::class.java
+        )
+    }
     lateinit var transaction: FragmentTransaction
     lateinit var fragOff: FragmentOffLineMemo
     lateinit var fragOn: FragmentOnLineMemo
     lateinit var fragUser: FragmentUser
-    //lateinit var shared: SharedPreferences
 
     override fun onStart() {
         super.onStart()
@@ -52,7 +60,6 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getSupportActionBar()!!.hide() //액션바 숨기기
 
         initStart()
 
@@ -88,16 +95,17 @@ class MainActivity : AppCompatActivity() {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun initStart(){
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)//binding.viewModel에 viewmodel 담기전에 먼저 초기화
-        binding.viewModel = mainViewModel //xml에서 main뷰모델 데이터에 접근 가능하게
+        binding.viewModel = viewModel //xml에서 main뷰모델 데이터에 접근 가능하게
         binding.mainActivity = this //xml에서 main액티비티 데이터에 접근 가능하게
         binding.lifecycleOwner = this //이거 안쓰면 데이터바인딩 쓸때 xml이 데이터 관측 못 함
 
         //shared = getSharedPreferences("temp",Context.MODE_PRIVATE)
-        if (mainViewModel.getAuth().currentUser != null) {
-            for (profile in mainViewModel.getAuth().currentUser!!.providerData) {
+        if (viewModel.getAuth().currentUser != null) {
+            for (profile in viewModel.getAuth().currentUser!!.providerData) {
                 Log.d("auth00Number","1")
-                mainViewModel.getAuth().photoUrl.value = profile.photoUrl
+                viewModel.getAuth().photoUrl.value = profile.photoUrl
             }
 
             //shared.getString("userPicture", "")!!.toUri()
@@ -129,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         //FBDatabase.setComment(comment)
     }
     fun myShow(){
-        if (mainViewModel.getAuth().currentUser != null) {
+        if (viewModel.getAuth().currentUser != null) {
             transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.Fragcontainer, fragUser, "User")
             //transaction.addToBackStack(null)

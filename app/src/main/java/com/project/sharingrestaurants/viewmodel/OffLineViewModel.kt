@@ -17,8 +17,8 @@ import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.DataTrans
 
-class OffLineViewModel : ViewModel() {
-    private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
+class OffLineViewModel(private val repository: ItemRepository) : ViewModel() {
+    //private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     val spinnerName: MutableLiveData<String> = MutableLiveData()
     val searchText: MutableLiveData<String> = MutableLiveData()

@@ -8,8 +8,8 @@ import com.project.sharingrestaurants.firebase.FBAuth
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 
-class OnDetailViewModel : ViewModel() {
-    private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
+class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
+    //private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     lateinit var item: ItemEntity
     lateinit var newItem: OffDetailItem

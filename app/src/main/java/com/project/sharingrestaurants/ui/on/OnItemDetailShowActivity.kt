@@ -5,21 +5,28 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.databinding.ActivityOnItemDetailShowBinding
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.FBLogin
 import com.project.sharingrestaurants.viewmodel.OnDetailViewModel
+import com.project.sharingrestaurants.viewmodel.OnLineViewModel
+import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 
 class OnItemDetailShowActivity : AppCompatActivity() {
     lateinit var binding: ActivityOnItemDetailShowBinding
-    val viewModel: OnDetailViewModel by viewModels<OnDetailViewModel>()
+    val viewModel: OnDetailViewModel by lazy {
+        ViewModelProvider(this, ViewModelFactory(MyApplication.REPOSITORY)).get(
+            OnDetailViewModel::class.java
+        )
+    }
     lateinit var item: BoardEntity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getSupportActionBar()!!.hide() //액션바 숨기기
 
         initStart()
         item = intent.getSerializableExtra("BoardEntity") as BoardEntity

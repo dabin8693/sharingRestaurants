@@ -22,19 +22,28 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.BitmapImageItem
 import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.databinding.ActivityOffItemAddBinding
 import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.viewmodel.OffAddViewModel
+import com.project.sharingrestaurants.viewmodel.OffDetailViewModel
+import com.project.sharingrestaurants.viewmodel.OffLineViewModel
+import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
 //화면 고정설정
 class OffItemAddActivity : AppCompatActivity() {
     lateinit var binding: ActivityOffItemAddBinding
-    val viewModel: OffAddViewModel by viewModels<OffAddViewModel>()
+    val viewModel: OffAddViewModel by lazy {
+        ViewModelProvider(this, ViewModelFactory(MyApplication.REPOSITORY)).get(
+            OffAddViewModel::class.java
+        )
+    }
     lateinit var cameraWork: CameraWork
 
     companion object{//util패키지로 이동
@@ -42,7 +51,6 @@ class OffItemAddActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getSupportActionBar()!!.hide() //액션바 숨기기
 
         initStart()
 
@@ -95,6 +103,7 @@ class OffItemAddActivity : AppCompatActivity() {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun initStart() {
+
         binding = DataBindingUtil.setContentView(
             this,
             R.layout.activity_off_item_add

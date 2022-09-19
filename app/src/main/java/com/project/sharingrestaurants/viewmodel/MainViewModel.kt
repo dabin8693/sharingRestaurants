@@ -9,8 +9,8 @@ import com.project.sharingrestaurants.firebase.FBAuth
 import com.project.sharingrestaurants.room.ItemRepository
 
 //Activity나 Fragmemt 또는 View의 Context를 참조해서는 안된다.(메모리 누수)(애플리케이션 context 사용)
-open class MainViewModel : ViewModel() {
-    private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
+open class MainViewModel(private val repository: ItemRepository) : ViewModel() {
+    //private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
 
     fun getAuth(): FBAuth{

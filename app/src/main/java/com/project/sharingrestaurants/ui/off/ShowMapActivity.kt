@@ -43,7 +43,6 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getSupportActionBar()!!.hide() //액션바 숨기기
 
         initStart()
 

@@ -20,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.gun0912.tedpermission.rx3.TedPermission
+import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnAdapter
 import com.project.sharingrestaurants.custom.CustomDialog
@@ -28,11 +29,12 @@ import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.FBLogin
 import com.project.sharingrestaurants.ui.MainActivity
 import com.project.sharingrestaurants.viewmodel.OnLineViewModel
+import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 
 class FragmentOnLineMemo : Fragment() {
     //뷰페이저2 구현
-    val viewmodel: OnLineViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(
+    val viewModel: OnLineViewModel by lazy {
+        ViewModelProvider(requireActivity(), ViewModelFactory(MyApplication.REPOSITORY)).get(
             OnLineViewModel::class.java
         )
     }
@@ -64,14 +66,14 @@ class FragmentOnLineMemo : Fragment() {
             val intent = Intent(requireActivity(), OnItemDetailShowActivity::class.java)//onClick
             intent.putExtra("BoardEntity", item)
             startActivity(intent)
-        }, viewmodel.currentLatitude.value!!, viewmodel.currentLongitude.value!!)
+        }, viewModel.currentLatitude.value!!, viewModel.currentLongitude.value!!)
         binding.recyclerViewOn.apply {
             this.adapter = onAdapter
             this.layoutManager =
                 LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             this.setHasFixedSize(true)//사이즈 측정이 필요없다 판단돼면 내부적으로 measure안한다
         }
-        viewmodel.getList().observe(viewLifecycleOwner){ list ->
+        viewModel.getList().observe(viewLifecycleOwner){ list ->
             //최신순으로 초기화
             //실시간변경x 정렬 스피너 이벤트 여부 or 프레그먼트 초기화 될때만 호출
             Log.d("리스트초기화",list.toString())
@@ -87,27 +89,27 @@ class FragmentOnLineMemo : Fragment() {
         savedInstanceState: Bundle?
     ) {
         binding = FragOnlineMemoBinding.inflate(inflater, container, false)
-        binding.viewModel = viewmodel
+        binding.viewModel = viewModel
         binding.fragmentOn = this
         binding.lifecycleOwner = viewLifecycleOwner
         activity = requireActivity() as MainActivity
 
         requestPermissions()//위치 권한
-        viewmodel.currentLatitude.value = 0.0
-        viewmodel.currentLongitude.value = 0.0
-        viewmodel.getCurrentGPS(activity).observe(viewLifecycleOwner){
+        viewModel.currentLatitude.value = 0.0
+        viewModel.currentLongitude.value = 0.0
+        viewModel.getCurrentGPS(activity).observe(viewLifecycleOwner){
             //위치정보도착하고 필터 거리순으로 클릭시 viewmodel에서 데이터 정렬후 onAdapter.setItems(list)
-            viewmodel.currentLatitude.value = it.latitude
-            viewmodel.currentLongitude.value = it.longitude
+            viewModel.currentLatitude.value = it.latitude
+            viewModel.currentLongitude.value = it.longitude
             if (onAdapter != null){
                 onAdapter.distChanged(it.latitude, it.longitude)
             }
         }
 
-        if (viewmodel.getIsLogin() == true) {
-            Log.d("url값은ㅇ",viewmodel.getAuth().photoUrl.value.toString())
+        if (viewModel.getIsLogin() == true) {
+            Log.d("url값은ㅇ",viewModel.getAuth().photoUrl.value.toString())
             Glide.with(this)
-                .load(viewmodel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
                 .into(binding.imageView)
                 .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
         }
@@ -115,11 +117,11 @@ class FragmentOnLineMemo : Fragment() {
     }
 
     fun loginShow() {
-        if (viewmodel.getIsLogin() == false) {
+        if (viewModel.getIsLogin() == false) {
             loginDialog = CustomDialog(activity)
             loginDialog.signOnClick {
                 val signInIntent: Intent =
-                    viewmodel.getAuth().googleSignInClient!!.signInIntent //구글로그인 페이지로 가는 인텐트 객체
+                    viewModel.getAuth().googleSignInClient!!.signInIntent //구글로그인 페이지로 가는 인텐트 객체
 
                 startActivityForResult(
                     signInIntent,
@@ -142,11 +144,11 @@ class FragmentOnLineMemo : Fragment() {
             try {
                 // 구글 로그인 성공
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
-                viewmodel.signIn(account, activity) {
-                    Log.d("url값은",viewmodel.getAuth().photoUrl.value.toString())
+                viewModel.signIn(account, activity) {
+                    Log.d("url값은",viewModel.getAuth().photoUrl.value.toString())
                     loginDialog.dismiss()
                     Glide.with(this)
-                        .load(viewmodel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                        .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
                         .into(binding.imageView)
                         .onLoadFailed(
                             ResourcesCompat.getDrawable(

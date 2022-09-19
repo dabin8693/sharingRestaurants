@@ -16,8 +16,8 @@ import com.project.sharingrestaurants.ui.off.OffItemAddActivity.Companion.DELIMI
 import retrofit2.http.Body
 import java.lang.StringBuilder
 
-class OffAddViewModel: ViewModel() {
-    val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
+class OffAddViewModel(private val repository: ItemRepository): ViewModel() {
+    //val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     val itemId: MutableLiveData<Long> = MutableLiveData()//프라이머 키
     val itemTitle: MutableLiveData<String> = MutableLiveData()

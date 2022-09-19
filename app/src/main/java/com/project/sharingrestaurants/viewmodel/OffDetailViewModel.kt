@@ -7,8 +7,8 @@ import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 
-class OffDetailViewModel : ViewModel() {
-    val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
+class OffDetailViewModel(private val repository: ItemRepository) : ViewModel() {
+    //val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     lateinit var item: ItemEntity
     lateinit var newItem: OffDetailItem
