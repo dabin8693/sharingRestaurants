@@ -159,11 +159,12 @@ class MainActivity : AppCompatActivity() {
         }else if(supportFragmentManager.findFragmentById(R.id.Fragcontainer) == fragOn){
             val intent = Intent(this, OnItemAddActivity::class.java)
             startActivity(intent)
-        /*
-            mainViewModel.addFBBoard(hashMapOf("documentId" to "", "timestamp" to FieldValue.serverTimestamp(), "userID" to "daf", "tilte" to "sdf", "place" to "xxx",
+/*
+            viewModel.addFBBoard(hashMapOf("documentId" to "", "timestamp" to FieldValue.serverTimestamp(), "userID" to "daf", "tilte" to "sdf", "place" to "xxx",
                 "locate" to "s", "priority" to 3.5f, "body" to "qwer", "image" to "xcv", "recommends" to 5, "latitude" to 3.2, "longitude" to 1.1))
 
-         */
+ */
+
         }else{
 
         }

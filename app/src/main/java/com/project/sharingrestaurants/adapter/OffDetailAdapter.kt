@@ -18,7 +18,7 @@ import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.databinding.*
 import com.project.sharingrestaurants.room.ItemEntity
 
-class OffDetailAdapter() : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
+class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
     private var items: List<String> = listOf()//
     private lateinit var binding: ViewDataBinding
 
