@@ -2,9 +2,11 @@ package com.project.sharingrestaurants.adapter
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -62,6 +64,7 @@ class OnAddAdapter(val itemInput: (String, Int) -> Unit): RecyclerView.Adapter<O
 
     fun updateItem(string: String){
         this.items.add(string)
+        notifyDataSetChanged()
     }
 
     inner class ViewHolder(binding: ViewDataBinding, viewType: Int) : RecyclerView.ViewHolder(binding.root) {
@@ -69,10 +72,15 @@ class OnAddAdapter(val itemInput: (String, Int) -> Unit): RecyclerView.Adapter<O
         val binding = binding
 
         fun bind(item: String, position: Int) {
+
             when (viewType) {
                 0 -> {
                     val temp = binding as OnAddEditBinding
-                    temp.edit.addTextChangedListener(object : TextWatcher{
+
+                    temp.edit.setText(item)
+
+
+                    temp.edit.addTextChangedListener(object : TextWatcher{//주의점!! position 지역변수 끌어다 쓰면 안됨 익명클래스라서 값이 복사됨 뷰홀더는 재활용되어서 bind함수로 넘어오는 position이랑 안 맞음
                         override fun beforeTextChanged(// 입력하기 전에 조치
                             s: CharSequence?,
                             start: Int,
@@ -92,14 +100,16 @@ class OnAddAdapter(val itemInput: (String, Int) -> Unit): RecyclerView.Adapter<O
                         }
 
                         override fun afterTextChanged(s: Editable?) {// 입력이 끝났을 때 조치
-                            itemInput(temp.edit.text.toString(), position/2)//액티비티에서 뷰모델에 저장
+                            itemInput(temp.edit.text.toString(), adapterPosition/2)
+                            items.set(adapterPosition, temp.edit.text.toString())
+
                         }//position/2 = 중간중간 사진때문에
 
                     })
                 }
                 1 -> {
                     Glide.with(itemView)
-                        .load(item).override(360,640)
+                        .load(item.toUri()).override(360,640)
                         .into((binding as OffItemImageBinding).image)
                 }
             }

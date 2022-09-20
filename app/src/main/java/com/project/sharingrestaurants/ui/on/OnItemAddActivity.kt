@@ -13,6 +13,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -84,7 +86,7 @@ class OnItemAddActivity : AppCompatActivity() {
 
     private fun initStart(){
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_off_item_add)//binding.viewModel에 viewmodel 담기전에 먼저 초기화
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_on_item_add)//binding.viewModel에 viewmodel 담기전에 먼저 초기화
         binding.viewModel = viewModel //xml에서 main뷰모델 데이터에 접근 가능하게
         binding.lifecycleOwner = this //이거 안쓰면 데이터바인딩 쓸때 xml이 데이터 관측 못 함
         cameraWork = CameraWork(applicationContext)
@@ -103,9 +105,16 @@ class OnItemAddActivity : AppCompatActivity() {
                 for (image in viewModel.imageList){
                     viewModel.setItemImage(image)
                 }
-                viewModel.addItem(this@OnItemAddActivity)
+                val liveData: MutableLiveData<Boolean> = MutableLiveData()
+                viewModel.addItem(this@OnItemAddActivity, contentResolver, liveData)
+                liveData.observe(this@OnItemAddActivity){
+                    if (true){
+                        finish()
+                    }else{
+                        Log.d("작성실패","")
+                    }
+                }
 
-                finish()
             }
         }
         builder.show()
@@ -118,6 +127,7 @@ class OnItemAddActivity : AppCompatActivity() {
             var intent: Intent = it.data!!
             var uri: Uri? = intent.data
             viewModel.imageList.add(uri.toString())//갤러리 uri
+            viewModel.textList.add("")//에디트텍스트 추가
             Adapter.updateItem(uri.toString())//이미지뷰 추가
             Adapter.updateItem("")//에디트텍스트 추가
         }
@@ -128,6 +138,7 @@ class OnItemAddActivity : AppCompatActivity() {
     ) {
         if (it.resultCode == RESULT_OK) {
             viewModel.imageList.add(viewModel.publicUri.toString())//공용저장소 uri
+            viewModel.textList.add("")//에디트텍스트 추가
             Adapter.updateItem(viewModel.publicUri.toString())//이미지뷰 추가
             Adapter.updateItem("")//에디트텍스트 추가
         }else{//안찍고 나오거나 실패시

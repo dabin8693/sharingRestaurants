@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.project.sharingrestaurants.databinding.OffItemBinding
 import com.project.sharingrestaurants.room.ItemEntity
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity.Companion.DELIMITER
+import com.project.sharingrestaurants.util.ConstValue
+import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import com.project.sharingrestaurants.util.DataTrans
 
 

@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.FieldValue
@@ -16,13 +18,14 @@ import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.ui.off.OffItemAddActivity
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity.Companion.DELIMITER
+import com.project.sharingrestaurants.util.ConstValue.DELIMITER
+import com.project.sharingrestaurants.util.ConstValue.FALSE
 import retrofit2.http.Body
 import java.lang.StringBuilder
 
 class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
 
-    val itemId: MutableLiveData<Long> = MutableLiveData()//프라이머 키
+    val documentId: MutableLiveData<String> = MutableLiveData()
     val itemTitle: MutableLiveData<String> = MutableLiveData()
     val itemPriority: MutableLiveData<Float> = MutableLiveData()
     val itemLocate: MutableLiveData<String> = MutableLiveData()
@@ -40,6 +43,9 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
     private val itemBodys: StringBuilder = StringBuilder()//(구분자 포함된 본문내용)(db저장 형식)
     private val itemImages: StringBuilder = StringBuilder()//(구분자 포함된 앱내 이미지 절대주소)(db저장 형식)
 
+    init {
+        textList.add("")
+    }
     fun setItemImage(uri: String){
         itemImages.append(uri + DELIMITER)
     }
@@ -48,7 +54,8 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
         itemBodys.append(text + DELIMITER)
     }
 
-    fun addItem(activity: FragmentActivity, contentResolver: ContentResolver) {
+    fun addItem(activity: FragmentActivity, contentResolver: ContentResolver, isSuccess: MutableLiveData<Boolean>) {
+
         val imageArr = itemImages.split(DELIMITER) as MutableList//size가 1이면 [0] = ""이다
         if (imageArr.size > 1) {//사이즈가 1개 이하일때 제거하면 에러 남
             imageArr.removeAt(imageArr.lastIndex)
@@ -68,27 +75,35 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
                     "recommends" to recommends,
                     "latitude" to itemLatitude,
                     "longitude" to itemLongitude
-                )
+                ), isSuccess
             )
         }else{
             repository.addFBImage(imageArr, contentResolver).observe(activity) { storageUri ->
-                repository.addFBBoard(
-                    hashMapOf(
-                        "documentId" to "",
-                        "timestamp" to FieldValue.serverTimestamp(),
-                        "userID" to repository.getAuth().currentUser!!.uid,
-                        "tilte" to itemTitle.value!!,
-                        "place" to itemPlace.value!!,
-                        "locate" to itemLocate.value!!,
-                        "priority" to (itemPriority.value ?: 0F),
-                        "body" to itemBodys.toString(),
-                        "image" to storageUri,
-                        "recommends" to recommends,
-                        "latitude" to itemLatitude,
-                        "longitude" to itemLongitude
+                Log.d("이미지들 업로드 성공함","ㅁㄴㅇ")
+                if (storageUri.equals(FALSE)){
+                    Log.d("이미지들 업로드 실패함","ㅁㄴㅇ")
+                    isSuccess.postValue(false)
+                }else {
+                    repository.addFBBoard(
+                        hashMapOf(
+                            "documentId" to "",
+                            "timestamp" to FieldValue.serverTimestamp(),
+                            "userID" to repository.getAuth().currentUser!!.uid,
+                            "tilte" to itemTitle.value!!,
+                            "place" to itemPlace.value!!,
+                            "locate" to itemLocate.value!!,
+                            "priority" to (itemPriority.value ?: 0F),
+                            "body" to itemBodys.toString(),
+                            "image" to storageUri,
+                            "recommends" to recommends,
+                            "latitude" to itemLatitude,
+                            "longitude" to itemLongitude
+                        ), isSuccess
                     )
-                )
+
+                }
             }
         }
+
     }
 }

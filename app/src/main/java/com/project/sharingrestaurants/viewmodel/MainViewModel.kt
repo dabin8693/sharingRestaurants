@@ -17,7 +17,7 @@ open class MainViewModel(private val repository: ItemRepository) : ViewModel() {
     }
 
     fun addFBBoard(boardMap: Map<String, Any>){
-        repository.addFBBoard(boardMap)
+        //repository.addFBBoard(boardMap)
     }
 
     fun getFBList(): LiveData<List<BoardEntity>> {

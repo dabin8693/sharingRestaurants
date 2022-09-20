@@ -31,6 +31,7 @@ class FBAuth(val context: MyApplication) {
     val isLogin get() = _isLogin
     var currentUser: FirebaseUser?= null
     val photoUrl get() = _photoUrl
+    lateinit var nickname: String
 
 
     companion object{
@@ -48,6 +49,7 @@ class FBAuth(val context: MyApplication) {
         if (mAuth!!.currentUser != null) {
             currentUser = mAuth!!.currentUser!!
             isLogin.value = true
+            nickname = currentUser!!.email!!.split("@").get(0)//임시
             Log.d("로그인상태", "ㅇㅁ")
         } else {
             Log.d("로그아웃상태", "ㅇㅁ")

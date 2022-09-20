@@ -4,8 +4,10 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.Auth
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.firebase.*
 import kotlinx.coroutines.CoroutineScope
@@ -77,12 +79,16 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //firestore database
 
-    fun addFBBoard(boardMap: Map<String, Any>){
-        fbDatabase.addBoard(boardMap)
+    fun addFBBoard(boardMap: Map<String, Any>, isSuccess: MutableLiveData<Boolean>){
+        fbDatabase.addBoard(boardMap, isSuccess)
     }
 
-    fun addFBAuth(authEntity: AuthEntity){
-        fbDatabase.addAuth(authEntity)
+    fun addFBAuth(nickname: String){
+        fbDatabase.addAuth(Auth.currentUser!!, nickname)
+    }
+
+    fun isFBAuth(): LiveData<Boolean>{//false = 회원정보x
+        return fbDatabase.isAuth(Auth)
     }
 
     fun addFBComment(commentEntity: CommentEntity, boardId: String){

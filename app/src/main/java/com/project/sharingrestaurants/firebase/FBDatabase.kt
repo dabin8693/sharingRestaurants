@@ -4,6 +4,8 @@ package com.project.sharingrestaurants.firebase
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.QueryDocumentSnapshot
@@ -34,15 +36,15 @@ class FBDatabase {
         }
     }
 
-    fun addBoard(boardMap: Map<String, Any>){
+    fun addBoard(boardMap: Map<String, Any>, isSuccess: MutableLiveData<Boolean>){
         //boardEntity.timestamp = FieldValue.serverTimestamp()
         //boardEntity.documentId = FieldPath.documentId()
-        fbDatabase.collection("board").add(boardMap)
+        fbDatabase.collection("board").add(boardMap).addOnSuccessListener { isSuccess.postValue(true) }.addOnFailureListener{isSuccess.postValue(false)}
         //fbDatabase.collection("").get().addOnSuccessListener { documents -> for (document in documents){ document.id; document.data; document.toObject<BoardEntity>() }; documents.toObjects<BoardEntity>() }
     }
 
-    fun addAuth(authEntity: AuthEntity){
-        fbDatabase.collection("auth").add(authEntity)
+    fun addAuth(currentUser: FirebaseUser, nickname: String){//추가 또는 닉네임 수정
+        fbDatabase.collection("auth").document(currentUser.uid).set(hashMapOf("uid" to currentUser.uid, "email" to currentUser.email, "nickname" to nickname, "timestamp" to FieldValue.serverTimestamp()))
     }
 
     fun addComment(commentEntity: CommentEntity, boardId: String){//해당글에 댓글, 답글 달기
@@ -79,11 +81,29 @@ class FBDatabase {
         return liveData
     }
 
-    fun getAuth(boardId: String): LiveData<List<AuthEntity>>{//해당글의 댓글,답글 목록
+    fun getAuth(boardId: String): LiveData<List<AuthEntity>>{//회원 목록
         val liveData: MutableLiveData<List<AuthEntity>> = MutableLiveData()
         fbDatabase.collection("auth").get().addOnSuccessListener { documents ->
 
             liveData.value = documents.toObjects<AuthEntity>() //비동기 처리후 옵저버 호출
+        }
+
+        return liveData
+    }
+
+    fun isAuth(auth: FBAuth): LiveData<Boolean>{
+        val liveData: MutableLiveData<Boolean> = MutableLiveData()
+        fbDatabase.collection("auth").whereEqualTo("uid", auth.currentUser!!.uid).get().addOnSuccessListener {
+            if(it.isEmpty){//회원정보가 없다
+                liveData.postValue(false)
+            }else{//회원정보가 있다
+                for (data in it){
+                    auth.nickname = data.data.get("nickname") as String//닉네임 가져오기
+                }
+                liveData.postValue(true)
+            }
+        }.addOnFailureListener{
+            liveData.postValue(false)
         }
 
         return liveData

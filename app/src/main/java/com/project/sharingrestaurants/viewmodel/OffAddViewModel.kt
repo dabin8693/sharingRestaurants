@@ -11,8 +11,7 @@ import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity.Companion.DELIMITER
+import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import retrofit2.http.Body
 import java.lang.StringBuilder
 

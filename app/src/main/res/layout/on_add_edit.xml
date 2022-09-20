@@ -10,9 +10,9 @@
             android:id="@+id/edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ss"
+            android:text=""
             android:textSize="25dp"
-            android:background="null"
+            android:background="@null"
             android:layout_margin="5dp" />
 
     </LinearLayout>

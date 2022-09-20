@@ -112,13 +112,7 @@
                 tools:listitem="@layout/off_item_text">
 
             </androidx.recyclerview.widget.RecyclerView>
-            <LinearLayout
-                android:id="@+id/focuselinear"
-                android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:layout_height="300dp">
 
-            </LinearLayout>
         </LinearLayout>
 
     </ScrollView>

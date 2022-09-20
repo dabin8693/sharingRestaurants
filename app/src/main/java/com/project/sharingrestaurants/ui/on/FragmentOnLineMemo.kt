@@ -60,7 +60,7 @@ class FragmentOnLineMemo : Fragment() {
         savedInstanceState: Bundle?
     ) {//뷰 초기화, livedata옵저버, recyclerview, viewpager2, adapter초기화
         super.onViewCreated(view, savedInstanceState)
-        Log.d("frag2", "onViewCreated")
+        Log.d("onfragment", "onViewCreated")
 
         onAdapter = OnAdapter ({
             val intent = Intent(requireActivity(), OnItemDetailShowActivity::class.java)//onClick
@@ -147,6 +147,7 @@ class FragmentOnLineMemo : Fragment() {
                 // 구글 로그인 성공
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.signIn(account, java.lang.ref.WeakReference(activity).get()) {
+                    viewModel.addFBAuth(viewLifecycleOwner)//db회원 정보 저장 및 불러오기
                     Log.d("url값은",viewModel.getAuth().photoUrl.value.toString())
                     loginDialog.dismiss()
                     Glide.with(this)

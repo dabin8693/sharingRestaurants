@@ -2,9 +2,7 @@ package com.project.sharingrestaurants.viewmodel
 
 import android.app.Activity
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.firebase.BoardEntity
@@ -37,6 +35,16 @@ class OnLineViewModel(private val repository: ItemRepository, private val login:
     }
     fun getAuth(): FBAuth {
         return repository.getAuth()
+    }
+
+    fun addFBAuth(lifecycleOwner: LifecycleOwner){
+        repository.isFBAuth().observe(lifecycleOwner){//회원정보 있으면 닉네임 가져옴
+            if (it){//회원정보o
+                repository.addFBAuth(getAuth().nickname)
+            }else{//회원정보x 닉네임 기본값으로 이메일 추가
+                repository.addFBAuth(getAuth().currentUser!!.email!!.split("@").get(0))
+            }
+        }
     }
 
 }

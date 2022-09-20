@@ -12,7 +12,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.room.ItemEntity
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity.Companion.DELIMITER
+import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
