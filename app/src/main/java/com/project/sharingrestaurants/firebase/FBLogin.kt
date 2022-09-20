@@ -35,6 +35,7 @@ class FBLogin(val Auth: FBAuth) {
 
     // 사용자가 정상적으로 로그인한 후에 GoogleSignInAccount 개체에서 ID 토큰을 가져와서
     // Firebase 사용자 인증 정보로 교환하고 Firebase 사용자 인증 정보를 사용해 Firebase에 인증합니다.
+    //activit = java.lang.ref.WeakReference(activity).get()
     fun firebaseAuthWithGoogle(acct: GoogleSignInAccount, context: Activity, callback: () -> Unit) {//리스너 중복클릭 못 하게 해야됨!!!(메모리 릭)
         //val liveData: MutableLiveData<Boolean> = MutableLiveData()
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)

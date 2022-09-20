@@ -1,5 +1,6 @@
 package com.project.sharingrestaurants.room
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.google.android.gms.auth.api.Auth
@@ -16,6 +17,7 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     private val itemDao = itemDatabase.dao()
     private val Auth: FBAuth = FBAuth.getInstance(application)
     private val fbDatabase: FBDatabase = FBDatabase.getInstance()
+    private val fbStorage: FBStorage = FBStorage()
 
     companion object{
         private var INSTANCE: ItemRepository? = null
@@ -99,6 +101,12 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     }
 
     //firestore database
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //firestore storage
+    fun addFBPicture(pictureUris: String): LiveData<String>{//구분자 포함 이미지 리스트
+        return fbStorage.addImageSaved(pictureUris)
+    }
+    //firestore storage
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //fireAuth
     fun getAuth(): FBAuth {

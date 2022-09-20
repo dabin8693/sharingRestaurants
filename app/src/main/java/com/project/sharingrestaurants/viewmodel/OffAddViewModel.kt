@@ -74,7 +74,7 @@ class OffAddViewModel(private val repository: ItemRepository): ViewModel() {
         itemBodys.append(text + DELIMITER)
     }
 
-    fun setItem(offDetailItem: OffDetailItem){
+    fun setItem(offDetailItem: OffDetailItem){//글 수정으로 들어올때
         itemId.value = offDetailItem.id
         itemLocate.value = offDetailItem.locate
         itemPlace.value = offDetailItem.place?: ""

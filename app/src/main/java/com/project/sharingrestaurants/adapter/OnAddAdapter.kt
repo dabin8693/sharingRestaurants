@@ -13,7 +13,7 @@ import com.project.sharingrestaurants.databinding.OffItemTextBinding
 import com.project.sharingrestaurants.databinding.OnAddEditBinding
 
 class OnAddAdapter(val itemInput: (String, Int) -> Unit): RecyclerView.Adapter<OnAddAdapter.ViewHolder>() {
-    private var items: List<String> = listOf()//edit = "", image = url.toString
+    private var items: ArrayList<String> = ArrayList<String>().apply { add("") }//edit = "" or string(글 수정일 경우), image = url.toString //처음 생성할때 에디트 텍스트 한개 추가
     private lateinit var binding: ViewDataBinding
 
     override fun getItemViewType(position: Int): Int {
@@ -55,9 +55,13 @@ class OnAddAdapter(val itemInput: (String, Int) -> Unit): RecyclerView.Adapter<O
         return items.size
     }
 
-    fun setItemList(array: List<String>) {
+    fun setItemList(array: ArrayList<String>) {
         this.items = array//edit = "", image = url.toString
         notifyDataSetChanged()
+    }
+
+    fun updateItem(string: String){
+        this.items.add(string)
     }
 
     inner class ViewHolder(binding: ViewDataBinding, viewType: Int) : RecyclerView.ViewHolder(binding.root) {

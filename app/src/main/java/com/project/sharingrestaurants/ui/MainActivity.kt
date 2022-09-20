@@ -107,7 +107,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d("auth00Number","1")
                 viewModel.getAuth().photoUrl.value = profile.photoUrl
             }
-
             //shared.getString("userPicture", "")!!.toUri()
             //Log.d("저장된uri:", shared.getString("userPicture", "")!!)
         }

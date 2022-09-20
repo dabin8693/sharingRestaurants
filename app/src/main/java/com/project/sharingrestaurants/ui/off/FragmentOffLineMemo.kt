@@ -227,6 +227,7 @@ class FragmentOffLineMemo : Fragment() {
     }
 
     fun loginShow() {
+
         if (viewModel.getIsLogin() == false) {
             loginDialog = CustomDialog(activity)
             loginDialog.signOnClick {
@@ -254,7 +255,7 @@ class FragmentOffLineMemo : Fragment() {
             try {
                 // 구글 로그인 성공
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
-                viewModel.signIn(account, activity){
+                viewModel.signIn(account, java.lang.ref.WeakReference(activity).get()){
                     Log.d("url값은",viewModel.getAuth().photoUrl.value.toString())
                         loginDialog.dismiss()
                         Glide.with(this)

@@ -79,6 +79,8 @@ class FragmentOnLineMemo : Fragment() {
             Log.d("리스트초기화",list.toString())
             onAdapter.setItems(list)//프래그먼트가 초기화 될때마다 리스트 초기화
         }
+
+
     }
 
 
@@ -144,7 +146,7 @@ class FragmentOnLineMemo : Fragment() {
             try {
                 // 구글 로그인 성공
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
-                viewModel.signIn(account, activity) {
+                viewModel.signIn(account, java.lang.ref.WeakReference(activity).get()) {
                     Log.d("url값은",viewModel.getAuth().photoUrl.value.toString())
                     loginDialog.dismiss()
                     Glide.with(this)
