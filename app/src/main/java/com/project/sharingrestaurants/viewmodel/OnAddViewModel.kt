@@ -48,7 +48,6 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
     }
 
     fun addItem(activity: FragmentActivity) {
-
         repository.addFBPicture(itemImages.toString()).observe(activity){storageUri ->
             repository.addFBBoard(hashMapOf("documentId" to "", "timestamp" to FieldValue.serverTimestamp(), "userID" to repository.getAuth().currentUser!!.uid,
                 "tilte" to itemTitle.value!!, "place" to itemPlace.value!!, "locate" to itemLocate.value!!,
