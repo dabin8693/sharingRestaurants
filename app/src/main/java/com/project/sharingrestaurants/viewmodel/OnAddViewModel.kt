@@ -1,6 +1,7 @@
 package com.project.sharingrestaurants.viewmodel
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.View
@@ -47,13 +48,47 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
         itemBodys.append(text + DELIMITER)
     }
 
-    fun addItem(activity: FragmentActivity) {
-        repository.addFBPicture(itemImages.toString()).observe(activity){storageUri ->
-            repository.addFBBoard(hashMapOf("documentId" to "", "timestamp" to FieldValue.serverTimestamp(), "userID" to repository.getAuth().currentUser!!.uid,
-                "tilte" to itemTitle.value!!, "place" to itemPlace.value!!, "locate" to itemLocate.value!!,
-                "priority" to (itemPriority.value?: 0F), "body" to itemBodys.toString(), "image" to storageUri, "recommends" to recommends,
-                "latitude" to itemLatitude, "longitude" to itemLongitude))
+    fun addItem(activity: FragmentActivity, contentResolver: ContentResolver) {
+        val imageArr = itemImages.split(DELIMITER) as MutableList//size가 1이면 [0] = ""이다
+        if (imageArr.size > 1) {//사이즈가 1개 이하일때 제거하면 에러 남
+            imageArr.removeAt(imageArr.lastIndex)
         }
-
+        if (imageArr[0] == "") {//이미지 없으면
+            repository.addFBBoard(
+                hashMapOf(
+                    "documentId" to "",
+                    "timestamp" to FieldValue.serverTimestamp(),
+                    "userID" to repository.getAuth().currentUser!!.uid,
+                    "tilte" to itemTitle.value!!,
+                    "place" to itemPlace.value!!,
+                    "locate" to itemLocate.value!!,
+                    "priority" to (itemPriority.value ?: 0F),
+                    "body" to itemBodys.toString(),
+                    "image" to "",
+                    "recommends" to recommends,
+                    "latitude" to itemLatitude,
+                    "longitude" to itemLongitude
+                )
+            )
+        }else{
+            repository.addFBImage(imageArr, contentResolver).observe(activity) { storageUri ->
+                repository.addFBBoard(
+                    hashMapOf(
+                        "documentId" to "",
+                        "timestamp" to FieldValue.serverTimestamp(),
+                        "userID" to repository.getAuth().currentUser!!.uid,
+                        "tilte" to itemTitle.value!!,
+                        "place" to itemPlace.value!!,
+                        "locate" to itemLocate.value!!,
+                        "priority" to (itemPriority.value ?: 0F),
+                        "body" to itemBodys.toString(),
+                        "image" to storageUri,
+                        "recommends" to recommends,
+                        "latitude" to itemLatitude,
+                        "longitude" to itemLongitude
+                    )
+                )
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.project.sharingrestaurants.room
 
+import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -103,8 +104,8 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     //firestore database
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //firestore storage
-    fun addFBPicture(pictureUris: String): LiveData<String>{//구분자 포함 이미지 리스트
-        return fbStorage.addImageSaved(pictureUris)
+    fun addFBImage(imageArr: List<String>, contentResolver: ContentResolver): LiveData<String>{//구분자 포함 이미지 리스트
+        return fbStorage.addImageSaved(imageArr, Auth.currentUser!!.uid, contentResolver)
     }
     //firestore storage
     //////////////////////////////////////////////////////////////////////////////////////////////////////
