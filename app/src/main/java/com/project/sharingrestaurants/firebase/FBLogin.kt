@@ -56,7 +56,7 @@ class FBLogin(val Auth: FBAuth) {
                             Log.d("authNumber","1")
                             Auth.photoUrl.value = profile.photoUrl!!
                         }
-                        callback()
+                        callback()//addOnCompleteListener비동기 종료후 참조 해제됨(여기가 가장 마지막으로 참조해제되는 곳)//livedata로 써도 됨
                         Log.d("포토uri:",Auth.photoUrl.value.toString())
                         //liveData.postValue(true)
                     } else {

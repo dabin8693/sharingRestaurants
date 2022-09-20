@@ -17,8 +17,7 @@ import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.DataTrans
 
-class OffLineViewModel(private val repository: ItemRepository) : ViewModel() {
-    //private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
+class OffLineViewModel(private val repository: ItemRepository, private val login: FBLogin) : ViewModel() {
 
     val spinnerName: MutableLiveData<String> = MutableLiveData()
     val searchText: MutableLiveData<String> = MutableLiveData()
@@ -61,7 +60,7 @@ class OffLineViewModel(private val repository: ItemRepository) : ViewModel() {
     }
 
     fun signIn(account: GoogleSignInAccount, activity: Activity?, callback: () -> Unit){
-        FBLogin(repository.getAuth()).firebaseAuthWithGoogle(account, activity!!, callback)
+        login.firebaseAuthWithGoogle(account, activity!!, callback)//FBLogin()이거 Factory로 받아오게 변경
     }
     fun getIsLogin(): Boolean {
         return repository.getAuth().isLogin.value!!
