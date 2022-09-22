@@ -105,9 +105,8 @@ class OnItemAddActivity : AppCompatActivity() {
                 for (image in viewModel.imageList){
                     viewModel.setItemImage(image)
                 }
-                val liveData: MutableLiveData<Boolean> = MutableLiveData()
-                viewModel.addItem(this@OnItemAddActivity, contentResolver, liveData)
-                liveData.observe(this@OnItemAddActivity){
+
+                viewModel.addItem(this@OnItemAddActivity, contentResolver).observe(this@OnItemAddActivity){
                     if (true){
                         finish()
                     }else{

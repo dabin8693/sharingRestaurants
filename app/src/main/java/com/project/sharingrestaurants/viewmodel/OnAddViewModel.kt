@@ -54,56 +54,55 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
         itemBodys.append(text + DELIMITER)
     }
 
-    fun addItem(activity: FragmentActivity, contentResolver: ContentResolver, isSuccess: MutableLiveData<Boolean>) {
-
+    fun addItem(activity: FragmentActivity, contentResolver: ContentResolver):LiveData<Boolean> {
+        val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
         val imageArr = itemImages.split(DELIMITER) as MutableList//size가 1이면 [0] = ""이다
         if (imageArr.size > 1) {//사이즈가 1개 이하일때 제거하면 에러 남
             imageArr.removeAt(imageArr.lastIndex)
         }
-        if (imageArr[0] == "") {//이미지 없으면
-            repository.addFBBoard(
-                hashMapOf(
-                    "documentId" to "",
-                    "timestamp" to FieldValue.serverTimestamp(),
-                    "userID" to repository.getAuth().currentUser!!.uid,
-                    "tilte" to itemTitle.value!!,
-                    "place" to itemPlace.value!!,
-                    "locate" to itemLocate.value!!,
-                    "priority" to (itemPriority.value ?: 0F),
-                    "body" to itemBodys.toString(),
-                    "image" to "",
-                    "recommends" to recommends,
-                    "latitude" to itemLatitude,
-                    "longitude" to itemLongitude
-                ), isSuccess
-            )
-        }else{
-            repository.addFBImage(imageArr, contentResolver).observe(activity) { storageUri ->
-                Log.d("이미지들 업로드 성공함","ㅁㄴㅇ")
-                if (storageUri.equals(FALSE)){
-                    Log.d("이미지들 업로드 실패함","ㅁㄴㅇ")
+        if (imageArr[0] == ""){//이미지 없을때
+            dbSave(imageArr[0]).observe(activity){ bool ->
+                if (bool == true){
+                    isSuccess.value = true
+                }
+            }
+        }else{//있으면 파이어스토리지 -> 파이어스토어
+            storageSave(imageArr, contentResolver).observe(activity){ storageUri ->
+                if (storageUri.equals(FALSE)){//파이어스토리지 저장실패
                     isSuccess.postValue(false)
-                }else {
-                    repository.addFBBoard(
-                        hashMapOf(
-                            "documentId" to "",
-                            "timestamp" to FieldValue.serverTimestamp(),
-                            "userID" to repository.getAuth().currentUser!!.uid,
-                            "tilte" to itemTitle.value!!,
-                            "place" to itemPlace.value!!,
-                            "locate" to itemLocate.value!!,
-                            "priority" to (itemPriority.value ?: 0F),
-                            "body" to itemBodys.toString(),
-                            "image" to storageUri,
-                            "recommends" to recommends,
-                            "latitude" to itemLatitude,
-                            "longitude" to itemLongitude
-                        ), isSuccess
-                    )
-
+                }else{
+                    dbSave(storageUri).observe(activity){ bool ->
+                        if (bool == true){
+                            isSuccess.value = true
+                        }else{
+                            isSuccess.value = false
+                        }
+                    }
                 }
             }
         }
+        return isSuccess
+    }
 
+    private fun storageSave(imageArr: List<String>, contentResolver: ContentResolver): LiveData<String>{
+        return repository.addFBImage(imageArr, contentResolver)
+    }
+    private fun dbSave(imageUri: String): LiveData<Boolean>{
+        return repository.addFBBoard(
+            hashMapOf(
+                "documentId" to "",
+                "timestamp" to FieldValue.serverTimestamp(),
+                "userID" to repository.getAuth().currentUser!!.uid,
+                "tilte" to itemTitle.value!!,
+                "place" to itemPlace.value!!,
+                "locate" to itemLocate.value!!,
+                "priority" to (itemPriority.value ?: 0F),
+                "body" to itemBodys.toString(),
+                "image" to imageUri,
+                "recommends" to recommends,
+                "latitude" to itemLatitude,
+                "longitude" to itemLongitude
+            )
+        )
     }
 }
