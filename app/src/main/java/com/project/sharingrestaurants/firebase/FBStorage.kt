@@ -18,6 +18,7 @@ import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import com.project.sharingrestaurants.util.ConstValue.FALSE
 import com.project.sharingrestaurants.util.DataTrans
 import com.project.sharingrestaurants.util.DataTrans.getTime
+import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
 import java.lang.StringBuilder
 

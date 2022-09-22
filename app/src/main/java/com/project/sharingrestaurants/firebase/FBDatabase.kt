@@ -4,12 +4,16 @@ package com.project.sharingrestaurants.firebase
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.tasks.await
 
 import kotlin.collections.ArrayList
 
@@ -36,6 +40,7 @@ class FBDatabase {
         fbDatabase.collection("board").add(boardMap)
             .addOnSuccessListener { liveData.postValue(true) }
             .addOnFailureListener { liveData.postValue(false) }
+        //val a: DocumentReference
         return liveData
     }
 
