@@ -18,7 +18,7 @@ import java.lang.Exception
 class ItemRepository(application: MyApplication) {//나중에 di사용 Application클래스에서 의존성 관리
     private val itemDatabase = ItemDatabase.getInstance(application)
     private val itemDao = itemDatabase.dao()
-    private val Auth: FBAuth = FBAuth.getInstance(application)
+    private val Auth: FBAuth = FBAuth.getInstance(application)//애플리케이션 클래스로 옮기기
     private val fbDatabase: FBDatabase = FBDatabase.getInstance()
     private val fbStorage: FBStorage = FBStorage()
 

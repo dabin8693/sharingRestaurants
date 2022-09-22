@@ -21,7 +21,7 @@ import com.project.sharingrestaurants.util.DataTrans.getTime
 import java.io.ByteArrayOutputStream
 import java.lang.StringBuilder
 
-class FBStorage {
+class FBStorage {//싱글톤으로 비즈니스 로직 다 뷰모델로
     private val storage = Firebase.storage("gs://restaurantapp-3152b.appspot.com")
     private val storageRef = storage.reference
     private var tempPath: StringBuilder ?= null
