@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.project.sharingrestaurants.viewmodel.OnAddViewModel" />
+    </data>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/edittitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"
+        android:text="@={viewModel.itemTitle}"
+        android:layout_margin="5dp"
+        android:inputType="text"
+        android:hint="제목" />
+
+    <TextView
+        android:id="@+id/showmap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:text="@={viewModel.itemLocate}"
+        android:padding="5dp"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:background="@{viewModel.mapDrawable}"
+        android:inputType="textMultiLine"
+        android:hint="주소 찾기" />
+    <EditText
+        android:id="@+id/editplace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="@={viewModel.itemPlace}"
+        android:layout_margin="5dp"
+        android:inputType="text"
+        android:hint="상세 주소" />
+    <RatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="43dp"
+        android:layout_gravity="center"
+        android:rating="@={viewModel.itemPriority}"
+        android:numStars="5"
+        android:stepSize="0.5" />
+
+</LinearLayout>
+</layout>

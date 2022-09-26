@@ -2,25 +2,30 @@ package com.project.sharingrestaurants.viewmodel
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.shapes.Shape
 import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.google.firebase.firestore.FieldValue
 import com.project.sharingrestaurants.MyApplication
+import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.ui.off.OffItemAddActivity
 import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import com.project.sharingrestaurants.util.ConstValue.FALSE
-import retrofit2.http.Body
 import java.lang.StringBuilder
 
 class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
@@ -30,6 +35,8 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
     val itemPriority: MutableLiveData<Float> = MutableLiveData()
     val itemLocate: MutableLiveData<String> = MutableLiveData()
     val itemPlace: MutableLiveData<String> = MutableLiveData()
+
+    val mapDrawable: MutableLiveData<Drawable> = MutableLiveData()
     val imageList: ArrayList<String> = ArrayList()
     val textList: ArrayList<String> = ArrayList()
 
@@ -46,6 +53,7 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
     init {
         textList.add("")
     }
+
     fun setItemImage(uri: String){
         itemImages.append(uri + DELIMITER)
     }

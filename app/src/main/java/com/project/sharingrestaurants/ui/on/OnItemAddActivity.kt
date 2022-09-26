@@ -2,6 +2,7 @@ package com.project.sharingrestaurants.ui.on
 
 import android.content.Intent
 import android.graphics.ImageDecoder
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -12,20 +13,24 @@ import android.widget.EditText
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.graphics.drawable.toDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnAdapter
 import com.project.sharingrestaurants.adapter.OnAddAdapter
 import com.project.sharingrestaurants.data.BitmapImageItem
+import com.project.sharingrestaurants.data.BoardHeadEntity
 import com.project.sharingrestaurants.databinding.ActivityMainBinding
 import com.project.sharingrestaurants.databinding.ActivityOffItemAddBinding
 import com.project.sharingrestaurants.databinding.ActivityOnItemAddBinding
+import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.ui.off.ShowMapActivity
 import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.viewmodel.MainViewModel
@@ -47,8 +52,14 @@ class OnItemAddActivity : AppCompatActivity() {
 
         initStart()
 
-        Adapter = OnAddAdapter{text, position ->//position은 중간중간 사진을 뺐다
+        Adapter = OnAddAdapter({text, position ->//position은 중간중간 사진을 뺐다
             viewModel.textList.set(position,text)//textlist사이즈는 사진추가될때마다 추가
+        }, {intent = Intent(this, ShowMapActivity::class.java)
+                mapCallBack.launch(intent)},viewModel, this).apply {
+            val list = ArrayList<Any>()
+            list.add(BoardHeadEntity("", "", "", 0f))
+            list.add("")
+            this.setItemList(list)
         }
         binding.recycle.apply {
             this.adapter = Adapter
@@ -56,6 +67,7 @@ class OnItemAddActivity : AppCompatActivity() {
                 LinearLayoutManager(this@OnItemAddActivity, RecyclerView.VERTICAL, false)
             this.setHasFixedSize(true)//사이즈 측정이 필요없다 판단돼면 내부적으로 measure안한다
         }
+
         binding.camera.setOnClickListener {//pictureUri, pictureName은 임시 변수
             intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             cameraWork.saveToMediaStore { pictureName, contentUri ->  viewModel.publicUri = contentUri; viewModel.publicName = pictureName}//공용저장소에 임시 파일 생성
@@ -78,10 +90,7 @@ class OnItemAddActivity : AppCompatActivity() {
             addItem()
         }
 
-        binding.showmap.setOnClickListener{
-            intent = Intent(this, ShowMapActivity::class.java)
-            mapCallBack.launch(intent)
-        }
+
     }
 
     private fun initStart(){
@@ -149,8 +158,11 @@ class OnItemAddActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()//콜백함수를 하나로 통일하면 누가 호출했는지 구분을 못 함
     ) {
         if (it.resultCode == RESULT_OK && it.data != null) {
-            binding.showmap.text = it.data!!.getStringExtra("address")
-            binding.showmap.background = null
+            //binding.showmap.text = it.data!!.getStringExtra("address")
+            //binding.showmap.background = null
+            viewModel.itemLocate.value = it.data!!.getStringExtra("address")
+            viewModel.mapDrawable.value = resources.getDrawable(R.drawable.empty,null)
+            //Adapter.mapSelected(BoardHeadEntity(viewModel.itemTitle.value!!, viewModel.itemPlace.value!!, it.data!!.getStringExtra("address")!!, viewModel.itemPriority.value!!))
             viewModel.itemLatitude = it.data!!.getDoubleExtra("latitude",0.0)
             viewModel.itemLongitude = it.data!!.getDoubleExtra("longitude",0.0)
             Log.d("위도2ㅇㅇㅎ",viewModel.itemLatitude.toString())
