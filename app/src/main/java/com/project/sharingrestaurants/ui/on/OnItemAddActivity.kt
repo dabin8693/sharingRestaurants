@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -52,13 +53,12 @@ class OnItemAddActivity : AppCompatActivity() {
 
         initStart()
 
-        Adapter = OnAddAdapter({text, position ->//position은 중간중간 사진을 뺐다
-            viewModel.textList.set(position,text)//textlist사이즈는 사진추가될때마다 추가
-        }, {intent = Intent(this, ShowMapActivity::class.java)
+        Adapter = OnAddAdapter({ position -> deleteDialog(position)}, {intent = Intent(this, ShowMapActivity::class.java)
                 mapCallBack.launch(intent)},viewModel, this).apply {
             val list = ArrayList<Any>()
-            list.add(BoardHeadEntity("", "", "", 0f))
-            list.add("")
+            list.add(BoardHeadEntity("", "", "", 0f))//head
+            list.add("")//edit
+            list.add("")//linear
             this.setItemList(list)
         }
         binding.recycle.apply {
@@ -108,6 +108,20 @@ class OnItemAddActivity : AppCompatActivity() {
             this.setMessage(resources.getText(R.string.completeDialog))
             this.setNegativeButton("NO") { _, _ -> }
             this.setPositiveButton("YES") { _, _ ->
+                for (any in Adapter.getItem()){
+                    if (Adapter.getItem().indexOf(any) == Adapter.getItem().lastIndex){//마지막 리니어레이아웃 제외
+                        break
+                    }
+                    if (Adapter.getItem().indexOf(any)%2 == 0){
+                        if (Adapter.getItem().indexOf(any) != 0){//image
+                            viewModel.imageList.add(any as String)
+                            Log.d("온이미지",(any as String))
+                        }
+                    }else{//text
+                        viewModel.textList.add(any as String)
+                        Log.d("온텍스트",(any as String))
+                    }
+                }
                 for (text in viewModel.textList){
                     viewModel.setItemBody(text)
                 }
@@ -132,12 +146,12 @@ class OnItemAddActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()//콜백함수를 하나로 통일하면 누가 호출했는지 구분을 못 함
     ) {
         if (it.resultCode == RESULT_OK && it.data != null) {
-            var intent: Intent = it.data!!
-            var uri: Uri? = intent.data
-            viewModel.imageList.add(uri.toString())//갤러리 uri
-            viewModel.textList.add("")//에디트텍스트 추가
-            Adapter.updateItem(uri.toString())//이미지뷰 추가
-            Adapter.updateItem("")//에디트텍스트 추가
+            val intent: Intent = it.data!!
+            val uri: Uri? = intent.data
+            //viewModel.imageList.add(uri.toString())//갤러리 uri//최대치만 확장하는거
+            //viewModel.textList.add("")//에디트텍스트 추가//최대치만 확장하는거
+            Adapter.addImage("")//에디트텍스트 추가
+            Adapter.addImage(uri.toString())//이미지뷰 추가
         }
     }
 
@@ -145,10 +159,10 @@ class OnItemAddActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == RESULT_OK) {
-            viewModel.imageList.add(viewModel.publicUri.toString())//공용저장소 uri
-            viewModel.textList.add("")//에디트텍스트 추가
-            Adapter.updateItem(viewModel.publicUri.toString())//이미지뷰 추가
-            Adapter.updateItem("")//에디트텍스트 추가
+            //viewModel.imageList.add(viewModel.publicUri.toString())//공용저장소 uri//최대치만 확장하는거
+            //viewModel.textList.add("")//에디트텍스트 추가//최대치만 확장하는거
+            Adapter.addImage("")//에디트텍스트 추가
+            Adapter.addImage(viewModel.publicUri.toString())//이미지뷰 추가
         }else{//안찍고 나오거나 실패시
             //미디어스토어 임시파일 삭제
         }
@@ -168,6 +182,18 @@ class OnItemAddActivity : AppCompatActivity() {
             Log.d("위도2ㅇㅇㅎ",viewModel.itemLatitude.toString())
             Log.d("경도2ㅇㅇㅎ",viewModel.itemLongitude.toString())
         }
+    }
+
+    private fun deleteDialog(position: Int) {
+        val builder = AlertDialog.Builder(this)
+        builder.apply {
+            this.setMessage("삭제하시겠습니까?")
+            this.setNegativeButton("NO") { _, _ -> }
+            this.setPositiveButton("YES") { _, _ ->
+                Adapter.deleteItem(position)
+            }
+        }
+        builder.show()
     }
 
 }
