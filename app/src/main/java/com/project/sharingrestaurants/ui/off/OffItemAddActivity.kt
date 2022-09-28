@@ -1,5 +1,6 @@
 package com.project.sharingrestaurants.ui.off
 
+import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -44,7 +45,6 @@ class OffItemAddActivity : AppCompatActivity() {
             OffAddViewModel::class.java
         )
     }
-    lateinit var cameraWork: CameraWork
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +84,7 @@ class OffItemAddActivity : AppCompatActivity() {
 
         binding.camera.setOnClickListener {//pictureUri, pictureName은 임시 변수
             intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            cameraWork.saveToMediaStore { pictureName, contentUri ->  viewModel.publicUri = contentUri; viewModel.publicName = pictureName}//공용저장소에 임시 파일 생성
+            CameraWork.saveToMediaStore(applicationContext) { pictureName, contentUri ->  viewModel.publicUri = contentUri; viewModel.publicName = pictureName}//공용저장소에 임시 파일 생성
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, viewModel.publicUri)//카메라엡이 publicUri를 통해 해당 위치에 사진 저장
             cameraCallBack.launch(intent)
@@ -111,7 +111,6 @@ class OffItemAddActivity : AppCompatActivity() {
         viewModel.nowEditText = binding.editbody
         viewModel.childCount = binding.addLinear.childCount - 1//마지막 리니어레이아웃1개 뺀다
         viewModel.nowEditPosition = 0
-        cameraWork = CameraWork(applicationContext)
     }
 
     private fun addItem() {//등록
@@ -124,7 +123,8 @@ class OffItemAddActivity : AppCompatActivity() {
                     var tempUri: String = ""
                     for (i in 0..(viewModel.getImageList().size - 1)) {//비트맵,string타입의 uri
                         if (viewModel.getImageList().get(i) is BitmapImageItem) {//비트맵일 경우 로컬에 저장후 uri가져오기
-                            tempUri = cameraWork.saveToprivate(//로컬에 비트맵저장하고 uri가져오기
+                            tempUri = CameraWork.saveToprivate(//로컬에 비트맵저장하고 uri가져오기
+                                applicationContext,
                                 (viewModel.getImageList().get(i) as BitmapImageItem).bitmap,
                                 (viewModel.getImageList().get(i) as BitmapImageItem).name
                             )
@@ -187,10 +187,10 @@ class OffItemAddActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val source = ImageDecoder.createSource(contentResolver, uri!!)
             ImageDecoder.decodeBitmap(source)?.let {
-                var bitmap = cameraWork.resizeBitmap(it)//0-0 1-2 2-4 3-6
+                var bitmap = CameraWork.resizeBitmap(it, 2)//0-0 1-2 2-4 3-6
                 //viewModel.imageBitmapOrStringList.add(getViewPosition()/2,bitmap)
                 if (code == "gallery") {//imageBitmapOrStringList변수는 이미지만 저장해서 getViewPosition보다 position이 2배 작다.
-                    viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, cameraWork.getTime() + ".jpg"))
+                    viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, CameraWork.getTime() + ".jpg"))
                     //viewModel.imageFileNameList.add(cameraWork.getTime() + ".jpg")
                 }else if (code == "camera"){
                     viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, viewModel.publicName))
@@ -200,10 +200,10 @@ class OffItemAddActivity : AppCompatActivity() {
             }
         } else {
             MediaStore.Images.Media.getBitmap(contentResolver, uri!!)?.let {
-                var bitmap = cameraWork.resizeBitmap(it)
+                var bitmap = CameraWork.resizeBitmap(it, 2)
                 //viewModel.imageBitmapOrStringList.add(getViewPosition()/2,bitmap)
                 if (code == "gallery") {
-                    viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, cameraWork.getTime() + ".jpg"))
+                    viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, CameraWork.getTime() + ".jpg"))
                 }else if (code == "camera"){
                     viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, viewModel.publicName))
                 }

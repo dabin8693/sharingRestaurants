@@ -13,9 +13,9 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CameraWork(val context: Context) {//애플리케이션 context
+object CameraWork {//애플리케이션 context
 
-    fun saveToprivate(bitmap: Bitmap, imageFileName: String): String {//글 작성 등록 버튼 눌렀을때
+    fun saveToprivate(context: Context, bitmap: Bitmap, imageFileName: String): String {//글 작성 등록 버튼 눌렀을때
         //var file = File(applicationContext.filesDir, imageFileName)//내장메모리 내 개인앱 저장소에 저장
         var file = context.getDir("Images", Context.MODE_PRIVATE)//images폴더없으면 생성
         file = File(file, imageFileName)//파일 오픈
@@ -32,16 +32,16 @@ class CameraWork(val context: Context) {//애플리케이션 context
         return file.absolutePath//room에 경로 저장
     }
 
-    fun resizeBitmap(bitmap: Bitmap): Bitmap {
+    fun resizeBitmap(bitmap: Bitmap, size: Int): Bitmap {
         var newBitmap = bitmap
         var height = bitmap.height
         var width = bitmap.width
-        newBitmap = Bitmap.createScaledBitmap(bitmap, width / 2, height / 2, true)//filter: 픽셀형태 조정
+        newBitmap = Bitmap.createScaledBitmap(bitmap, width / size, height / size, true)//filter: 픽셀형태 조정
         Log.d("리사이즈1", "ㅇㅇ")
         return newBitmap
     }
 
-    fun saveToMediaStore(CallBack: (String, Uri) -> Unit) {//MediaStore컨텐츠프로바이더 접근해서 공용저장소에 파일 저장하고 컨텐츠uri 가져오기
+    fun saveToMediaStore(context: Context, CallBack: (String, Uri) -> Unit) {//MediaStore컨텐츠프로바이더 접근해서 공용저장소에 파일 저장하고 컨텐츠uri 가져오기
         val pictureName: String
         val values = ContentValues().apply {
             //viewModel.imageFileNameList.add(imageFileName)

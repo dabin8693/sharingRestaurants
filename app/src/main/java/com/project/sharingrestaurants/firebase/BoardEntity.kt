@@ -16,6 +16,7 @@ data class BoardEntity(
     var priority: Float =0f,//별점
     var body: String ="",//내용(구분자 포함)
     var image: String ="",//파이어스토리지 uri(구분자 포함)
+    var thumb: String = "",
     var recommends: Int =0,//추천 수
     //var comments: Int,//댓글 수
     var latitude: Double =0.0,//위도

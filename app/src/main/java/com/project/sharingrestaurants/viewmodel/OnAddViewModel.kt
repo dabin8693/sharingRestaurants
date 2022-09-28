@@ -4,29 +4,42 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.shapes.Shape
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.ui.off.OffItemAddActivity
+import com.project.sharingrestaurants.util.CameraWork
+import com.project.sharingrestaurants.util.CameraWork.resizeBitmap
 import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import com.project.sharingrestaurants.util.ConstValue.FALSE
+import com.project.sharingrestaurants.util.DataTrans.getTime
+import kotlinx.coroutines.*
+import java.io.ByteArrayOutputStream
 import java.lang.StringBuilder
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
 
@@ -49,6 +62,10 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
     var itemLongitude: Double = 0.0
     private val itemBodys: StringBuilder = StringBuilder()//(구분자 포함된 본문내용)(db저장 형식)
     private val itemImages: StringBuilder = StringBuilder()//(구분자 포함된 앱내 이미지 절대주소)(db저장 형식)
+
+    private val uploadImagePath: StringBuilder = StringBuilder()
+    private var uploadThumImagePath: String = ""
+    val uploadSuccess: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
         textList.add("")
@@ -75,26 +92,127 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
                 }
             }
         }else{//있으면 파이어스토리지 -> 파이어스토어
-            storageSave(imageArr, contentResolver).observe(activity){ storageUri ->
-                if (storageUri.equals(FALSE)){//파이어스토리지 저장실패
-                    isSuccess.postValue(false)
-                }else{
-                    dbSave(storageUri).observe(activity){ bool ->
+            imageSavedPath(imageArr, repository.getAuth().currentUser!!.uid, contentResolver).observe(activity){ bool ->
+                if (bool){
+                    dbSave(uploadImagePath.toString()).observe(activity){ bool ->
                         if (bool == true){
                             isSuccess.value = true
                         }else{
                             isSuccess.value = false
                         }
                     }
+                }else{
+                    isSuccess.postValue(false)
                 }
             }
         }
         return isSuccess
     }
 
-    private fun storageSave(imageArr: List<String>, contentResolver: ContentResolver): LiveData<String>{
-        return repository.addFBImage(imageArr, contentResolver)
+    private fun imageSavedPath(imageArr: List<String>, uid: String, contentResolver: ContentResolver): LiveData<Boolean>{
+        val liveData: MutableLiveData<Boolean> = MutableLiveData()
+        val time: String = getTime()
+        val listSize: Int = imageArr.size
+        val successList: ArrayList<Boolean> = ArrayList()
+
+        for (image in imageArr){
+            if (imageArr.indexOf(image) == 0){
+                val imageName = "0" + imageArr.indexOf(image)
+                val pathAbs = repository.getFBStorageRef().child(uid).child(time).child(imageName)
+                uploadImagePath.append(pathAbs.path + DELIMITER)
+                var data = bitmapUpload(image.toUri(), contentResolver)
+                Log.d("세이브 코루틴 안안",imageName)
+                addImageFBStorage(uid, time, imageName, data, liveData, listSize, successList)
+                Log.d("세이브 코루틴 밖밖",imageName)
+                val thumbName = "thumbnail"
+                val thumbPathAbs = repository.getFBStorageRef().child(uid).child(time).child(thumbName)
+                uploadThumImagePath = thumbPathAbs.path
+                data = thumBitmapUpload(image.toUri(), contentResolver)
+                Log.d("세이브 코루틴 안안",imageName)
+                addImageFBStorage(uid, time, thumbName, data, liveData, listSize, successList)
+                Log.d("세이브 코루틴 밖밖",imageName)
+            }else if(imageArr.indexOf(image) < 10){
+                val imageName = "0" + imageArr.indexOf(image)
+                val pathAbs = repository.getFBStorageRef().child(uid).child(time).child(imageName)
+                uploadImagePath.append(pathAbs.path + DELIMITER)
+                val data = bitmapUpload(image.toUri(), contentResolver)
+                Log.d("세이브 코루틴 안안",imageName)
+                addImageFBStorage(uid, time, imageName, data, liveData, listSize, successList)
+                Log.d("세이브 코루틴 밖밖",imageName)
+            }else if(imageArr.indexOf(image) < 100){
+                val imageName = imageArr.indexOf(image).toString()
+                val pathAbs = repository.getFBStorageRef().child(uid).child(time).child(imageName)
+                uploadImagePath.append(pathAbs.path + DELIMITER)
+                val data = bitmapUpload(image.toUri(), contentResolver)
+                Log.d("세이브 코루틴 안안",imageName)
+                addImageFBStorage(uid, time, imageName, data, liveData, listSize, successList)
+                Log.d("세이브 코루틴 밖밖",imageName)
+            }
+
+        }
+        return liveData
     }
+
+    private fun bitmapUpload(uri: Uri, contentResolver: ContentResolver): ByteArray{
+        val bitmap: Bitmap
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val source = ImageDecoder.createSource(contentResolver, uri!!)
+            bitmap = ImageDecoder.decodeBitmap(source)
+        }else{
+            bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri!!)
+        }
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        return baos.toByteArray()
+    }
+
+    private fun thumBitmapUpload(uri: Uri, contentResolver: ContentResolver): ByteArray{
+        var bitmap: Bitmap
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val source = ImageDecoder.createSource(contentResolver, uri!!)
+            bitmap = ImageDecoder.decodeBitmap(source)
+        }else{
+            bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri!!)
+        }
+        bitmap = resizeBitmap(bitmap, 4)
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        return baos.toByteArray()
+    }
+
+    private fun addImageFBStorage(uid: String, time: String, name: String, data: ByteArray, liveData: MutableLiveData<Boolean>, listSize: Int, successList: ArrayList<Boolean>){
+        CoroutineScope(Dispatchers.IO).launch {
+            val value = repository.addImageFBStorage(uid, time, name, data)
+            Log.d("세이브 코루틴 안",name)
+            syncSave(value, liveData, listSize, successList)
+        }
+        Log.d("세이브 코루틴 밖",name)
+    }
+
+    @Synchronized private fun syncSave(path: String, liveData: MutableLiveData<Boolean>, listSize: Int, successList: ArrayList<Boolean>){
+        Log.d("세이브 싱크",path)
+        if (path == "FALSE"){
+            uploadSuccess.postValue(false)
+            successList.add(false)
+        }else{
+            uploadSuccess.postValue(true)
+            successList.add(true)
+        }
+        if (successList.size == listSize){//모든 사진처리가 끝났을때(실패나 성공)
+            var count: Int = 0
+            for (bool in successList){
+                if (bool == false){
+                    count++
+                }
+            }
+            if (count == 0){//실패가 한나도 없으면
+                liveData.postValue(true)
+            }else {
+                liveData.postValue(false)
+            }
+        }
+    }
+
     private fun dbSave(imageUri: String): LiveData<Boolean>{
         return repository.addFBBoard(
             hashMapOf(
@@ -107,6 +225,7 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
                 "priority" to (itemPriority.value ?: 0F),
                 "body" to itemBodys.toString(),
                 "image" to imageUri,
+                "thumb" to uploadThumImagePath,
                 "recommends" to recommends,
                 "latitude" to itemLatitude,
                 "longitude" to itemLongitude

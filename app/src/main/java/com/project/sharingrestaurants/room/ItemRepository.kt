@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.Auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.firebase.*
 import kotlinx.coroutines.CoroutineScope
@@ -110,8 +111,10 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     //firestore database
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //firestore storage
-    fun addFBImage(imageArr: List<String>, contentResolver: ContentResolver): LiveData<String>{//구분자 포함 이미지 리스트
-        return fbStorage.addImageSaved(imageArr, Auth.currentUser!!.uid, contentResolver)
+    fun getFBStorageRef(): StorageReference = fbStorage.getFBStorageRef()
+
+    suspend fun addImageFBStorage(uid: String, time: String, name: String, data: ByteArray): String{
+        return fbStorage.addImage(uid, time, name, data)
     }
     //firestore storage
     //////////////////////////////////////////////////////////////////////////////////////////////////////

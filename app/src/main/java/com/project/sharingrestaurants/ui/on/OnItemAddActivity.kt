@@ -1,5 +1,6 @@
 package com.project.sharingrestaurants.ui.on
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
@@ -11,6 +12,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -37,6 +39,9 @@ import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.viewmodel.MainViewModel
 import com.project.sharingrestaurants.viewmodel.OnAddViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class OnItemAddActivity : AppCompatActivity() {
     lateinit var binding: ActivityOnItemAddBinding
@@ -46,7 +51,6 @@ class OnItemAddActivity : AppCompatActivity() {
             OnAddViewModel::class.java
         )
     }
-    lateinit var cameraWork: CameraWork
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +74,7 @@ class OnItemAddActivity : AppCompatActivity() {
 
         binding.camera.setOnClickListener {//pictureUri, pictureName은 임시 변수
             intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            cameraWork.saveToMediaStore { pictureName, contentUri ->  viewModel.publicUri = contentUri; viewModel.publicName = pictureName}//공용저장소에 임시 파일 생성
+            CameraWork.saveToMediaStore(applicationContext) { pictureName, contentUri ->  viewModel.publicUri = contentUri; viewModel.publicName = pictureName}//공용저장소에 임시 파일 생성
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, viewModel.publicUri)//카메라엡이 publicUri를 통해 해당 위치에 사진 저장
             cameraCallBack.launch(intent)
@@ -98,7 +102,6 @@ class OnItemAddActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_on_item_add)//binding.viewModel에 viewmodel 담기전에 먼저 초기화
         binding.viewModel = viewModel //xml에서 main뷰모델 데이터에 접근 가능하게
         binding.lifecycleOwner = this //이거 안쓰면 데이터바인딩 쓸때 xml이 데이터 관측 못 함
-        cameraWork = CameraWork(applicationContext)
 
     }
 
@@ -128,7 +131,7 @@ class OnItemAddActivity : AppCompatActivity() {
                 for (image in viewModel.imageList){
                     viewModel.setItemImage(image)
                 }
-
+                progressStart(viewModel.uploadSuccess)
                 viewModel.addItem(this@OnItemAddActivity, contentResolver).observe(this@OnItemAddActivity){
                     if (true){
                         finish()
@@ -140,6 +143,13 @@ class OnItemAddActivity : AppCompatActivity() {
             }
         }
         builder.show()
+    }
+
+    private fun progressStart(uploadSuccess: LiveData<Boolean>){
+        //다이얼로그 생성 -> 다이얼로그 안에서 프로그레스바 진행(io스레드에서)
+        uploadSuccess.observe(this){//다이얼로그 중복 호출로 인한 옵저버 중복 생성 방지로 다이얼로그 외부에서 옵저버 생성
+            //여기서 다이얼로그안의 프로그레스바 진행 상태 변경
+        }
     }
 
     private val galleryCallBack: ActivityResultLauncher<Intent> = registerForActivityResult(//갤러리 앱
