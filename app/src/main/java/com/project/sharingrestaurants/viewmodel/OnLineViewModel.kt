@@ -4,6 +4,7 @@ import android.app.Activity
 import android.net.Uri
 import androidx.lifecycle.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.FBAuth
@@ -47,4 +48,7 @@ class OnLineViewModel(private val repository: ItemRepository, private val login:
         }
     }
 
+    fun getStorageRef(): StorageReference{
+        return repository.getFBStorageRef()
+    }
 }

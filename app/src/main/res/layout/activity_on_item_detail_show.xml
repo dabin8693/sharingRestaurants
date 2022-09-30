@@ -32,7 +32,7 @@
                 android:src="@drawable/arrow_small_left_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"></ImageView>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/write"
@@ -68,14 +68,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="경기도 수원시"
-                android:textSize="20dp"></TextView>
+                android:textSize="20dp" />
 
             <TextView
                 android:id="@+id/place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="치킨집"
-                android:textSize="20dp"></TextView>
+                android:textSize="20dp" />
 
             <RatingBar
                 android:id="@+id/rating"
@@ -107,7 +107,7 @@
                     android:id="@+id/profilenickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:text="닉네임"
                     android:textSize="14dp"
                     app:layout_constraintBottom_toTopOf="@+id/linear1"
@@ -120,7 +120,7 @@
                     android:id="@+id/linear1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/profileimage"
@@ -139,7 +139,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:text="조회수"
                         android:textSize="12dp"
                         app:layout_constraintStart_toEndOf="@+id/texttime">
@@ -149,7 +149,7 @@
                         android:id="@+id/see"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:textSize="12dp"
                         android:text="315">
 
@@ -162,7 +162,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="내용1"
-                android:textSize="20dp"></TextView>
+                android:textSize="20dp" />
 
             <ImageView
                 android:id="@+id/image"
@@ -177,7 +177,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textSize="20dp"></TextView>
+                android:textSize="20dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -215,11 +215,12 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12dp"
-                    android:text="댓글"></TextView>
+                    android:text="댓글" />
                 <TextView
                     android:id="@+id/recomments"
                     android:layout_width="wrap_content"

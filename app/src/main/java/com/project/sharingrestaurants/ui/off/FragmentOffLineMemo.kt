@@ -75,7 +75,7 @@ class FragmentOffLineMemo : Fragment() {
             view,
             savedInstanceState
         )//옵저버 lifecycle 무조건 viewLifecycleOwner사용!!!(중복 구독 방지)
-
+        Log.d("프래그 ㅁㅁ","ㄴㅇㄹ")
         inputMethodManager =
             requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager //키보드 매니저
         //inputMethodManager.hideSoftInputFromWindow(binding.searchView.windowToken, 0)

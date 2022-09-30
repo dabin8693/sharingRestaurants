@@ -73,6 +73,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        Log.d("리스타트 ㅁㅁ","ㄴㅇㄹ")
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 

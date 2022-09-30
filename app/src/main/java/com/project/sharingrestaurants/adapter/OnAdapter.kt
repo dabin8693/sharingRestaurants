@@ -12,16 +12,18 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.databinding.OnItemBinding
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.room.ItemEntity
+import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import com.project.sharingrestaurants.util.DataTrans
 import com.project.sharingrestaurants.viewmodel.OffLineViewModel
 import com.project.sharingrestaurants.viewmodel.OnLineViewModel
 
 
-class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Double, var currentLongitude: Double) :  RecyclerView.Adapter<OnAdapter.ViewHolder>(){
+class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Double, var currentLongitude: Double, val storageRef: StorageReference) :  RecyclerView.Adapter<OnAdapter.ViewHolder>(){
     private var items: List<BoardEntity> = listOf()
     private val viewHolderList: ArrayList<OnAdapter.ViewHolder> = ArrayList()
     private lateinit var context: Context
@@ -60,25 +62,24 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
         fun bind(item: BoardEntity) {//뷰홀더에 데이터 바인딩
             // 아이템 상세 정보로 이동
             Log.d("바인드 뷰홀더22","ㅇㅇ")
-            //binding.distance.setText("6.2km")
             binding.title.setText(item.tilte)
             binding.number.setText(item.recommends.toString())
             binding.place.setText(item.place)
             binding.ratingBar.rating = item.priority
-            //binding.title.setText("수원역 죠스떡볶이 맛집추천")
-            //binding.place.setText("6번출구 앞 죠스떡볶이")
-            //binding.number.setText("2")
-            //binding.ratingBar.rating = 5F
-            Glide.with(itemView)
-                .load(item.image)//첫번째 사진만 보여준다
-                .override(180,180)
-                .into(binding.picture)
-                .onLoadFailed(
-                    ResourcesCompat.getDrawable(
-                    context.resources,
-                    R.mipmap.ic_launcher,
-                    null)
-                )
+            Log.d("뷰홀더 썸네일ㅁㅁ",item.thumb.substring(1))
+                Log.d("ㅁㅁ","성공")
+                Glide.with(itemView)
+                    .load(storageRef.child(item.thumb.substring(1)))//첫번째 사진만 보여준다
+                    .override(180,180)
+                    .into(binding.picture)
+                    .onLoadFailed(
+                        ResourcesCompat.getDrawable(
+                            context.resources,
+                            R.mipmap.ic_launcher,
+                            null)
+                    )
+
+
             itemView.setOnClickListener {
                 itemClick(item)
             }

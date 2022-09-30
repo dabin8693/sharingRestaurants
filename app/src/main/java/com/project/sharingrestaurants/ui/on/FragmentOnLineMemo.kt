@@ -61,12 +61,12 @@ class FragmentOnLineMemo : Fragment() {
     ) {//뷰 초기화, livedata옵저버, recyclerview, viewpager2, adapter초기화
         super.onViewCreated(view, savedInstanceState)
         Log.d("onfragment", "onViewCreated")
-
+        Log.d("프래그 ㅁㅁ","ㄴㅇㄹ")
         onAdapter = OnAdapter ({
             val intent = Intent(requireActivity(), OnItemDetailShowActivity::class.java)//onClick
             intent.putExtra("BoardEntity", item)
             startActivity(intent)
-        }, viewModel.currentLatitude.value!!, viewModel.currentLongitude.value!!)
+        }, viewModel.currentLatitude.value!!, viewModel.currentLongitude.value!!, viewModel.getStorageRef())
         binding.recyclerViewOn.apply {
             this.adapter = onAdapter
             this.layoutManager =
