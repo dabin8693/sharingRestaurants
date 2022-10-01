@@ -62,7 +62,7 @@ class OffAdapter(val itemClick: (ItemEntity, Int) -> Unit, val itemLongClick: (I
             binding.itemRatingBar.rating = item.priority
             binding.itemDistance.text = DataTrans.calDist(item.latitude,item.longitude,
                 currentLatitude, currentLongitude
-            ).toString()+"km"
+            )
 
             when (item.imageURL) {
                 "null" -> {
@@ -94,7 +94,7 @@ class OffAdapter(val itemClick: (ItemEntity, Int) -> Unit, val itemLongClick: (I
         fun changeDistance(){
             binding.itemDistance.text = DataTrans.calDist(item.latitude,item.longitude,
                 currentLatitude, currentLongitude
-            ).toString()+"km"
+            )
         }
     }
 }

@@ -80,7 +80,7 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //firestore database
 
-    fun addFBBoard(boardMap: Map<String, Any>): LiveData<Boolean>{
+    fun addFBBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
         return fbDatabase.addBoard(boardMap)
     }
 

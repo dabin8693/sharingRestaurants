@@ -12,6 +12,10 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.signature.ObjectKey
 import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.databinding.OnItemBinding
@@ -27,6 +31,7 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
     private var items: List<BoardEntity> = listOf()
     private val viewHolderList: ArrayList<OnAdapter.ViewHolder> = ArrayList()
     private lateinit var context: Context
+    //val glide: RequestManager
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {//뷰홀더 생성
@@ -66,19 +71,26 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
             binding.number.setText(item.recommends.toString())
             binding.place.setText(item.place)
             binding.ratingBar.rating = item.priority
-            Log.d("뷰홀더 썸네일ㅁㅁ",item.thumb.substring(1))
-                Log.d("ㅁㅁ","성공")
+            if(item.thumb != "") {//null체크는 필요없음
+                Log.d("뷰홀더 썸네일ㅁㅁ", item.thumb.substring(1))
+                Log.d("ㅁㅁ", "성공")
                 Glide.with(itemView)
+                    //캐시 쓸때 참조카운터로 캐시를 유지해서 캐시 허용옵션으로 적용하면 프래그먼트 재로딩시 이미지 호출 안됨(캐시가 비워져서)
+                    //application context를 써도 캐싱 실패함
+                //glide
                     .load(storageRef.child(item.thumb.substring(1)))//첫번째 사진만 보여준다
-                    .override(180,180)
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .override(180, 180)
                     .into(binding.picture)
                     .onLoadFailed(
                         ResourcesCompat.getDrawable(
                             context.resources,
                             R.mipmap.ic_launcher,
-                            null)
+                            null
+                        )
                     )
-
+            }
 
             itemView.setOnClickListener {
                 itemClick(item)
@@ -91,7 +103,7 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
         fun changeDistance(){
             binding.distance.text = DataTrans.calDist(item.latitude,item.longitude,
                 currentLatitude, currentLongitude
-            ).toString()+"km"
+            )
         }
     }
 

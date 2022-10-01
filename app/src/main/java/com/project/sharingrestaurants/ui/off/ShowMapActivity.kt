@@ -40,6 +40,8 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap
     private lateinit var marker: Marker
     private lateinit var currentLocation: Location
+    private var lastLatitude: Double = 0.0
+    private var lastLongitude: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,12 +66,12 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
         requestPermissions()
 
         binding.btnConfirm.setOnClickListener{
-            Log.d("위도1ㅇㅇㅎ",currentLocation.latitude.toString())
-            Log.d("경도1ㅇㅇㅎ",currentLocation.longitude.toString())
+            Log.d("위도1ㅇㅇㅎ",lastLongitude.toString())
+            Log.d("경도1ㅇㅇㅎ",lastLatitude.toString())
             val intent = Intent(this, OffItemAddActivity::class.java)
             intent.putExtra("address", binding.tvLocation.text.toString())
-            intent.putExtra("longitude",currentLocation.longitude)
-            intent.putExtra("latitude",currentLocation.latitude)
+            intent.putExtra("longitude", lastLongitude)
+            intent.putExtra("latitude", lastLatitude)
             setResult(RESULT_OK, intent)
             finish()
         }
@@ -148,6 +150,8 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
                 setTextColor(Color.parseColor("#2d2d2d"))
             }
+            lastLatitude = naverMap.cameraPosition.target.latitude
+            lastLongitude = naverMap.cameraPosition.target.longitude
             binding.btnConfirm.run {
                 setBackgroundResource(R.drawable.rectangleshape)
                 setTextColor(Color.parseColor("#FF000000"))

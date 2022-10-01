@@ -14,8 +14,8 @@ data class BoardEntity(
     var place: String ="",//세부주소(사용자 입력)
     var locate: String ="",//지도에서 선택한 주소
     var priority: Float =0f,//별점
-    var body: String ="",//내용(구분자 포함)
-    var image: String ="",//파이어스토리지 uri(구분자 포함)
+    var body: List<String> = listOf(),//내용(구분자 포함)
+    var image: List<String> = listOf(),//파이어스토리지 uri(구분자 포함)
     var thumb: String = "",
     var recommends: Int =0,//추천 수
     //var comments: Int,//댓글 수

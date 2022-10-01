@@ -125,13 +125,16 @@ class OnItemAddActivity : AppCompatActivity() {
                         Log.d("온텍스트",(any as String))
                     }
                 }
+                /*
                 for (text in viewModel.textList){
                     viewModel.setItemBody(text)
                 }
                 for (image in viewModel.imageList){
                     viewModel.setItemImage(image)
                 }
-                progressStart(viewModel.uploadSuccess)
+
+                 */
+                //progressStart(viewModel.uploadSuccess)
                 viewModel.addItem(this@OnItemAddActivity, contentResolver).observe(this@OnItemAddActivity){
                     if (true){
                         finish()

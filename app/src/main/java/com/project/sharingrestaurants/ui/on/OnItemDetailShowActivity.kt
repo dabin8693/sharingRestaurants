@@ -38,7 +38,7 @@ class OnItemDetailShowActivity : AppCompatActivity() {
             .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
             .override(100,100)
             .into(binding.profileimage)
-        binding.image.setImageURI(item.image.toUri())
+        //binding.image.setImageURI(item.image.toUri())
         binding.profilenickname.setText("미식가")
         binding.body.setText("굳굳")
         binding.recommend.setText("2")

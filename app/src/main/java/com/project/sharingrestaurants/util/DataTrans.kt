@@ -13,9 +13,12 @@ import com.google.android.gms.location.LocationServices
 import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.util.ConstValue.DELIMITER
+import java.lang.Math.asin
+import java.lang.Math.sqrt
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.pow
 
 object DataTrans {
 
@@ -54,23 +57,23 @@ object DataTrans {
         }
         fusedLocationProviderClient.lastLocation
             .addOnSuccessListener { location ->
+                Log.d("현재위치ㅇㅇㅎ","latitude"+location.latitude+"longitude"+location.longitude)
                 liveData.postValue(gps(location.latitude, location.longitude))
             }
         return liveData
     }
 
-    fun calDist(lat1:Double, lon1:Double, lat2:Double, lon2:Double) : Long{
-        val EARTH_R = 6371000.0
-        val rad = Math.PI / 180
-        val radLat1 = rad * lat1
-        val radLat2 = rad * lat2
-        val radDist = rad * (lon1 - lon2)
-
-        var distance = Math.sin(radLat1) * Math.sin(radLat2)
-        distance = distance + Math.cos(radLat1) * Math.cos(radLat2) * Math.cos(radDist)
-        val ret = EARTH_R * Math.acos(distance)
-        Log.d("거리",Math.round(ret).toString())
-        return Math.round(ret)/1000 // 킬로미터로 변환
+    fun calDist(lat1:Double, lon1:Double, lat2:Double, lon2:Double) : String{
+        val R = 6372.8 * 1000
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2).pow(2.0) + Math.sin(dLon / 2).pow(2.0) * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+        val c = 2 * asin(sqrt(a))
+        val meter = (R * c).toInt()
+        val first = meter/1000
+        val second = meter%1000
+        val kilometer = first.toString() + "." + second.toString() + "km"
+        return kilometer
     }
 
     data class gps(

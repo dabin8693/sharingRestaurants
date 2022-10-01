@@ -60,10 +60,12 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
     //위 변수들 데이터바인딩
     var itemLatitude: Double = 0.0
     var itemLongitude: Double = 0.0
-    private val itemBodys: StringBuilder = StringBuilder()//(구분자 포함된 본문내용)(db저장 형식)
+    //private val itemBodys: StringBuilder = StringBuilder()//(구분자 포함된 본문내용)(db저장 형식)
+    //private val itemBodys: ArrayList<String> = ArrayList()
     private val itemImages: StringBuilder = StringBuilder()//(구분자 포함된 앱내 이미지 절대주소)(db저장 형식)
 
-    private val uploadImagePath: StringBuilder = StringBuilder()
+    //private val uploadImagePath: StringBuilder = StringBuilder()
+    private val uploadImagePath: ArrayList<String> = ArrayList()
     private var uploadThumImagePath: String = ""
     val uploadSuccess: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -72,29 +74,30 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
     }
 
     fun setItemImage(uri: String){
-        itemImages.append(uri + DELIMITER)
+        //itemImages.append(uri + DELIMITER)
     }
 
     fun setItemBody(text: String){
-        itemBodys.append(text + DELIMITER)
+        //itemBodys.append(text + DELIMITER)
+        //itemBodys.add(text)
     }
 
     fun addItem(activity: FragmentActivity, contentResolver: ContentResolver):LiveData<Boolean> {
         val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
-        val imageArr = itemImages.split(DELIMITER) as MutableList//size가 1이면 [0] = ""이다
-        if (imageArr.size > 1) {//사이즈가 1개 이하일때 제거하면 에러 남
-            imageArr.removeAt(imageArr.lastIndex)
+        //val imageArr = itemImages.split(DELIMITER) as MutableList//size가 1이면 [0] = ""이다
+        if (imageList.size > 1) {//사이즈가 1개 이하일때 제거하면 에러 남
+            imageList.removeAt(imageList.lastIndex)
         }
-        if (imageArr[0] == ""){//이미지 없을때
-            dbSave(imageArr[0]).observe(activity){ bool ->
+        if (imageList[0] == ""){//이미지 없을때
+            dbSave(imageList).observe(activity){ bool ->
                 if (bool == true){
                     isSuccess.value = true
                 }
             }
         }else{//있으면 파이어스토리지 -> 파이어스토어
-            imageSavedPath(imageArr, repository.getAuth().currentUser!!.uid, contentResolver).observe(activity){ bool ->
+            imageSavedPath(imageList, repository.getAuth().currentUser!!.uid, contentResolver).observe(activity){ bool ->
                 if (bool){
-                    dbSave(uploadImagePath.toString()).observe(activity){ bool ->
+                    dbSave(uploadImagePath).observe(activity){ bool ->
                         if (bool == true){
                             isSuccess.value = true
                         }else{
@@ -119,13 +122,15 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
             if (imageArr.indexOf(image) == 0){
                 val imageName = "0" + imageArr.indexOf(image)
                 val pathAbs = repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                uploadImagePath.append(pathAbs.path + DELIMITER)
+                //uploadImagePath.append(pathAbs.path + DELIMITER)
+                uploadImagePath.add(pathAbs.path)
                 var data = bitmapUpload(image.toUri(), contentResolver)
                 Log.d("세이브 코루틴 안안",imageName)
                 addImageFBStorage(uid, time, imageName, data, liveData, listSize, successList)
                 Log.d("세이브 코루틴 밖밖",imageName)
                 val thumbName = "thumbnail"
                 val thumbPathAbs = repository.getFBStorageRef().child(uid).child(time).child(thumbName)
+                //uploadThumImagePath = thumbPathAbs.path
                 uploadThumImagePath = thumbPathAbs.path
                 data = thumBitmapUpload(image.toUri(), contentResolver)
                 Log.d("세이브 코루틴 안안",imageName)
@@ -134,7 +139,8 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
             }else if(imageArr.indexOf(image) < 10){
                 val imageName = "0" + imageArr.indexOf(image)
                 val pathAbs = repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                uploadImagePath.append(pathAbs.path + DELIMITER)
+                //uploadImagePath.append(pathAbs.path + DELIMITER)
+                uploadImagePath.add(pathAbs.path)
                 val data = bitmapUpload(image.toUri(), contentResolver)
                 Log.d("세이브 코루틴 안안",imageName)
                 addImageFBStorage(uid, time, imageName, data, liveData, listSize, successList)
@@ -142,7 +148,8 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
             }else if(imageArr.indexOf(image) < 100){
                 val imageName = imageArr.indexOf(image).toString()
                 val pathAbs = repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                uploadImagePath.append(pathAbs.path + DELIMITER)
+                //uploadImagePath.append(pathAbs.path + DELIMITER)
+                uploadImagePath.add(pathAbs.path)
                 val data = bitmapUpload(image.toUri(), contentResolver)
                 Log.d("세이브 코루틴 안안",imageName)
                 addImageFBStorage(uid, time, imageName, data, liveData, listSize, successList)
@@ -213,17 +220,17 @@ class OnAddViewModel(private val repository: ItemRepository): ViewModel() {
         }
     }
 
-    private fun dbSave(imageUri: String): LiveData<Boolean>{
+    private fun dbSave(imageUri: ArrayList<String>): LiveData<Boolean>{
         return repository.addFBBoard(
             hashMapOf(
-                "documentId" to "",
+                "documentId" to "",//데이터베이스 호출부분에서 추가
                 "timestamp" to FieldValue.serverTimestamp(),
                 "userID" to repository.getAuth().currentUser!!.uid,
                 "tilte" to (itemTitle.value ?: ""),
                 "place" to (itemPlace.value ?: ""),
                 "locate" to (itemLocate.value ?: ""),
                 "priority" to (itemPriority.value ?: 0F),
-                "body" to itemBodys.toString(),
+                "body" to textList,
                 "image" to imageUri,
                 "thumb" to uploadThumImagePath,
                 "recommends" to recommends,

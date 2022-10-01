@@ -1,7 +1,9 @@
 package com.project.sharingrestaurants.firebase
 
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.Task
@@ -35,12 +37,15 @@ class FBDatabase {
     //boardEntity.timestamp = FieldValue.serverTimestamp()
     //boardEntity.documentId = FieldPath.documentId()
     //fbDatabase.collection("").get().addOnSuccessListener { documents -> for (document in documents){ document.id; document.data; document.toObject<BoardEntity>() }; documents.toObjects<BoardEntity>() }
-    fun addBoard(boardMap: Map<String, Any>): LiveData<Boolean>{
+    fun addBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
-        fbDatabase.collection("board").add(boardMap)
+        val documentRef: DocumentReference = fbDatabase.collection("board").document()
+        boardMap.replace("documentId", documentRef.id)//api24이상
+            documentRef.set(boardMap)
             .addOnSuccessListener { liveData.postValue(true) }
             .addOnFailureListener { liveData.postValue(false) }
         //val a: DocumentReference
+
         return liveData
     }
 
@@ -63,8 +68,10 @@ class FBDatabase {
     fun getBoard(): LiveData<List<BoardEntity>> {
         Log.d("리스트 호출", "ㄴㅇㄹㄴㅇㄹ")
         val liveData: MutableLiveData<List<BoardEntity>> = MutableLiveData()
-        val list: ArrayList<BoardEntity> = ArrayList()
+
+        //var list: ArrayList<BoardEntity> = ArrayList()
         fbDatabase.collection("board").get().addOnSuccessListener { documents ->
+            /*
             for (document in documents) {
                 val boardEntity: BoardEntity = document.toObject<BoardEntity>()
                 boardEntity.documentId = document.id//id에 쓰레기값들어가 있어서 진짜 documentId로 저장
@@ -73,7 +80,8 @@ class FBDatabase {
                 Log.d("도큐먼트id list는", document.toObject<BoardEntity>().documentId)
             }
             liveData.value = list
-            //liveData.value = documents.toObjects<BoardEntity>() //비동기 처리후 옵저버 호출
+         */
+            liveData.value = documents.toObjects<BoardEntity>() as ArrayList<BoardEntity>
         }
 
         return liveData

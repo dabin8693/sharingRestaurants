@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.signature.ObjectKey
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
@@ -40,6 +41,7 @@ import com.project.sharingrestaurants.viewmodel.OffAddViewModel
 import com.project.sharingrestaurants.viewmodel.OffLineViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 import kotlinx.coroutines.*
+import java.security.Signature
 
 
 class FragmentOffLineMemo : Fragment() {
@@ -261,6 +263,9 @@ class FragmentOffLineMemo : Fragment() {
                         loginDialog.dismiss()
                         Glide.with(this)
                             .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                            .skipMemoryCache(true)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .signature(ObjectKey("sign"))
                             .into(binding.imageView)
                             .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
 

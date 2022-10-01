@@ -152,6 +152,8 @@ class FragmentOnLineMemo : Fragment() {
                     loginDialog.dismiss()
                     Glide.with(this)
                         .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .into(binding.imageView)
                         .onLoadFailed(
                             ResourcesCompat.getDrawable(

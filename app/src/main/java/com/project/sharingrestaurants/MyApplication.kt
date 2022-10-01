@@ -2,6 +2,7 @@ package com.project.sharingrestaurants
 
 import android.app.Application
 import android.content.SharedPreferences
+import com.bumptech.glide.Glide
 import com.project.sharingrestaurants.room.ItemRepository
 
 
@@ -26,5 +27,13 @@ class MyApplication : Application() {
         REPOSITORY = getRepository()
     }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        Glide.get(this).clearMemory()
+    }
 
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        Glide.get(this).trimMemory(level)
+    }
 }
