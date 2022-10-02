@@ -36,7 +36,7 @@ class FBDatabase {
         }
     }
 
-    fun addBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
+    fun addBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean> {
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
         val documentRef: DocumentReference = fbDatabase.collection("board").document()
         boardMap.replace("documentId", documentRef.id)//api24이상
@@ -59,63 +59,78 @@ class FBDatabase {
     }
 
     fun addComment(commentMap: MutableMap<String, Any>, boardId: String) {//해당글에 댓글
-        val documentRef: DocumentReference = fbDatabase.collection("board").document(boardId).collection("comment").document()
+        val documentRef: DocumentReference =
+            fbDatabase.collection("board").document(boardId).collection("comment").document()
         commentMap.replace("documentId", documentRef.id)
         documentRef.set(commentMap)
     }
 
     fun addReply(replyMap: MutableMap<String, Any>, boardId: String) {//해당글에 댓글
-        val documentRef: DocumentReference = fbDatabase.collection("board").document(boardId).collection("reply").document()
+        val documentRef: DocumentReference =
+            fbDatabase.collection("board").document(boardId).collection("reply").document()
         replyMap.replace("documentId", documentRef.id)
         documentRef.set(replyMap)
     }
 
-    fun insertBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
+    fun insertBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean> {
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
-        fbDatabase.collection("board").document(boardMap.get("documentId").toString()).update(boardMap)
+        fbDatabase.collection("board").document(boardMap.get("documentId").toString())
+            .update(boardMap)
             .addOnSuccessListener { liveData.postValue(true) }
             .addOnFailureListener { liveData.postValue(false) }
         return liveData
     }
 
-    fun insertNicknameAuth(uid: String, nickname: String): LiveData<Boolean>{
+    fun insertNicknameAuth(uid: String, nickname: String): LiveData<Boolean> {
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
         fbDatabase.collection("auth").document(uid).update("nickname", nickname)
             .addOnSuccessListener { liveData.postValue(true) }
             .addOnFailureListener { liveData.postValue(false) }
         return liveData
     }
+
     fun getBoard(): LiveData<List<BoardEntity>> {
         Log.d("리스트 호출", "ㄴㅇㄹㄴㅇㄹ")
         val liveData: MutableLiveData<List<BoardEntity>> = MutableLiveData()
-
-        fbDatabase.collection("board").get().addOnSuccessListener { documents ->
-            liveData.value = documents.toObjects<BoardEntity>() as ArrayList<BoardEntity>
+        fbDatabase.collection("board").get()
+            .addOnSuccessListener { documents ->
+            liveData.value = documents.toObjects<BoardEntity>()
         }
 
         return liveData
     }
 
-    fun getComment(boardId: String): LiveData<List<CommentEntity>> {//해당글의 댓글,답글 목록
+    fun getComment(boardId: String): LiveData<List<CommentEntity>> {//해당글의 댓글 목록
         val liveData: MutableLiveData<List<CommentEntity>> = MutableLiveData()
         fbDatabase.collection("board").document(boardId).collection("comment").get()
             .addOnSuccessListener { documents ->
-
                 liveData.value = documents.toObjects<CommentEntity>() //비동기 처리후 옵저버 호출
             }
 
         return liveData
     }
 
+    fun getReply(boardId: String): LiveData<List<ReplyEntity>> {//해당글의 댓글 목록
+        val liveData: MutableLiveData<List<ReplyEntity>> = MutableLiveData()
+        fbDatabase.collection("board").document(boardId).collection("reply").get()
+            .addOnSuccessListener { documents ->
+                liveData.value = documents.toObjects<ReplyEntity>() //비동기 처리후 옵저버 호출
+            }
+
+        return liveData
+    }
+
     suspend fun getNicknameAuth(email: String): String {//회원 이메일로 닉네임 가져오기 //다른 유저들
-        try {//중복 호출 방지하기 위해 viewmodel에서 회원정보들을 hashMap(key:email, value:nickname)으로 저장하고 없으면 호출하는식으로
+        try {
+            //중복 호출 방지하기 위해 viewmodel에서 회원정보들을 hashMap(key:email, value:nickname)으로 저장하고 없으면 호출하는식으로
+            //fragment, detailactivy가 hashmap을 공유하고 fragment가 체인지 되기전까지 유지 그 이후는 다시 최신화
             val task = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
             var nickname: String = ""
             for (data in task) {
                 nickname = data.data.get("nickname") as String//닉네임 가져오기
             }
             return nickname
-        }catch (e: Exception){
+        } catch (e: Exception) {
             return ""
         }
     }
@@ -134,8 +149,8 @@ class FBDatabase {
                     liveData.postValue(true)
                 }
             }.addOnFailureListener {
-            liveData.postValue(false)
-        }.addOnFailureListener {
+                liveData.postValue(false)
+            }.addOnFailureListener {
                 auth.nickname = auth.currentUser!!.email!!.split("@").get(0)//초기값 설정
                 liveData.postValue(false)
             }

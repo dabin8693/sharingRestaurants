@@ -120,6 +120,10 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
         return fbDatabase.getComment(boardId)
     }
 
+    fun getFBReplyList(boardId: String): LiveData<List<ReplyEntity>>{
+        return fbDatabase.getReply(boardId)
+    }
+
     //firestore database
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //firestore storage
