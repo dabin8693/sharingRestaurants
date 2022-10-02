@@ -16,6 +16,7 @@ import android.widget.ProgressBar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -35,6 +36,8 @@ import com.project.sharingrestaurants.databinding.ActivityMainBinding
 import com.project.sharingrestaurants.databinding.ActivityOffItemAddBinding
 import com.project.sharingrestaurants.databinding.ActivityOnItemAddBinding
 import com.project.sharingrestaurants.firebase.BoardEntity
+import com.project.sharingrestaurants.ui.MainActivity
+import com.project.sharingrestaurants.ui.off.OffItemAddActivity
 import com.project.sharingrestaurants.ui.off.ShowMapActivity
 import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.viewmodel.MainViewModel
@@ -141,6 +144,7 @@ class OnItemAddActivity : AppCompatActivity() {
                 //progressStart(viewModel.uploadSuccess)
                 viewModel.upLoad(this@OnItemAddActivity, contentResolver).observe(this@OnItemAddActivity){
                     if (true){
+                        setResult(RESULT_OK)
                         finish()
                     }else{
                         Log.d("작성실패","")

@@ -99,7 +99,9 @@ class FBDatabase {
 
         return liveData
     }
-
+    //댓글목록을 먼저 다 불러오고 그 다음 답글목록을 전부 불러온다 댓글list에 답글list를 삽입 삽입 순서는 답글 TimeStamp순서로 삽입 위치 결정 방법은 답글 필드의 댓글documentId기준
+    //어뎁터에서 댓글 답글 분류는 data class타입 비교로
+    //댓글, 답글도 코루틴으로
     fun getComment(boardId: String): LiveData<List<CommentEntity>> {//해당글의 댓글 목록
         val liveData: MutableLiveData<List<CommentEntity>> = MutableLiveData()
         fbDatabase.collection("board").document(boardId).collection("comment").get()
@@ -110,7 +112,7 @@ class FBDatabase {
         return liveData
     }
 
-    fun getReply(boardId: String): LiveData<List<ReplyEntity>> {//해당글의 댓글 목록
+    fun getReply(boardId: String): LiveData<List<ReplyEntity>> {//해당글의 답글 목록
         val liveData: MutableLiveData<List<ReplyEntity>> = MutableLiveData()
         fbDatabase.collection("board").document(boardId).collection("reply").get()
             .addOnSuccessListener { documents ->
