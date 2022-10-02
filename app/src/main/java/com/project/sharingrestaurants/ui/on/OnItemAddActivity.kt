@@ -30,6 +30,7 @@ import com.project.sharingrestaurants.adapter.OnAdapter
 import com.project.sharingrestaurants.adapter.OnAddAdapter
 import com.project.sharingrestaurants.data.BitmapImageItem
 import com.project.sharingrestaurants.data.BoardHeadEntity
+import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.databinding.ActivityMainBinding
 import com.project.sharingrestaurants.databinding.ActivityOffItemAddBinding
 import com.project.sharingrestaurants.databinding.ActivityOnItemAddBinding
@@ -57,14 +58,21 @@ class OnItemAddActivity : AppCompatActivity() {
 
         initStart()
 
-        Adapter = OnAddAdapter({ position -> deleteDialog(position)}, {intent = Intent(this, ShowMapActivity::class.java)
+        if (intent != null && intent.hasExtra("BoardEntity")) {
+            //off detail에서 넘어온 경우
+            val item: BoardEntity = intent.getSerializableExtra("BoardEntity") as BoardEntity
+            applyExistingInfo(item)
+        }else{
+            Adapter = OnAddAdapter({ position -> deleteDialog(position)}, {intent = Intent(this, ShowMapActivity::class.java)
                 mapCallBack.launch(intent)},viewModel, this).apply {
-            val list = ArrayList<Any>()
-            list.add(BoardHeadEntity("", "", "", 0f))//head
-            list.add("")//edit
-            list.add("")//linear
-            this.setItemList(list)
+                val list = ArrayList<Any>()
+                list.add(BoardHeadEntity("", "", "", 0f))//head
+                list.add("")//edit
+                list.add("")//linear
+                this.setItemList(list)
+            }
         }
+
         binding.recycle.apply {
             this.adapter = Adapter
             this.layoutManager =
@@ -111,38 +119,33 @@ class OnItemAddActivity : AppCompatActivity() {
             this.setMessage(resources.getText(R.string.completeDialog))
             this.setNegativeButton("NO") { _, _ -> }
             this.setPositiveButton("YES") { _, _ ->
-                for (any in Adapter.getItem()){
-                    if (Adapter.getItem().indexOf(any) == Adapter.getItem().lastIndex){//마지막 리니어레이아웃 제외
+                for (index in 0 until Adapter.getItem().size){
+                    Log.d("탈출", index.toString())
+                    Log.d("탈출 라스트", Adapter.getItem().lastIndex.toString())
+                    if (index == Adapter.getItem().lastIndex){//마지막 리니어레이아웃 제외
+                        Log.d("탈출1", index.toString())
                         break
                     }
-                    if (Adapter.getItem().indexOf(any)%2 == 0){
-                        if (Adapter.getItem().indexOf(any) != 0){//image
-                            viewModel.imageList.add(any as String)
-                            Log.d("온이미지",(any as String))
+                    if (index%2 == 0){
+                        if (index != 0){//image
+                            viewModel.imageList.add(Adapter.getItem().get(index).toString())
+                            Log.d("탈출2", index.toString())
                         }
+                        Log.d("탈출3", index.toString())
                     }else{//text
-                        viewModel.textList.add(any as String)
-                        Log.d("온텍스트",(any as String))
+                        Log.d("탈출4", index.toString())
+                        viewModel.textList.add(Adapter.getItem().get(index).toString())
                     }
                 }
-                /*
-                for (text in viewModel.textList){
-                    viewModel.setItemBody(text)
-                }
-                for (image in viewModel.imageList){
-                    viewModel.setItemImage(image)
-                }
 
-                 */
                 //progressStart(viewModel.uploadSuccess)
-                viewModel.addItem(this@OnItemAddActivity, contentResolver).observe(this@OnItemAddActivity){
+                viewModel.upLoad(this@OnItemAddActivity, contentResolver).observe(this@OnItemAddActivity){
                     if (true){
                         finish()
                     }else{
                         Log.d("작성실패","")
                     }
                 }
-
             }
         }
         builder.show()
@@ -207,6 +210,29 @@ class OnItemAddActivity : AppCompatActivity() {
             }
         }
         builder.show()
+    }
+
+    //기존 정보 적용
+    private fun applyExistingInfo(item: BoardEntity){
+        viewModel.setItem(item)
+        if (!item.locate.equals("")){//지도 선택o
+            viewModel.mapDrawable.value = resources.getDrawable(R.drawable.empty,null)
+        }
+
+        Adapter = OnAddAdapter({ position -> deleteDialog(position)}, {intent = Intent(this, ShowMapActivity::class.java)
+            mapCallBack.launch(intent)},viewModel, this).apply {
+            val list = ArrayList<Any>()
+            list.add(BoardHeadEntity(item.tilte, item.place, item.locate, item.priority))//head
+            list.add("")//edit
+            for (index in 0 until (item.body.size-1)){//총 인덱스-1 개
+                list.add(item.body.get(index))
+                list.add(item.image.get(index))
+            }
+            list.add(item.body.last())
+            list.add("")//linear
+            this.setItemList(list)
+        }
+        viewModel.isInserted = true
     }
 
 }

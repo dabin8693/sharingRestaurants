@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.BoardHeadEntity
 import com.project.sharingrestaurants.databinding.*
+import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.ui.off.ShowMapActivity
 import com.project.sharingrestaurants.viewmodel.OnAddViewModel
 
@@ -113,10 +114,24 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(binding: ViewDataBinding, viewType: Int) : RecyclerView.ViewHolder(binding.root) {//edit텍스트는 클릭리스너 말고 포커스체인지 리스너로 해야 한번터치로 응답함
-        val viewType = viewType
-        val binding = binding
+    inner class ViewHolder(val binding: ViewDataBinding, val viewType: Int) : RecyclerView.ViewHolder(binding.root) {//edit텍스트는 클릭리스너 말고 포커스체인지 리스너로 해야 한번터치로 응답함
 
+        init {//초기값
+            when(viewType){//head
+                2 -> {
+                    binding as OnAddHeadBinding
+                    val item = items.get(0) as BoardHeadEntity
+                    if (item.locate.equals("")) {//지도 선택x
+                        viewModel.mapDrawable.value = context.resources.getDrawable(R.drawable.rectangleshape, null)
+                    }else{
+                        viewModel.mapDrawable.value = context.resources.getDrawable(R.drawable.empty,null)
+                    }
+                    viewModel.itemTitle.value = item.tilte
+                    viewModel.itemPlace.value = item.place
+                    viewModel.itemPriority.value = item.priority
+                }
+            }
+        }
         fun bind(item: Any, position: Int) {//item타입 - BoardHeadEntity(data class), text(edit, image, linear)
 
             when (viewType) {
@@ -170,9 +185,9 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
                     }
                 }
 
-                2 -> {//head
+                2 -> {//head //livedata데이터바인딩이라 따로 데이터 담을 필요x//최초 생성할때만 초기값 설정
                     binding as OnAddHeadBinding
-                    viewModel.mapDrawable.value = context.resources.getDrawable(R.drawable.rectangleshape, null)
+
                     binding.showmap.setOnClickListener{
                         showMap()
                     }

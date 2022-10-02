@@ -71,7 +71,7 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
             binding.number.setText(item.recommends.toString())
             binding.place.setText(item.place)
             binding.ratingBar.rating = item.priority
-            if(item.thumb != "") {//null체크는 필요없음
+            if(!item.thumb.equals("")) {//null체크는 필요없음
                 Log.d("뷰홀더 썸네일ㅁㅁ", item.thumb.substring(1))
                 Log.d("ㅁㅁ", "성공")
                 Glide.with(itemView)

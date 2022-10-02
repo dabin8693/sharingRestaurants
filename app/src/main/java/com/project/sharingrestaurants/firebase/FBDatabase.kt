@@ -44,7 +44,6 @@ class FBDatabase {
             documentRef.set(boardMap)
             .addOnSuccessListener { liveData.postValue(true) }
             .addOnFailureListener { liveData.postValue(false) }
-        //val a: DocumentReference
 
         return liveData
     }
@@ -63,6 +62,14 @@ class FBDatabase {
     fun addComment(commentEntity: CommentEntity, boardId: String) {//해당글에 댓글, 답글 달기
         fbDatabase.collection("board").document(boardId).collection("comment").add(commentEntity)
 
+    }
+
+    fun insertBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
+        val liveData: MutableLiveData<Boolean> = MutableLiveData()
+        fbDatabase.collection("board").document(boardMap.get("documentId").toString()).update(boardMap)
+            .addOnSuccessListener { liveData.postValue(true) }
+            .addOnFailureListener { liveData.postValue(false) }
+        return liveData
     }
 
     fun getBoard(): LiveData<List<BoardEntity>> {

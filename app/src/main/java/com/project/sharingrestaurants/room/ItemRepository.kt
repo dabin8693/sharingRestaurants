@@ -84,6 +84,10 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
         return fbDatabase.addBoard(boardMap)
     }
 
+    fun insertFBBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
+        return fbDatabase.insertBoard(boardMap)
+    }
+
     fun addFBAuth(nickname: String){
         fbDatabase.addAuth(Auth.currentUser!!, nickname)
     }

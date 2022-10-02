@@ -186,7 +186,7 @@ class OffItemAddActivity : AppCompatActivity() {
     private fun callBackProcessing(uri: Uri, code: String){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val source = ImageDecoder.createSource(contentResolver, uri!!)
-            ImageDecoder.decodeBitmap(source)?.let {
+            ImageDecoder.decodeBitmap(source).let {
                 var bitmap = CameraWork.resizeBitmap(it, 2)//0-0 1-2 2-4 3-6
                 //viewModel.imageBitmapOrStringList.add(getViewPosition()/2,bitmap)
                 if (code == "gallery") {//imageBitmapOrStringList변수는 이미지만 저장해서 getViewPosition보다 position이 2배 작다.
