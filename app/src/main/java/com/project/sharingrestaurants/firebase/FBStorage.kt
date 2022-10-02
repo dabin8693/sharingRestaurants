@@ -11,6 +11,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.project.sharingrestaurants.ui.off.OffItemAddActivity
@@ -24,10 +25,19 @@ import java.lang.Exception
 import java.lang.StringBuilder
 
 class FBStorage {
-    //싱글톤으로 비즈니스 로직 다 뷰모델로
     private val storage = Firebase.storage("gs://restaurantapp-3152b.appspot.com")
     private val storageRef = storage.reference
 
+    companion object {
+        private var INSTANCE: FBStorage? = null
+
+        fun getInstance(): FBStorage {//스레드 경합없음으로 synchronized필요없음
+            if (INSTANCE == null) {//중복 생성 방지
+                INSTANCE = FBStorage()
+            }
+            return INSTANCE ?: FBStorage()//null이면  재생성
+        }
+    }
 
     fun getFBStorageRef(): StorageReference = this.storageRef
 

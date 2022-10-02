@@ -40,10 +40,8 @@ class OnLineViewModel(private val repository: ItemRepository, private val login:
 
     fun addFBAuth(lifecycleOwner: LifecycleOwner){
         repository.isFBAuth().observe(lifecycleOwner){//회원정보 있으면 닉네임 가져옴
-            if (it){//회원정보o
-                repository.addFBAuth(getAuth().nickname)
-            }else{//회원정보x 닉네임 기본값으로 이메일 추가
-                repository.addFBAuth(getAuth().currentUser!!.email!!.split("@").get(0))
+            if (!it) {//회원정보x
+                repository.addFBAuth()//회원정보 추가
             }
         }
     }

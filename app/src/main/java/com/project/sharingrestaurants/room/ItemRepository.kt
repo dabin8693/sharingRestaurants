@@ -21,7 +21,7 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     private val itemDao = itemDatabase.dao()
     private val Auth: FBAuth = FBAuth.getInstance(application)//애플리케이션 클래스로 옮기기
     private val fbDatabase: FBDatabase = FBDatabase.getInstance()
-    private val fbStorage: FBStorage = FBStorage()
+    private val fbStorage: FBStorage = FBStorage.getInstance()
 
     companion object{
         private var INSTANCE: ItemRepository? = null
@@ -88,24 +88,32 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
         return fbDatabase.insertBoard(boardMap)
     }
 
-    fun addFBAuth(nickname: String){
-        fbDatabase.addAuth(Auth.currentUser!!, nickname)
+    fun insertNicknameAuth(nickname: String): LiveData<Boolean>{
+        return fbDatabase.insertNicknameAuth(Auth.currentUser!!.uid, nickname)
+    }
+
+    fun addFBAuth(){
+        fbDatabase.addAuth(Auth.currentUser!!)
     }
 
     fun isFBAuth(): LiveData<Boolean>{//false = 회원정보x
         return fbDatabase.isAuth(Auth)
     }
 
-    fun addFBComment(commentEntity: CommentEntity, boardId: String){
-        fbDatabase.addComment(commentEntity, boardId)
+    fun addFBComment(commentMap: MutableMap<String, Any>, boardId: String){
+        fbDatabase.addComment(commentMap, boardId)
+    }
+
+    fun addReply(replyMap: MutableMap<String, Any>, boardId: String){
+        fbDatabase.addReply(replyMap, boardId)
     }
 
     fun getFBList(): LiveData<List<BoardEntity>>{
         return fbDatabase.getBoard()
     }
 
-    fun getFBAuth(boardId: String): LiveData<List<AuthEntity>>{
-        return fbDatabase.getAuth(boardId)
+    suspend fun getFBNicknameAuth(email: String): String{
+        return fbDatabase.getNicknameAuth(email)
     }
 
     fun getFBCommentList(boardId: String): LiveData<List<CommentEntity>>{

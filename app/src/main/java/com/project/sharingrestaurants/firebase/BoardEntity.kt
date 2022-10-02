@@ -18,7 +18,9 @@ data class BoardEntity(
     var image: List<String> = listOf(),//파이어스토리지 uri(구분자 포함)
     var thumb: String = "",
     var recommends: Int =0,//추천 수
-    //var comments: Int,//댓글 수
     var latitude: Double =0.0,//위도
-    var longitude: Double =0.0//경도
+    var longitude: Double =0.0,//경도
+//위는 파이어스토어 필드
+    var comments: Int =0,//댓글 수
+    var nickname: String =""
 ): Serializable

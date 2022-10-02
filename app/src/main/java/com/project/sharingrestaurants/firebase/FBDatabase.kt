@@ -16,6 +16,7 @@ import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 
 import kotlin.collections.ArrayList
 
@@ -34,34 +35,39 @@ class FBDatabase {
             return INSTANCE ?: FBDatabase()//null이면  재생성
         }
     }
-    //boardEntity.timestamp = FieldValue.serverTimestamp()
-    //boardEntity.documentId = FieldPath.documentId()
-    //fbDatabase.collection("").get().addOnSuccessListener { documents -> for (document in documents){ document.id; document.data; document.toObject<BoardEntity>() }; documents.toObjects<BoardEntity>() }
+
     fun addBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
         val documentRef: DocumentReference = fbDatabase.collection("board").document()
         boardMap.replace("documentId", documentRef.id)//api24이상
-            documentRef.set(boardMap)
+        documentRef.set(boardMap)
             .addOnSuccessListener { liveData.postValue(true) }
             .addOnFailureListener { liveData.postValue(false) }
 
         return liveData
     }
 
-    fun addAuth(currentUser: FirebaseUser, nickname: String) {//추가 또는 닉네임 수정
+    fun addAuth(currentUser: FirebaseUser) {//추가 //처음 추가할때는 닉네임
         fbDatabase.collection("auth").document(currentUser.uid).set(
             hashMapOf(
                 "uid" to currentUser.uid,
                 "email" to currentUser.email,
-                "nickname" to nickname,
+                "nickname" to currentUser.email!!.split("@").get(0),//초기값 설정
                 "timestamp" to FieldValue.serverTimestamp()
             )
         )
     }
 
-    fun addComment(commentEntity: CommentEntity, boardId: String) {//해당글에 댓글, 답글 달기
-        fbDatabase.collection("board").document(boardId).collection("comment").add(commentEntity)
+    fun addComment(commentMap: MutableMap<String, Any>, boardId: String) {//해당글에 댓글
+        val documentRef: DocumentReference = fbDatabase.collection("board").document(boardId).collection("comment").document()
+        commentMap.replace("documentId", documentRef.id)
+        documentRef.set(commentMap)
+    }
 
+    fun addReply(replyMap: MutableMap<String, Any>, boardId: String) {//해당글에 댓글
+        val documentRef: DocumentReference = fbDatabase.collection("board").document(boardId).collection("reply").document()
+        replyMap.replace("documentId", documentRef.id)
+        documentRef.set(replyMap)
     }
 
     fun insertBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
@@ -72,22 +78,18 @@ class FBDatabase {
         return liveData
     }
 
+    fun insertNicknameAuth(uid: String, nickname: String): LiveData<Boolean>{
+        val liveData: MutableLiveData<Boolean> = MutableLiveData()
+        fbDatabase.collection("auth").document(uid).update("nickname", nickname)
+            .addOnSuccessListener { liveData.postValue(true) }
+            .addOnFailureListener { liveData.postValue(false) }
+        return liveData
+    }
     fun getBoard(): LiveData<List<BoardEntity>> {
         Log.d("리스트 호출", "ㄴㅇㄹㄴㅇㄹ")
         val liveData: MutableLiveData<List<BoardEntity>> = MutableLiveData()
 
-        //var list: ArrayList<BoardEntity> = ArrayList()
         fbDatabase.collection("board").get().addOnSuccessListener { documents ->
-            /*
-            for (document in documents) {
-                val boardEntity: BoardEntity = document.toObject<BoardEntity>()
-                boardEntity.documentId = document.id//id에 쓰레기값들어가 있어서 진짜 documentId로 저장
-                list.add(boardEntity)
-                Log.d("도큐먼트id는", document.id)
-                Log.d("도큐먼트id list는", document.toObject<BoardEntity>().documentId)
-            }
-            liveData.value = list
-         */
             liveData.value = documents.toObjects<BoardEntity>() as ArrayList<BoardEntity>
         }
 
@@ -105,21 +107,25 @@ class FBDatabase {
         return liveData
     }
 
-    fun getAuth(boardId: String): LiveData<List<AuthEntity>> {//회원 목록
-        val liveData: MutableLiveData<List<AuthEntity>> = MutableLiveData()
-        fbDatabase.collection("auth").get().addOnSuccessListener { documents ->
-
-            liveData.value = documents.toObjects<AuthEntity>() //비동기 처리후 옵저버 호출
+    suspend fun getNicknameAuth(email: String): String {//회원 이메일로 닉네임 가져오기 //다른 유저들
+        try {//중복 호출 방지하기 위해 viewmodel에서 회원정보들을 hashMap(key:email, value:nickname)으로 저장하고 없으면 호출하는식으로
+            val task = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
+            var nickname: String = ""
+            for (data in task) {
+                nickname = data.data.get("nickname") as String//닉네임 가져오기
+            }
+            return nickname
+        }catch (e: Exception){
+            return ""
         }
-
-        return liveData
     }
 
-    fun isAuth(auth: FBAuth): LiveData<Boolean> {
+    fun isAuth(auth: FBAuth): LiveData<Boolean> {//현재로그인유저 회원정보있는지 확인
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
         fbDatabase.collection("auth").whereEqualTo("uid", auth.currentUser!!.uid).get()
             .addOnSuccessListener {
                 if (it.isEmpty) {//회원정보가 없다
+                    auth.nickname = auth.currentUser!!.email!!.split("@").get(0)//초기값 설정
                     liveData.postValue(false)
                 } else {//회원정보가 있다
                     for (data in it) {
@@ -129,7 +135,10 @@ class FBDatabase {
                 }
             }.addOnFailureListener {
             liveData.postValue(false)
-        }
+        }.addOnFailureListener {
+                auth.nickname = auth.currentUser!!.email!!.split("@").get(0)//초기값 설정
+                liveData.postValue(false)
+            }
 
         return liveData
     }
