@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
 
     val nicknamMap: MutableMap<String, String> = hashMapOf()//key - email, value - nickname
+    var isRecomment: Boolean = false//이게 true면 추천수 불러올때 추가로 1더하기
 
     fun getAuth(): FBAuth {
         return repository.getAuth()

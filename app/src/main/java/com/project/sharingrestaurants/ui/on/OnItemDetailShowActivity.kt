@@ -3,6 +3,7 @@ package com.project.sharingrestaurants.ui.on
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
@@ -42,6 +43,8 @@ class OnItemDetailShowActivity : AppCompatActivity() {
         viewModel.incrementLookBoard(item.documentId)
         if (viewModel.getAuth().isLogin.value == true) {
             if (item.uid.equals(viewModel.getAuth().currentUser!!.uid)) {//내가 작성한 글일 경우
+                binding.insert.visibility = View.VISIBLE
+                binding.delete.visibility = View.VISIBLE
                 item.nickname = viewModel.getAuth().nickname
                 item.profileImage = viewModel.getAuth().currentUser!!.photoUrl.toString()
             }
