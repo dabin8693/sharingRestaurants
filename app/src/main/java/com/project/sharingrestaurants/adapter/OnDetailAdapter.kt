@@ -176,6 +176,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                     binding.recomment.setOnClickListener {
                         viewModel.incrementRecommendsBoard(entity.documentId)
                         entity.recommends++
+                        binding.recommend.text = entity.recommends.toString()
                         viewModel.isRecomment = true
                         it.isClickable = false
                     }//추천클릭
