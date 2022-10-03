@@ -44,40 +44,40 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
+                android:padding="3dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="@{() -> mainActivity.offShow()}"
-                android:layout_margin="10dp"
-                android:src="@drawable/edit_24">
+                android:src="@{viewModel.offDrawable}">
 
             </ImageView>
 
             <ImageView
+                android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="@{() -> mainActivity.onShow()}"
-                android:layout_margin="10dp"
-                android:src="@drawable/globe_24">
+                android:src="@{viewModel.onDrawable}">
 
             </ImageView>
             <ImageView
+                android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="@{() -> mainActivity.upShow()}"
-                android:layout_margin="10dp"
-                android:src="@drawable/social_network_24">
+                android:src="@{viewModel.upDrawable}">
 
             </ImageView>
             <ImageView
+                android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="@{() -> mainActivity.myShow()}"
-                android:layout_margin="10dp"
-                android:src="@drawable/user_24">
+                android:src="@{viewModel.myDrawable}">
 
             </ImageView>
 

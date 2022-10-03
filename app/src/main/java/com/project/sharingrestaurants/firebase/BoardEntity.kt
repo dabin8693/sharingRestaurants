@@ -8,7 +8,8 @@ import java.util.*
 
 data class BoardEntity(
     var documentId: String ="",
-    var userID: String ="",//닉네임은 이걸로 auth컬렉션 조회(회원이 닉네임 바꿨다고 모든 글의 닉네임을 바꿀 수는 없다)
+    var uid: String ="",
+    var email: String ="",//닉네임은 이걸로 auth컬렉션 조회(회원이 닉네임 바꿨다고 모든 글의 닉네임을 바꿀 수는 없다)
     var timestamp: Date = Date(),//기본키 역할//(댓글,답글)은 board의 하위 노드에
     var tilte: String ="",//제목
     var place: String ="",//세부주소(사용자 입력)

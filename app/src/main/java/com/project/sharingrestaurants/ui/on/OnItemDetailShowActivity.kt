@@ -20,6 +20,9 @@ import com.project.sharingrestaurants.firebase.FBLogin
 import com.project.sharingrestaurants.viewmodel.OnDetailViewModel
 import com.project.sharingrestaurants.viewmodel.OnLineViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class OnItemDetailShowActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOnItemDetailShowBinding
@@ -36,15 +39,37 @@ class OnItemDetailShowActivity : AppCompatActivity() {
 
         initStart()
         item = intent.getSerializableExtra("BoardEntity") as BoardEntity
+        viewModel.incrementLookBoard(item.documentId)
+        if (viewModel.getAuth().isLogin.value == true) {
+            if (item.uid.equals(viewModel.getAuth().currentUser!!.uid)) {//내가 작성한 글일 경우
+                item.nickname = viewModel.getAuth().nickname
+                item.profileImage = viewModel.getAuth().currentUser!!.photoUrl.toString()
+            }
+        }
 
-        adapter = OnDetailAdapter(item)
+        adapter = OnDetailAdapter(item, viewModel)
         binding.recycle.apply {
-            this.adapter = adapter
+            this.adapter = this@OnItemDetailShowActivity.adapter
             this.layoutManager =
                 LinearLayoutManager(this@OnItemDetailShowActivity, RecyclerView.VERTICAL, false)
             this.setHasFixedSize(true)//사이즈 측정이 필요없다 판단돼면 내부적으로 measure안한다
         }
-
+        //adapter.notifyDataSetChanged()
+        if (viewModel.getAuth().isLogin.value == true) {
+            viewModel.nicknamMap.set(viewModel.getAuth().currentUser!!.email!!, viewModel.getAuth().nickname)
+            if (!item.uid.equals(viewModel.getAuth().currentUser!!.uid)) {//내가 작성한 글이 아닐경우
+                viewModel.getLoadBodyData().observe(this) {
+                    adapter.setBodyItem(it)
+                }
+            }else{
+                viewModel.getLoadLookData().observe(this) {
+                    adapter.setLookItem(it)
+                }
+            }
+        }
+        viewModel.getLoadCommentData().observe(this){
+            adapter.setCommentItem(it)
+        }
     }
 
     private fun initStart(){
@@ -53,4 +78,6 @@ class OnItemDetailShowActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
     }
+
+
 }

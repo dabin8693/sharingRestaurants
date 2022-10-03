@@ -52,6 +52,7 @@ class FBDatabase {
             hashMapOf(
                 "uid" to currentUser.uid,
                 "email" to currentUser.email,
+                "image" to currentUser.photoUrl,
                 "nickname" to currentUser.email!!.split("@").get(0),//초기값 설정
                 "timestamp" to FieldValue.serverTimestamp()
             )
@@ -79,6 +80,20 @@ class FBDatabase {
             .addOnSuccessListener { liveData.postValue(true) }
             .addOnFailureListener { liveData.postValue(false) }
         return liveData
+    }
+
+    fun incrementLookBoard(boardId: String){//boardId = documentId
+        fbDatabase.collection("board").document(boardId)
+            .update("look",FieldValue.increment(1))//조회수 증가
+            .addOnSuccessListener {  }
+            .addOnFailureListener {  }
+    }
+
+    fun incrementRecommendsBoard(boardId: String) {//recommends = 추천
+        fbDatabase.collection("board").document(boardId)
+            .update("recommends",FieldValue.increment(1))//추천수 증가
+            .addOnSuccessListener {  }
+            .addOnFailureListener {  }
     }
 
     fun insertNicknameAuth(uid: String, nickname: String): LiveData<Boolean> {

@@ -341,7 +341,8 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
             hashMapOf(
                 "documentId" to "",//데이터베이스 호출부분에서 추가
                 "timestamp" to FieldValue.serverTimestamp(),
-                "userID" to repository.getAuth().currentUser!!.uid,
+                "uid" to repository.getAuth().currentUser!!.uid,
+                "email" to repository.getAuth().currentUser!!.email!!,
                 "tilte" to (itemTitle.value ?: ""),
                 "place" to (itemPlace.value ?: ""),
                 "locate" to (itemLocate.value ?: ""),
@@ -351,7 +352,8 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                 "thumb" to uploadThumImagePath,
                 "recommends" to 0,//recommends
                 "latitude" to itemLatitude,
-                "longitude" to itemLongitude
+                "longitude" to itemLongitude,
+                "look" to 0
             )
         )
     }
@@ -361,7 +363,8 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
             hashMapOf(
                 "documentId" to documentId,//데이터베이스 호출부분에서 추가
                 "timestamp" to FieldValue.serverTimestamp(),
-                "userID" to repository.getAuth().currentUser!!.uid,
+                "uid" to repository.getAuth().currentUser!!.uid,
+                "email" to repository.getAuth().currentUser!!.email!!,
                 "tilte" to (itemTitle.value ?: ""),
                 "place" to (itemPlace.value ?: ""),
                 "locate" to (itemLocate.value ?: ""),
@@ -371,7 +374,8 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                 "thumb" to uploadThumImagePath,
                 "recommends" to recommends,//recommends
                 "latitude" to itemLatitude,
-                "longitude" to itemLongitude
+                "longitude" to itemLongitude,
+                "look" to 0
             )
         )
     }

@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         transaction.replace(R.id.Fragcontainer, fragOff, "Off")
         //transaction.addToBackStack(null)
         transaction.commit()
-
+        viewModel.setOffDrawable(this)
     }
 
 
@@ -117,15 +117,11 @@ class MainActivity : AppCompatActivity() {
         binding.mainActivity = this //xml에서 main액티비티 데이터에 접근 가능하게
         binding.lifecycleOwner = this //이거 안쓰면 데이터바인딩 쓸때 xml이 데이터 관측 못 함
 
-        //shared = getSharedPreferences("temp",Context.MODE_PRIVATE)
         if (viewModel.getAuth().currentUser != null) {
-            for (profile in viewModel.getAuth().currentUser!!.providerData) {
-                Log.d("auth00Number", "1")
-                viewModel.getAuth().photoUrl.value = profile.photoUrl
-            }
-            //shared.getString("userPicture", "")!!.toUri()
-            //Log.d("저장된uri:", shared.getString("userPicture", "")!!)
+            viewModel.getAuth().photoUrl.value = viewModel.getAuth()!!.currentUser!!.photoUrl
         }
+        viewModel.setOffDrawable(this)
+
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,6 +130,7 @@ class MainActivity : AppCompatActivity() {
         transaction.replace(R.id.Fragcontainer, fragOff, "Off")
         //transaction.addToBackStack(null)
         transaction.commit()
+        viewModel.setOffDrawable(this)
     }
 
     fun onShow() {
@@ -145,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         }else{
             fragOn.updateList()
         }
+        viewModel.setOnDrawable(this)
     }
 
     fun upShow() {
@@ -156,6 +154,7 @@ class MainActivity : AppCompatActivity() {
         //FBDatabase.setAuth(auth)
         //FBDatabase.setBoard(board)
         //FBDatabase.setComment(comment)
+        viewModel.setUpDrawable(this)
     }
 
     fun myShow() {
@@ -164,6 +163,7 @@ class MainActivity : AppCompatActivity() {
             transaction.replace(R.id.Fragcontainer, fragUser, "User")
             //transaction.addToBackStack(null)
             transaction.commit()
+            viewModel.setMyDrawable(this)
         } else {
             if (supportFragmentManager.findFragmentById(R.id.Fragcontainer) == fragOff) {
                 fragOff.loginShow()

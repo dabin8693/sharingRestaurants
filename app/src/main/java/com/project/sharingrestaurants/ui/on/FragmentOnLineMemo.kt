@@ -43,8 +43,6 @@ class FragmentOnLineMemo : Fragment() {
     }
     private lateinit var binding: FragOnlineMemoBinding
     private lateinit var onAdapter: OnAdapter
-    private lateinit var item: BoardEntity
-    private lateinit var itemList: List<BoardEntity>
     private lateinit var loginDialog: CustomDialog
     private lateinit var activity: MainActivity
 
@@ -67,7 +65,7 @@ class FragmentOnLineMemo : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d("생명주기", "onViewCreated")
         onAdapter = OnAdapter(
-            {
+            { item ->
                 val intent =
                     Intent(activity, OnItemDetailShowActivity::class.java)//onClick
                 intent.putExtra("BoardEntity", item)

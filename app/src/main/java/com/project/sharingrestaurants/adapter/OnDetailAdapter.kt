@@ -1,6 +1,7 @@
 package com.project.sharingrestaurants.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.OffDetailItem
@@ -15,10 +17,11 @@ import com.project.sharingrestaurants.databinding.*
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.CommentEntity
 import com.project.sharingrestaurants.firebase.ReplyEntity
+import com.project.sharingrestaurants.viewmodel.OnDetailViewModel
 import java.text.SimpleDateFormat
 
-class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageReference) : RecyclerView.Adapter<OnDetailAdapter.ViewHolder>() {
-    private lateinit var viewTypeList: ArrayList<String>
+class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailViewModel) : RecyclerView.Adapter<OnDetailAdapter.ViewHolder>() {
+    private val viewTypeList: ArrayList<String> = ArrayList()
     private lateinit var commentItems: List<Any>//CommentEntity, ReplyEntity
     private var commentsSize: Int = 0
     private lateinit var binding: ViewDataBinding
@@ -32,6 +35,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageRe
         }
         viewTypeList.add("text")
         viewTypeList.add("footer")
+        Log.d("ㅌㅌinit",viewTypeList.size.toString())
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -83,21 +87,23 @@ class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageRe
     }
 
     override fun getItemCount(): Int {
+        Log.d("ㅌㅌ사이즈",viewTypeList.size.toString())
         return viewTypeList.size
     }
 /////////////////////////////////////////////////////
     //비동기 호출
-    fun setLookCount(look: Int) {
-        entity.look = look
+    fun setBodyItem(item: BoardEntity){
+        entity.look = item.look//조회수
+        entity.profileImage = item.profileImage//프로필 이미지
+        entity.nickname = item.nickname//프로필 닉네임
+        entity.comments = item.comments//댓글 수
+        notifyItemChanged(0)
     }
-    fun setProfileImage(image: String){
-        entity.profileImage = image
-    }
-    fun setProfileNickname(nickname: String){
-        entity.nickname = nickname
-    }
-    fun setCommentCount(comment: Int){
-        entity.comments = comment
+
+    fun setLookItem(item: BoardEntity){
+        entity.look = item.look//조회수
+        entity.comments = item.comments//댓글 수
+        notifyItemChanged(0)
     }
 
     fun setCommentItem(commentItems: List<Any>) {
@@ -125,17 +131,21 @@ class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageRe
                     binding.locate.text = entity.locate
                     binding.place.text = entity.place
                     binding.rating.rating = entity.priority
-                    Glide.with(itemView)//uid비교 //나중에 비동기 초기화
-                        .load(storageRef.child(entity.profileImage.substring(1)))
-                        .override(360,640)
-                        .into(binding.profileimage)
-                        .onLoadFailed(
-                            ResourcesCompat.getDrawable(
-                                context.resources,
-                                R.mipmap.ic_launcher,
-                                null
+                    if (!entity.profileImage.equals("")) {
+                        Glide.with(itemView)//uid비교 //나중에 비동기 초기화
+                            .load(entity.profileImage)
+                            .skipMemoryCache(true)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .override(360, 640)
+                            .into(binding.profileimage)
+                            .onLoadFailed(
+                                ResourcesCompat.getDrawable(
+                                    context.resources,
+                                    R.mipmap.ic_launcher,
+                                    null
+                                )
                             )
-                        )
+                    }
                     binding.profilenickname.text = entity.nickname//uid비교//나중에 비동기 초기화
                     val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
                     binding.time.text = format.format(entity.timestamp)
@@ -148,7 +158,9 @@ class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageRe
                 2 -> {
                     binding as OffItemImageBinding
                     Glide.with(itemView)
-                        .load(storageRef.child(entity.image.get((position/2)-1).substring(1)))//2,4,6,8 //0,1,2,3
+                        .load(viewModel.getStorageRef().child(entity.image.get((position/2)-1).substring(1)))//2,4,6,8 //0,1,2,3
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .override(360,640)
                         .into(binding.image)
                         .onLoadFailed(
@@ -161,7 +173,11 @@ class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageRe
                 }
                 3 -> {
                     binding as OnDetailFooterBinding
-                    binding.recomment.setOnClickListener {  }//추천클릭
+                    binding.recomment.setOnClickListener {
+                        viewModel.incrementRecommendsBoard(entity.documentId)
+                        entity.recommends++
+                        it.isClickable = false
+                    }//추천클릭
                     binding.recommend.text = entity.recommends.toString()
                     binding.comments.text = entity.comments.toString()//나중에 비동기 초기화
                     binding.send.setOnClickListener {  }//댓글 전송 클릭
@@ -172,7 +188,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageRe
                     val commentEntity: CommentEntity = commentItems.get(position-firstCommentPosition) as CommentEntity
                     binding.profilenickname.text = commentEntity.nickname //uid비교
                     Glide.with(itemView)//uid비교
-                        .load(storageRef.child(commentEntity.profileImage.substring(1)))
+                        .load(viewModel.getStorageRef().child(commentEntity.profileImage.substring(1)))
                         .override(360,640)
                         .into(binding.profileimage)
                         .onLoadFailed(
@@ -195,7 +211,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val storageRef: StorageRe
                     val replyEntity: ReplyEntity = commentItems.get(position-firstCommentPosition) as ReplyEntity
                     binding.profilenickname.text = replyEntity.nickname //uid비교
                     Glide.with(itemView)//uid비교
-                        .load(storageRef.child(replyEntity.profileImage.substring(1)))
+                        .load(viewModel.getStorageRef().child(replyEntity.profileImage.substring(1)))
                         .override(360,640)
                         .into(binding.profileimage)
                         .onLoadFailed(

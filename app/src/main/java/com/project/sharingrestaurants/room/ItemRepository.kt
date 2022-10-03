@@ -92,6 +92,14 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
         return fbDatabase.insertNicknameAuth(Auth.currentUser!!.uid, nickname)
     }
 
+    fun incrementLookBoard(boardId: String){
+        fbDatabase.incrementLookBoard(boardId)
+    }
+
+    fun incrementRecommendsBoard(boardId: String) {
+        fbDatabase.incrementRecommendsBoard(boardId)
+    }
+
     fun addFBAuth(){
         fbDatabase.addAuth(Auth.currentUser!!)
     }

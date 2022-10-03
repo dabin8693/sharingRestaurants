@@ -32,7 +32,7 @@
             android:src="@drawable/arrow_small_left_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></ImageView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/completeButton"
