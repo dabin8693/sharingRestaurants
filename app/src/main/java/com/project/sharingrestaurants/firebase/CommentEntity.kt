@@ -12,5 +12,6 @@ data class CommentEntity(//댓글 board하위 컬렉션
     var timestamp: Date,
     var body: String,
     //위는 파이어스토어 필드
-    var nickname: String =""
+    var nickname: String ="",
+    var profileImage: String =""
 ): Serializable

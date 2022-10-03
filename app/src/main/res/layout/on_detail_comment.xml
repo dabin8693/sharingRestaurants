@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -29,6 +31,7 @@
         </TextView>
 
         <TextView
+            android:id="@+id/body"
             android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,23 +57,34 @@
             </TextView>
 
             <TextView
+                android:id="@+id/replybutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="조회수"
+                android:layout_marginStart="10dp"
+                android:text="답글 쓰기"
                 android:textSize="12dp">
 
             </TextView>
-
             <TextView
-                android:id="@+id/see"
+                android:id="@+id/insertbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="315"
+                android:layout_marginStart="10dp"
+                android:text="수정"
                 android:textSize="12dp">
 
             </TextView>
+            <TextView
+                android:id="@+id/deletebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="삭제"
+                android:textSize="12dp">
+
+            </TextView>
+
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
+</layout>

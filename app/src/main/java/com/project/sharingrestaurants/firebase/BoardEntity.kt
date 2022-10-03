@@ -14,13 +14,15 @@ data class BoardEntity(
     var place: String ="",//세부주소(사용자 입력)
     var locate: String ="",//지도에서 선택한 주소
     var priority: Float =0f,//별점
-    var body: List<String> = listOf(),//내용(구분자 포함)
-    var image: List<String> = listOf(),//파이어스토리지 uri(구분자 포함)
+    var body: List<String> = listOf(),//최소 사이즈 = 1
+    var image: List<String> = listOf(),//최소 사이즈 = 1(이미지 없으면 index 0 값 = "")
     var thumb: String = "",
     var recommends: Int =0,//추천 수
     var latitude: Double =0.0,//위도
     var longitude: Double =0.0,//경도
+    var look: Int = 0,//조회수
 //위는 파이어스토어 필드
-    var comments: Int =0,//댓글 수
-    var nickname: String =""
+    var comments: Int =0,//댓글 수//세부글에서 쿼리
+    var nickname: String ="",//세부글에서 쿼리
+    var profileImage: String =""//세부글에서 쿠
 ): Serializable

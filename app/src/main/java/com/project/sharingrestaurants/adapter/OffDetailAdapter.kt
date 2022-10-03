@@ -88,7 +88,7 @@ class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
         return items.size
     }
 
-    fun setItemList(array: List<String>) {
+    private fun setItemList(array: List<String>) {
         this.items = array
         notifyDataSetChanged()
     }

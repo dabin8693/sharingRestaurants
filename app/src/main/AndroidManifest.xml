@@ -16,6 +16,7 @@
         android:theme="@style/Theme.SharingRestaurants">
         <activity
             android:name=".ui.off.ShowMapActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <meta-data
@@ -24,9 +25,12 @@
 
         <activity
             android:name=".ui.on.OnItemDetailShowActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.off.OffItemDetailShowActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.on.OnItemAddActivity"
@@ -38,6 +42,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
