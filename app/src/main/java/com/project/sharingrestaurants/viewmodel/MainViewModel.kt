@@ -50,11 +50,4 @@ class MainViewModel(private val repository: ItemRepository) : ViewModel() {
         return repository.getIsLogin()
     }
 
-    fun addFBBoard(boardMap: Map<String, Any>){
-        //repository.addFBBoard(boardMap)
-    }
-
-    fun getFBList(): LiveData<List<BoardEntity>> {
-        return repository.getFBList()
-    }
 }

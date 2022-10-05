@@ -21,6 +21,7 @@ data class BoardEntity(
 //위는 파이어스토어 board컬렉션 필드
     var comments: Int =0,//댓글 수//count컬렉션
     var like: Int =0,//추천 수//count컬렉션
+    var likeUsers: List<String> = listOf(),
     var nickname: String ="",//auth컬렉션
     var profileImage: String =""//auth컬렉션
 ): Serializable

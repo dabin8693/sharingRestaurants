@@ -3,6 +3,7 @@ package com.project.sharingrestaurants.firebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import com.project.sharingrestaurants.util.ConstValue
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 
@@ -32,7 +33,7 @@ class FBStorage {
             task.await()
             return path.path
         } catch (e: Exception) {
-            return "FALSE"
+            return ConstValue.FALSE
         }
     }
 }

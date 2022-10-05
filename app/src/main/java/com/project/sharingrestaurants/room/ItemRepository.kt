@@ -67,43 +67,39 @@ class ItemRepository(application: MyApplication) {
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //firestore database
 
-    fun addFBBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
+    suspend fun addFBBoard(boardMap: MutableMap<String, Any>): Boolean{
         return fbDatabase.addBoard(boardMap)
     }
 
-    fun insertFBBoard(boardMap: MutableMap<String, Any>): LiveData<Boolean>{
+    suspend fun insertFBBoard(boardMap: MutableMap<String, Any>): Boolean{
         return fbDatabase.insertBoard(boardMap)
     }
 
-    fun insertNicknameAuth(nickname: String): LiveData<Boolean>{
-        return fbDatabase.insertNicknameAuth(getAuth().nickname, nickname)
+    suspend fun insertNicknameAuth(nickname: String): Boolean{
+        return fbDatabase.insertNicknameAuth(getAuth().uid, nickname)
     }
 
-    fun incrementLook(boardId: String){
+    suspend fun incrementLook(boardId: String){
         fbDatabase.incrementLook(boardId)
     }
 
-    fun incrementLike(boardId: String) {
+    suspend fun incrementLike(boardId: String) {
         fbDatabase.incrementLike(boardId)
     }
 
-    fun addFBAuth(){
+    suspend fun addFBAuth(){
         fbDatabase.addAuth(getAuth())
     }
 
-    fun isFBAuth(): LiveData<Boolean>{//false = 회원정보x
-        return fbDatabase.isAuth(getAuth())
-    }
-
-    fun addFBComment(commentMap: MutableMap<String, Any>, boardId: String){
+    suspend fun addFBComment(commentMap: MutableMap<String, Any>, boardId: String){
         fbDatabase.addComment(commentMap, boardId)
     }
 
-    fun addReply(replyMap: MutableMap<String, Any>, boardId: String){
+    suspend fun addReply(replyMap: MutableMap<String, Any>, boardId: String){
         fbDatabase.addReply(replyMap, boardId)
     }
 
-    fun getFBList(): LiveData<List<BoardEntity>>{
+    suspend fun getFBList(): List<BoardEntity>{
         return fbDatabase.getBoard()
     }
 
@@ -111,11 +107,11 @@ class ItemRepository(application: MyApplication) {
         return fbDatabase.getNicknameAuth(email)
     }
 
-    fun getFBCommentList(boardId: String): LiveData<List<CommentEntity>>{
+    suspend fun getFBCommentList(boardId: String): List<CommentEntity>{
         return fbDatabase.getComment(boardId)
     }
 
-    fun getFBReplyList(boardId: String): LiveData<List<ReplyEntity>>{
+    suspend fun getFBReplyList(boardId: String): List<ReplyEntity>{
         return fbDatabase.getReply(boardId)
     }
 

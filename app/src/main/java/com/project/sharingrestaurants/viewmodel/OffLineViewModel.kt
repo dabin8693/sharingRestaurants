@@ -9,6 +9,9 @@ import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.DataTrans
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class OffLineViewModel(private val repository: ItemRepository) : ViewModel() {
 
@@ -61,11 +64,9 @@ class OffLineViewModel(private val repository: ItemRepository) : ViewModel() {
     fun getAuth(): UserEntity {
         return repository.getAuth()
     }
-    fun addFBAuth(lifecycleOwner: LifecycleOwner){
-        repository.isFBAuth().observe(lifecycleOwner){//회원정보 있으면 닉네임 가져옴
-            if (!it) {//회원정보x
-                repository.addFBAuth()//회원정보 추가
-            }
+    fun addFBAuth(){
+        CoroutineScope(Dispatchers.Main).launch {
+            repository.addFBAuth()//회원정보 추가
         }
     }
 

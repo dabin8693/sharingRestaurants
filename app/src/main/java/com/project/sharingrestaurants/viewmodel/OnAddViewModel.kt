@@ -81,11 +81,7 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
             imageList.add("")
         }
         if (imageList[0].equals("")) {//이미지 없을때
-            dbSave(imageList).observe(activity) { bool ->
-                if (bool == true) {
-                    isSuccess.value = true
-                }
-            }
+            dbSave(imageList, isSuccess)
         } else {//있으면 파이어스토리지 -> 파이어스토어
             imageSavedPath(
                 imageList,
@@ -93,15 +89,9 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                 contentResolver
             ).observe(activity) { bool ->
                 if (bool) {
-                    dbSave(uploadImagePath).observe(activity) { bool ->
-                        if (bool == true) {
-                            isSuccess.value = true
-                        } else {
-                            isSuccess.value = false
-                        }
-                    }
+                    dbSave(uploadImagePath, isSuccess)
                 } else {
-                    isSuccess.postValue(false)
+                    isSuccess.value = false
                 }
             }
         }
@@ -116,11 +106,7 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
             imageList.add("")
         }
         if (imageList[0].equals("")) {//이미지 없을때
-            dbInsert(imageList).observe(activity) { bool ->
-                if (bool == true) {
-                    isSuccess.value = true
-                }
-            }
+            dbInsert(imageList, isSuccess)
         } else {//있으면 파이어스토리지 -> 파이어스토어
             if (isChanged()) {//사진 변경됨
                 imageSavedPath(
@@ -129,23 +115,13 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                     contentResolver
                 ).observe(activity) { bool ->
                     if (bool) {
-                        dbInsert(uploadImagePath).observe(activity) { bool ->
-                            if (bool == true) {
-                                isSuccess.value = true
-                            } else {
-                                isSuccess.value = false
-                            }
-                        }
+                        dbInsert(uploadImagePath, isSuccess)
                     } else {
-                        isSuccess.postValue(false)
+                        isSuccess.value = false
                     }
                 }
             } else {//사진 변경x
-                dbInsert(imageList).observe(activity) { bool ->
-                    if (bool == true) {
-                        isSuccess.value = true
-                    }
-                }
+                dbInsert(imageList, isSuccess)
             }
         }
     }
@@ -300,45 +276,51 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         }
     }
 
-    private fun dbSave(imageUri: ArrayList<String>): LiveData<Boolean> {
-        return repository.addFBBoard(
-            hashMapOf(
-                "documentId" to "",//데이터베이스 호출부분에서 추가
-                "timestamp" to FieldValue.serverTimestamp(),
-                "uid" to repository.getAuth().uid,
-                "email" to repository.getAuth().email,
-                "tilte" to (itemTitle.value ?: ""),
-                "place" to (itemPlace.value ?: ""),
-                "locate" to (itemLocate.value ?: ""),
-                "priority" to (itemPriority.value ?: 0F),
-                "body" to textList,
-                "image" to imageUri,
-                "thumb" to uploadThumImagePath,
-                "latitude" to itemLatitude,
-                "longitude" to itemLongitude,
-                "look" to 0
+    private fun dbSave(imageUri: ArrayList<String>, isSuccess: MutableLiveData<Boolean>) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val bool: Boolean = repository.addFBBoard(
+                hashMapOf(
+                    "documentId" to "",//데이터베이스 호출부분에서 추가
+                    "timestamp" to FieldValue.serverTimestamp(),
+                    "uid" to repository.getAuth().uid,
+                    "email" to repository.getAuth().email,
+                    "tilte" to (itemTitle.value ?: ""),
+                    "place" to (itemPlace.value ?: ""),
+                    "locate" to (itemLocate.value ?: ""),
+                    "priority" to (itemPriority.value ?: 0F),
+                    "body" to textList,
+                    "image" to imageUri,
+                    "thumb" to uploadThumImagePath,
+                    "latitude" to itemLatitude,
+                    "longitude" to itemLongitude,
+                    "look" to 0
+                )
             )
-        )
+            isSuccess.value = bool
+        }
     }
 
-    private fun dbInsert(imageUri: ArrayList<String>): LiveData<Boolean> {
-        return repository.insertFBBoard(
-            hashMapOf(
-                "documentId" to documentId,//데이터베이스 호출부분에서 추가
-                "timestamp" to FieldValue.serverTimestamp(),
-                "uid" to repository.getAuth().uid,
-                "email" to repository.getAuth().email,
-                "tilte" to (itemTitle.value ?: ""),
-                "place" to (itemPlace.value ?: ""),
-                "locate" to (itemLocate.value ?: ""),
-                "priority" to (itemPriority.value ?: 0F),
-                "body" to textList,
-                "image" to imageUri,
-                "thumb" to uploadThumImagePath,
-                "latitude" to itemLatitude,
-                "longitude" to itemLongitude,
-                "look" to 0
+    private fun dbInsert(imageUri: ArrayList<String>, isSuccess: MutableLiveData<Boolean>) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val bool: Boolean = repository.insertFBBoard(
+                hashMapOf(
+                    "documentId" to documentId,//데이터베이스 호출부분에서 추가
+                    "timestamp" to FieldValue.serverTimestamp(),
+                    "uid" to repository.getAuth().uid,
+                    "email" to repository.getAuth().email,
+                    "tilte" to (itemTitle.value ?: ""),
+                    "place" to (itemPlace.value ?: ""),
+                    "locate" to (itemLocate.value ?: ""),
+                    "priority" to (itemPriority.value ?: 0F),
+                    "body" to textList,
+                    "image" to imageUri,
+                    "thumb" to uploadThumImagePath,
+                    "latitude" to itemLatitude,
+                    "longitude" to itemLongitude,
+                    "look" to 0
+                )
             )
-        )
+            isSuccess.value = bool
+        }
     }
 }

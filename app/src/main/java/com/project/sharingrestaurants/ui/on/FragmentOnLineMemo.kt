@@ -147,7 +147,7 @@ class FragmentOnLineMemo : Fragment() {
                 // 구글 로그인 성공
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.signIn(account, java.lang.ref.WeakReference(activity).get()) {
-                    viewModel.addFBAuth(viewLifecycleOwner)//db회원 정보 저장 및 불러오기
+                    viewModel.addFBAuth()//db회원 정보 저장 및 불러오기
                     loginDialog.dismiss()
                     Glide.with(this)
                         .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
