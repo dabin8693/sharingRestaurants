@@ -1,26 +1,20 @@
 package com.project.sharingrestaurants.adapter
 
 import android.content.Context
-import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.core.net.toUri
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.data.BoardHeadEntity
 import com.project.sharingrestaurants.databinding.*
 import com.project.sharingrestaurants.firebase.BoardEntity
-import com.project.sharingrestaurants.ui.off.ShowMapActivity
 import com.project.sharingrestaurants.viewmodel.OnAddViewModel
 
 class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val viewModel: OnAddViewModel, val lifecycleOwner: LifecycleOwner): RecyclerView.Adapter<OnAddAdapter.ViewHolder>() {
@@ -120,7 +114,7 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
             when(viewType){//head
                 2 -> {
                     binding as OnAddHeadBinding
-                    val item = items.get(0) as BoardHeadEntity
+                    val item = items.get(0) as BoardEntity
                     if (item.locate.equals("")) {//지도 선택x
                         viewModel.mapDrawable.value = context.resources.getDrawable(R.drawable.rectangleshape, null)
                     }else{

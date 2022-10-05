@@ -1,18 +1,14 @@
 package com.project.sharingrestaurants.viewmodel
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.view.View
 import android.widget.EditText
-import android.widget.ImageView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.project.sharingrestaurants.MyApplication
-import com.project.sharingrestaurants.data.OffDetailItem
+import com.project.sharingrestaurants.data.OffItem
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.ConstValue.DELIMITER
-import retrofit2.http.Body
 import java.lang.StringBuilder
 
 class OffAddViewModel(private val repository: ItemRepository): ViewModel() {
@@ -73,16 +69,16 @@ class OffAddViewModel(private val repository: ItemRepository): ViewModel() {
         itemBodys.append(text + DELIMITER)
     }
 
-    fun setItem(offDetailItem: OffDetailItem){//글 수정으로 들어올때
-        itemId.value = offDetailItem.id
-        itemLocate.value = offDetailItem.locate
-        itemPlace.value = offDetailItem.place?: ""
-        itemTitle.value = offDetailItem.title?: ""
-        itemPriority.value = offDetailItem.priority
+    fun setItem(offItem: OffItem){//글 수정으로 들어올때
+        itemId.value = offItem.id
+        itemLocate.value = offItem.locate
+        itemPlace.value = offItem.place?: ""
+        itemTitle.value = offItem.title?: ""
+        itemPriority.value = offItem.priority
 
-        if(offDetailItem.imageURL.size != 0) {
-            if (offDetailItem.imageURL.get(0) != "") {
-                for (i in offDetailItem.imageURL) {
+        if(offItem.imageURL.size != 0) {
+            if (offItem.imageURL.get(0) != "") {
+                for (i in offItem.imageURL) {
                     addImageUri(i)//string타입 uri
                 }
             }

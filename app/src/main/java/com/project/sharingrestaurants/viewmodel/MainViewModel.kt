@@ -10,6 +10,7 @@ import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.FBAuth
+import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemRepository
 
 //Activity나 Fragmemt 또는 View의 Context를 참조해서는 안된다.(메모리 누수)(애플리케이션 context 사용)
@@ -44,8 +45,12 @@ open class MainViewModel(private val repository: ItemRepository) : ViewModel() {
         myDrawable.value = activity.resources.getDrawable(R.drawable.my,null)
     }
 
-    fun getAuth(): FBAuth{
+    fun getAuth(): UserEntity {
         return repository.getAuth()
+    }
+
+    fun getIsLogin(): Boolean{
+        return repository.getIsLogin()
     }
 
     fun addFBBoard(boardMap: Map<String, Any>){

@@ -1,45 +1,24 @@
 package com.project.sharingrestaurants.viewmodel
 
-import android.app.Activity
 import android.content.ContentResolver
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.shapes.Shape
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
-import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import androidx.core.graphics.drawable.toDrawable
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.storage.StorageReference
-import com.project.sharingrestaurants.MyApplication
-import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.firebase.BoardEntity
-import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity
-import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.util.CameraWork.resizeBitmap
-import com.project.sharingrestaurants.util.ConstValue.DELIMITER
-import com.project.sharingrestaurants.util.ConstValue.FALSE
 import com.project.sharingrestaurants.util.DataTrans.getTime
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
-import java.lang.StringBuilder
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
@@ -111,7 +90,7 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         } else {//있으면 파이어스토리지 -> 파이어스토어
             imageSavedPath(
                 imageList,
-                repository.getAuth().currentUser!!.uid,
+                repository.getAuth().uid,
                 contentResolver
             ).observe(activity) { bool ->
                 if (bool) {
@@ -147,7 +126,7 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
             if (isChanged()) {//사진 변경됨
                 imageSavedPath(
                     imageList,
-                    repository.getAuth().currentUser!!.uid,
+                    repository.getAuth().uid,
                     contentResolver
                 ).observe(activity) { bool ->
                     if (bool) {
@@ -221,41 +200,29 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                     val imageName = "0" + imageArr.indexOf(image)
                     val pathAbs =
                         repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                    //uploadImagePath.append(pathAbs.path + DELIMITER)
                     uploadImagePath.add(pathAbs.path)
                     var data = bitmapUpload(image.toUri(), contentResolver)
-                    Log.d("세이브 코루틴 안안", imageName)
                     addImageFBStorage(uid, time, imageName, data, liveData, imageTotal, successList)
-                    Log.d("세이브 코루틴 밖밖", imageName)
                     val thumbName = "thumbnail"
                     val thumbPathAbs =
                         repository.getFBStorageRef().child(uid).child(time).child(thumbName)
-                    //uploadThumImagePath = thumbPathAbs.path
                     uploadThumImagePath = thumbPathAbs.path
                     data = thumBitmapUpload(image.toUri(), contentResolver)
-                    Log.d("세이브 코루틴 안안", imageName)
                     addImageFBStorage(uid, time, thumbName, data, liveData, imageTotal, successList)
-                    Log.d("세이브 코루틴 밖밖", imageName)
                 } else if (imageArr.indexOf(image) < 10) {
                     val imageName = "0" + imageArr.indexOf(image)
                     val pathAbs =
                         repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                    //uploadImagePath.append(pathAbs.path + DELIMITER)
                     uploadImagePath.add(pathAbs.path)
                     val data = bitmapUpload(image.toUri(), contentResolver)
-                    Log.d("세이브 코루틴 안안", imageName)
                     addImageFBStorage(uid, time, imageName, data, liveData, imageTotal, successList)
-                    Log.d("세이브 코루틴 밖밖", imageName)
                 } else if (imageArr.indexOf(image) < 100) {
                     val imageName = imageArr.indexOf(image).toString()
                     val pathAbs =
                         repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                    //uploadImagePath.append(pathAbs.path + DELIMITER)
                     uploadImagePath.add(pathAbs.path)
                     val data = bitmapUpload(image.toUri(), contentResolver)
-                    Log.d("세이브 코루틴 안안", imageName)
                     addImageFBStorage(uid, time, imageName, data, liveData, imageTotal, successList)
-                    Log.d("세이브 코루틴 밖밖", imageName)
                 }
             }
         }
@@ -298,12 +265,10 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         imageTotal: Int,
         successList: ArrayList<Boolean>
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             val value = repository.addImageFBStorage(uid, time, name, data)
-            Log.d("세이브 코루틴 안", name)
             syncSave(value, liveData, imageTotal, successList)
         }
-        Log.d("세이브 코루틴 밖", name)
     }
 
     @Synchronized
@@ -313,7 +278,6 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         imageTotal: Int,
         successList: ArrayList<Boolean>
     ) {
-        Log.d("세이브 싱크", path)
         if (path == "FALSE") {
             uploadSuccess.postValue(false)
             successList.add(false)
@@ -341,8 +305,8 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
             hashMapOf(
                 "documentId" to "",//데이터베이스 호출부분에서 추가
                 "timestamp" to FieldValue.serverTimestamp(),
-                "uid" to repository.getAuth().currentUser!!.uid,
-                "email" to repository.getAuth().currentUser!!.email!!,
+                "uid" to repository.getAuth().uid,
+                "email" to repository.getAuth().email,
                 "tilte" to (itemTitle.value ?: ""),
                 "place" to (itemPlace.value ?: ""),
                 "locate" to (itemLocate.value ?: ""),
@@ -363,8 +327,8 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
             hashMapOf(
                 "documentId" to documentId,//데이터베이스 호출부분에서 추가
                 "timestamp" to FieldValue.serverTimestamp(),
-                "uid" to repository.getAuth().currentUser!!.uid,
-                "email" to repository.getAuth().currentUser!!.email!!,
+                "uid" to repository.getAuth().uid,
+                "email" to repository.getAuth().email,
                 "tilte" to (itemTitle.value ?: ""),
                 "place" to (itemPlace.value ?: ""),
                 "locate" to (itemLocate.value ?: ""),

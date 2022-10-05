@@ -1,51 +1,28 @@
 package com.project.sharingrestaurants.ui.on
 
-import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.ImageDecoder
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.graphics.drawable.toDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.adapter.OnAdapter
 import com.project.sharingrestaurants.adapter.OnAddAdapter
-import com.project.sharingrestaurants.data.BitmapImageItem
-import com.project.sharingrestaurants.data.BoardHeadEntity
-import com.project.sharingrestaurants.data.OffDetailItem
-import com.project.sharingrestaurants.databinding.ActivityMainBinding
-import com.project.sharingrestaurants.databinding.ActivityOffItemAddBinding
 import com.project.sharingrestaurants.databinding.ActivityOnItemAddBinding
 import com.project.sharingrestaurants.firebase.BoardEntity
-import com.project.sharingrestaurants.ui.MainActivity
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity
 import com.project.sharingrestaurants.ui.off.ShowMapActivity
 import com.project.sharingrestaurants.util.CameraWork
-import com.project.sharingrestaurants.viewmodel.MainViewModel
 import com.project.sharingrestaurants.viewmodel.OnAddViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class OnItemAddActivity : AppCompatActivity() {
     lateinit var binding: ActivityOnItemAddBinding
@@ -69,7 +46,7 @@ class OnItemAddActivity : AppCompatActivity() {
             Adapter = OnAddAdapter({ position -> deleteDialog(position)}, {intent = Intent(this, ShowMapActivity::class.java)
                 mapCallBack.launch(intent)},viewModel, this).apply {
                 val list = ArrayList<Any>()
-                list.add(BoardHeadEntity("", "", "", 0f))//head
+                list.add(BoardEntity())//head
                 list.add("")//edit
                 list.add("")//linear
                 this.setItemList(list)
@@ -222,11 +199,17 @@ class OnItemAddActivity : AppCompatActivity() {
         if (!item.locate.equals("")){//지도 선택o
             viewModel.mapDrawable.value = resources.getDrawable(R.drawable.empty,null)
         }
-
+//item.tilte, item.place, item.locate, item.priority
         Adapter = OnAddAdapter({ position -> deleteDialog(position)}, {intent = Intent(this, ShowMapActivity::class.java)
             mapCallBack.launch(intent)},viewModel, this).apply {
             val list = ArrayList<Any>()
-            list.add(BoardHeadEntity(item.tilte, item.place, item.locate, item.priority))//head
+            val boardEntity: BoardEntity = BoardEntity().also {
+                it.tilte = item.tilte
+                it.place = item.place
+                it.locate = item.locate
+                it.priority = item.priority
+            }
+            list.add(boardEntity)//head
             list.add("")//edit
             for (index in 0 until (item.body.size-1)){//총 인덱스-1 개
                 list.add(item.body.get(index))

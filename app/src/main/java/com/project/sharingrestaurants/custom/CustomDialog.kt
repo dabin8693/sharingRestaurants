@@ -4,10 +4,8 @@ import android.app.Activity
 import android.app.Dialog
 import android.view.Window
 import android.widget.Button
-import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.common.SignInButton
 import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.firebase.FBLogin
 
 class CustomDialog(activity: Activity) : Dialog(activity) {
     private val signbutton: SignInButton

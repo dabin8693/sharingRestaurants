@@ -1,25 +1,20 @@
 package com.project.sharingrestaurants.viewmodel
 
-import android.app.Activity
-import android.net.Uri
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.firebase.FBAuth
-import com.project.sharingrestaurants.firebase.FBLogin
+import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemRepository
 
-class UserViewModel(private val repository: ItemRepository, private val login: FBLogin): ViewModel() {
+class UserViewModel(private val repository: ItemRepository): ViewModel() {
 
     fun signOut(){
-        FBLogin(repository.getAuth()).signOut()
+        repository.signOut()
     }
 
     fun getIsLogin(): Boolean {
-        return repository.getAuth().isLogin.value!!
+        return repository.getIsLogin()
     }
-    fun getAuth(): FBAuth {
+    fun getAuth(): UserEntity {
         return repository.getAuth()
     }
 

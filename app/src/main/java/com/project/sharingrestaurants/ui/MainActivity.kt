@@ -12,35 +12,19 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FieldValue
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.custom.CustomDialog
-import com.project.sharingrestaurants.data.BitmapImageItem
 import com.project.sharingrestaurants.databinding.ActivityMainBinding
-import com.project.sharingrestaurants.firebase.*
 import com.project.sharingrestaurants.ui.off.FragmentOffLineMemo
 import com.project.sharingrestaurants.ui.off.OffItemAddActivity
 import com.project.sharingrestaurants.ui.on.FragmentOnLineMemo
 import com.project.sharingrestaurants.ui.on.OnItemAddActivity
-import com.project.sharingrestaurants.util.CameraWork
-import com.project.sharingrestaurants.util.DataTrans
-
 import com.project.sharingrestaurants.viewmodel.MainViewModel
-import com.project.sharingrestaurants.viewmodel.OnLineViewModel
-import com.project.sharingrestaurants.viewmodel.UserViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
-import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -117,9 +101,6 @@ class MainActivity : AppCompatActivity() {
         binding.mainActivity = this //xml에서 main액티비티 데이터에 접근 가능하게
         binding.lifecycleOwner = this //이거 안쓰면 데이터바인딩 쓸때 xml이 데이터 관측 못 함
 
-        if (viewModel.getAuth().currentUser != null) {
-            viewModel.getAuth().photoUrl.value = viewModel.getAuth()!!.currentUser!!.photoUrl
-        }
         viewModel.setOffDrawable(this)
 
     }
@@ -158,7 +139,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun myShow() {
-        if (viewModel.getAuth().currentUser != null) {
+        if (viewModel.getIsLogin()) {//로그인 상태
             transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.Fragcontainer, fragUser, "User")
             //transaction.addToBackStack(null)

@@ -1,8 +1,6 @@
 package com.project.sharingrestaurants.adapter
 
-import android.app.Activity
-import android.content.Context
-import android.provider.ContactsContract
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.project.sharingrestaurants.databinding.OffItemBinding
 import com.project.sharingrestaurants.room.ItemEntity
-import com.project.sharingrestaurants.util.ConstValue
 import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import com.project.sharingrestaurants.util.DataTrans
 
@@ -22,7 +19,6 @@ class OffAdapter(val itemClick: (ItemEntity, Int) -> Unit, val itemLongClick: (I
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {//뷰홀더 생성
-        Log.d("뷰홀더 생성","ㅇㅇ")
         val binding = OffItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         val viewholer = ViewHolder(binding)
         viewHolderList.add(viewholer)
@@ -30,16 +26,13 @@ class OffAdapter(val itemClick: (ItemEntity, Int) -> Unit, val itemLongClick: (I
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {//뷰홀더에 데이터 바인딩
-        Log.d("뷰홀더 바인드 생성","ㅇㅇ")
         holder.bind(items[position], position)
     }
 
     override fun getItemCount(): Int {//리스트 총 크기 = items.size
-        Log.d("아이템 사이즈","ㅇㅇ")
         return items.size
     }
     fun setItems(items: List<ItemEntity>) {//아이템 체인지 이벤트 보내기
-        Log.d("셋아이템","ㅇㅇ")
         this.items = items
         notifyDataSetChanged()
     }
@@ -55,7 +48,6 @@ class OffAdapter(val itemClick: (ItemEntity, Int) -> Unit, val itemLongClick: (I
         //itemView = binding.root
         lateinit var item: ItemEntity
         fun bind(item: ItemEntity, position: Int) {//뷰홀더에 데이터 바인딩
-            Log.d("뷰홀더 바인드","ㅇㅇ")
             this.item = item
             binding.itemName.text = item.title
             binding.itemPlace.text = item.place

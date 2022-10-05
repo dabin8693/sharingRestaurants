@@ -44,18 +44,13 @@ class FBStorage {
 
 
     suspend fun addImage(uid: String, time: String, name: String, data: ByteArray): String {
-        Log.d("세이브 add 안안", name)
         val path: StorageReference = storageRef.child(uid).child(time).child(name)
         val task = path.putBytes(data)
         try {
-            Log.d("세이브 add 안", name)
             task.await()
-            Log.d("세이브 add 밖", name)
             return path.path
         } catch (e: Exception) {
-            Log.d("세이브 add 밖", name)
             return "FALSE"
         }
-        Log.d("세이브 add 밖밖", name)
     }
 }

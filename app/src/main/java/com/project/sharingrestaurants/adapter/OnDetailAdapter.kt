@@ -10,9 +10,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.databinding.*
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.CommentEntity

@@ -41,19 +41,19 @@ class FBDatabase {
         val documentRef: DocumentReference = fbDatabase.collection("board").document()
         boardMap.replace("documentId", documentRef.id)//api24이상
         documentRef.set(boardMap)
-            .addOnSuccessListener { liveData.postValue(true) }
-            .addOnFailureListener { liveData.postValue(false) }
+            .addOnSuccessListener { liveData.value = true }
+            .addOnFailureListener { liveData.value = false }
 
         return liveData
     }
 
-    fun addAuth(currentUser: FirebaseUser) {//추가 //처음 추가할때는 닉네임
-        fbDatabase.collection("auth").document(currentUser.uid).set(
+    fun addAuth(user: UserEntity) {//추가 //처음 추가할때는 닉네임
+        fbDatabase.collection("auth").document(user.uid).set(
             hashMapOf(
-                "uid" to currentUser.uid,
-                "email" to currentUser.email,
-                "image" to currentUser.photoUrl,
-                "nickname" to currentUser.email!!.split("@").get(0),//초기값 설정
+                "uid" to user.uid,
+                "email" to user.email,
+                "image" to user.profileImage,
+                "nickname" to user.nickname,//초기값은 이메일 앞부분이 들어가 있다
                 "timestamp" to FieldValue.serverTimestamp()
             )
         )
@@ -77,8 +77,8 @@ class FBDatabase {
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
         fbDatabase.collection("board").document(boardMap.get("documentId").toString())
             .update(boardMap)
-            .addOnSuccessListener { liveData.postValue(true) }
-            .addOnFailureListener { liveData.postValue(false) }
+            .addOnSuccessListener { liveData.value = true }
+            .addOnFailureListener { liveData.value = false }
         return liveData
     }
 
@@ -99,13 +99,12 @@ class FBDatabase {
     fun insertNicknameAuth(uid: String, nickname: String): LiveData<Boolean> {
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
         fbDatabase.collection("auth").document(uid).update("nickname", nickname)
-            .addOnSuccessListener { liveData.postValue(true) }
-            .addOnFailureListener { liveData.postValue(false) }
+            .addOnSuccessListener { liveData.value = true }
+            .addOnFailureListener { liveData.value = false }
         return liveData
     }
 
     fun getBoard(): LiveData<List<BoardEntity>> {
-        Log.d("리스트 호출", "ㄴㅇㄹㄴㅇㄹ")
         val liveData: MutableLiveData<List<BoardEntity>> = MutableLiveData()
         fbDatabase.collection("board").get()
             .addOnSuccessListener { documents ->
@@ -152,24 +151,23 @@ class FBDatabase {
         }
     }
 
-    fun isAuth(auth: FBAuth): LiveData<Boolean> {//현재로그인유저 회원정보있는지 확인
+    fun isAuth(user: UserEntity): LiveData<Boolean> {//현재로그인유저 회원정보있는지 확인
         val liveData: MutableLiveData<Boolean> = MutableLiveData()
-        fbDatabase.collection("auth").whereEqualTo("uid", auth.currentUser!!.uid).get()
+        Log.d("uid는",user.uid)
+        fbDatabase.collection("auth").whereEqualTo("uid", user.uid).get()
             .addOnSuccessListener {
                 if (it.isEmpty) {//회원정보가 없다
-                    auth.nickname = auth.currentUser!!.email!!.split("@").get(0)//초기값 설정
-                    liveData.postValue(false)
+                    user.nickname = user.email.split("@").get(0)//초기값 설정
+                    liveData.value = false
                 } else {//회원정보가 있다
                     for (data in it) {
-                        auth.nickname = data.data.get("nickname") as String//닉네임 가져오기
+                        user.nickname = data.data.get("nickname") as String//닉네임 가져오기
                     }
-                    liveData.postValue(true)
+                    liveData.value = true
                 }
             }.addOnFailureListener {
-                liveData.postValue(false)
-            }.addOnFailureListener {
-                auth.nickname = auth.currentUser!!.email!!.split("@").get(0)//초기값 설정
-                liveData.postValue(false)
+                user.nickname = user.email.split("@").get(0)//초기값 설정
+                liveData.value = false
             }
 
         return liveData

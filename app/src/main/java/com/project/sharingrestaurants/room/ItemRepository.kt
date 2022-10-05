@@ -1,11 +1,14 @@
 package com.project.sharingrestaurants.room
 
+import android.app.Activity
 import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.StorageReference
@@ -19,7 +22,7 @@ import java.lang.Exception
 class ItemRepository(application: MyApplication) {//나중에 di사용 Application클래스에서 의존성 관리
     private val itemDatabase = ItemDatabase.getInstance(application)
     private val itemDao = itemDatabase.dao()
-    private val Auth: FBAuth = FBAuth.getInstance(application)//애플리케이션 클래스로 옮기기
+    private val Auth: FBAuth = FBAuth.getInstance(application)//파이어베이스 중에 제일 먼저 초기화
     private val fbDatabase: FBDatabase = FBDatabase.getInstance()
     private val fbStorage: FBStorage = FBStorage.getInstance()
 
@@ -89,7 +92,7 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     }
 
     fun insertNicknameAuth(nickname: String): LiveData<Boolean>{
-        return fbDatabase.insertNicknameAuth(Auth.currentUser!!.uid, nickname)
+        return fbDatabase.insertNicknameAuth(getAuth().nickname, nickname)
     }
 
     fun incrementLookBoard(boardId: String){
@@ -101,11 +104,11 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     }
 
     fun addFBAuth(){
-        fbDatabase.addAuth(Auth.currentUser!!)
+        fbDatabase.addAuth(getAuth())
     }
 
     fun isFBAuth(): LiveData<Boolean>{//false = 회원정보x
-        return fbDatabase.isAuth(Auth)
+        return fbDatabase.isAuth(getAuth())
     }
 
     fun addFBComment(commentMap: MutableMap<String, Any>, boardId: String){
@@ -143,8 +146,24 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     //firestore storage
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //fireAuth
-    fun getAuth(): FBAuth {
-        return Auth
+    fun getAuth(): UserEntity {
+        return Auth.getUser()
+    }
+
+    fun getIsLogin(): Boolean{
+        return Auth.getIsLogin()
+    }
+
+    fun signOut() {
+        return Auth.signOut()
+    }
+
+    fun signInGoogle(acct: GoogleSignInAccount, context: Activity, callback: () -> Unit){
+        Auth.firebaseAuthWithGoogle(acct, context, callback)
+    }
+
+    fun getGoogleSignInClient(): GoogleSignInClient {
+        return Auth.getGoogleSignInClient()
     }
 
 }

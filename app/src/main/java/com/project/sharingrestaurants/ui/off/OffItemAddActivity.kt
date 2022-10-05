@@ -1,6 +1,5 @@
 package com.project.sharingrestaurants.ui.off
 
-import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -18,7 +17,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
@@ -27,15 +25,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.BitmapImageItem
-import com.project.sharingrestaurants.data.OffDetailItem
+import com.project.sharingrestaurants.data.OffItem
 import com.project.sharingrestaurants.databinding.ActivityOffItemAddBinding
 import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.viewmodel.OffAddViewModel
-import com.project.sharingrestaurants.viewmodel.OffDetailViewModel
-import com.project.sharingrestaurants.viewmodel.OffLineViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
-import java.text.SimpleDateFormat
-import java.util.*
 
 //화면 고정설정
 class OffItemAddActivity : AppCompatActivity() {
@@ -54,7 +48,7 @@ class OffItemAddActivity : AppCompatActivity() {
 
         if (intent != null && intent.hasExtra("OffDetailItem")) {
             //off detail에서 넘어온 경우
-            applyExistingInfo(intent.getSerializableExtra("OffDetailItem") as OffDetailItem)
+            applyExistingInfo(intent.getSerializableExtra("OffDetailItem") as OffItem)
         }
 
         binding.back.setOnClickListener {
@@ -334,7 +328,7 @@ class OffItemAddActivity : AppCompatActivity() {
     }
 
     //기존 정보 적용
-    private fun applyExistingInfo(item: OffDetailItem){
+    private fun applyExistingInfo(item: OffItem){
         viewModel.setItem(item)
 
         binding.showmap.background = null

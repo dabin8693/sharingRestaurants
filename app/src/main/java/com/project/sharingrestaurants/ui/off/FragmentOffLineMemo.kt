@@ -159,9 +159,8 @@ class FragmentOffLineMemo : Fragment() {
         }
 
         if (viewModel.getIsLogin() == true) {
-            Log.d("url값은ㅇ", viewModel.getAuth().photoUrl.value.toString())
             Glide.with(this)
-                .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
                 .into(binding.imageView)
                 .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
         }
@@ -245,7 +244,7 @@ class FragmentOffLineMemo : Fragment() {
             loginDialog = CustomDialog(activity)
             loginDialog.signOnClick {
                 val signInIntent: Intent =
-                    viewModel.getAuth().googleSignInClient!!.signInIntent //구글로그인 페이지로 가는 인텐트 객체
+                    viewModel.getGoogleSignInClient().signInIntent //구글로그인 페이지로 가는 인텐트 객체
 
                 startActivityForResult(signInIntent, 100) //Google Sign In flow 시작
             }
@@ -261,7 +260,6 @@ class FragmentOffLineMemo : Fragment() {
 
         // 구글로그인 버튼 응답
         if (requestCode == 100) {
-
             // 구글로그인 버튼 응답
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
@@ -269,10 +267,10 @@ class FragmentOffLineMemo : Fragment() {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.signIn(account, java.lang.ref.WeakReference(activity).get()) {//로그인 성공
                     viewModel.addFBAuth(viewLifecycleOwner)//db회원 정보 저장 및 불러오기
-                    Log.d("url값은", viewModel.getAuth().photoUrl.value.toString())
+                    Log.d("url값은", viewModel.getAuth().profileImage)
                     loginDialog.dismiss()
                     Glide.with(this)
-                        .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                        .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
                         .skipMemoryCache(true)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .signature(ObjectKey("sign"))

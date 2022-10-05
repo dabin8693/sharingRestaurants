@@ -1,29 +1,20 @@
 package com.project.sharingrestaurants.adapter
 
-import android.content.Context
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.RatingBar
-import android.widget.TextView
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.data.OffDetailItem
+import com.project.sharingrestaurants.data.OffItem
 import com.project.sharingrestaurants.databinding.*
-import com.project.sharingrestaurants.room.ItemEntity
 
 class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
     private var items: List<String> = listOf()//
     private lateinit var binding: ViewDataBinding
 
     override fun getItemViewType(position: Int): Int {
-        Log.d("타입생성호출","")
         when (position) {
             0 -> {
                 return 0//text(title)
@@ -49,8 +40,6 @@ class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        Log.d("뷰홀더생성호출","")
-
         when (viewType) {
             0 -> {
                 binding = OffItemTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)//text
@@ -73,18 +62,15 @@ class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
                 return ViewHolder(binding, viewType)
             }
         }
-        Log.d("뷰홀더 예외","")
         binding = OffItemImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)//image
         return ViewHolder(binding, viewType)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Log.d("뷰홀더호출",position.toString())
         holder.bind(items.get(position))
     }
 
     override fun getItemCount(): Int {
-        Log.d("카운트호출",items.size.toString())
         return items.size
     }
 
@@ -93,7 +79,7 @@ class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
         notifyDataSetChanged()
     }
 //list -> arraylist x //arraylist -> list o //list -> mutablelist o
-    fun setItem(items: OffDetailItem) {
+    fun setItem(items: OffItem) {
         val array = ArrayList<String>()
         array.add(items.title)
         array.add(items.locate)

@@ -1,21 +1,17 @@
 package com.project.sharingrestaurants.viewmodel
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import androidx.arch.core.util.Function
 import androidx.lifecycle.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.project.sharingrestaurants.MyApplication
-import com.project.sharingrestaurants.custom.CustomDialog
-import com.project.sharingrestaurants.firebase.AuthEntity
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.project.sharingrestaurants.firebase.FBAuth
-import com.project.sharingrestaurants.firebase.FBLogin
+import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.DataTrans
 
-class OffLineViewModel(private val repository: ItemRepository, private val login: FBLogin) : ViewModel() {
+class OffLineViewModel(private val repository: ItemRepository) : ViewModel() {
 
     val spinnerName: MutableLiveData<String> = MutableLiveData()
     val searchText: MutableLiveData<String> = MutableLiveData()
@@ -58,12 +54,12 @@ class OffLineViewModel(private val repository: ItemRepository, private val login
     }
 
     fun signIn(account: GoogleSignInAccount, activity: Activity?, callback: () -> Unit){
-        login.firebaseAuthWithGoogle(account, activity!!, callback)//FBLogin()이거 Factory로 받아오게 변경
+        repository.signInGoogle(account, activity!!, callback)//FBLogin()이거 Factory로 받아오게 변경
     }
     fun getIsLogin(): Boolean {
-        return repository.getAuth().isLogin.value!!
+        return repository.getIsLogin()
     }
-    fun getAuth(): FBAuth {
+    fun getAuth(): UserEntity {
         return repository.getAuth()
     }
     fun addFBAuth(lifecycleOwner: LifecycleOwner){
@@ -74,8 +70,8 @@ class OffLineViewModel(private val repository: ItemRepository, private val login
         }
     }
 
-    fun deleteReference(){
-
+    fun getGoogleSignInClient(): GoogleSignInClient {
+        return repository.getGoogleSignInClient()
     }
 
 

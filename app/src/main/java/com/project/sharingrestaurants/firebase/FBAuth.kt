@@ -22,16 +22,12 @@ import com.project.sharingrestaurants.room.ItemRepository
 
 class FBAuth(val context: MyApplication) {
 
-    private var _mAuth: FirebaseAuth?= FirebaseAuth.getInstance() //싱글톤 객체임
-    private var _googleSignInClient: GoogleSignInClient?= null
-    private var _isLogin: MutableLiveData<Boolean> = MutableLiveData()
-    private var _photoUrl: MutableLiveData<Uri> = MutableLiveData()
-    val mAuth get() = _mAuth
-    val googleSignInClient get() = _googleSignInClient
-    val isLogin get() = _isLogin
-    var currentUser: FirebaseUser?= null
-    val photoUrl get() = _photoUrl
-    lateinit var nickname: String
+    private var mAuth: FirebaseAuth = FirebaseAuth.getInstance() //싱글톤 객체임
+    private var googleSignInClient: GoogleSignInClient
+    private var isLogin: Boolean = false
+    private var currentUser: FirebaseUser?= null
+    private var userEntity: UserEntity = UserEntity()
+
 
 
     companion object{
@@ -46,14 +42,15 @@ class FBAuth(val context: MyApplication) {
     }
 
     init {
-        if (mAuth!!.currentUser != null) {
-            currentUser = mAuth!!.currentUser!!
-            isLogin.value = true
-            nickname = currentUser!!.email!!.split("@").get(0)//임시
-            Log.d("로그인상태", "ㅇㅁ")
+        if (mAuth.currentUser != null) {//로그인 여부 체크
+            currentUser = mAuth.currentUser
+            isLogin = true
+            userEntity.nickname = currentUser!!.email!!.split("@").get(0)//임시
+            userEntity.uid = currentUser!!.uid
+            userEntity.email = currentUser!!.email!!
+            userEntity.profileImage = currentUser!!.photoUrl.toString()
         } else {
-            Log.d("로그아웃상태", "ㅇㅁ")
-            isLogin.value = false
+            isLogin = false
         }
         val googleSignInOptions =
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -61,6 +58,90 @@ class FBAuth(val context: MyApplication) {
                 .requestEmail()
                 .build()
 
-        _googleSignInClient = GoogleSignIn.getClient(this.context!!, googleSignInOptions)
+        googleSignInClient = GoogleSignIn.getClient(this.context!!, googleSignInOptions)
     }
+
+    fun getUser(): UserEntity{
+        return userEntity
+    }
+
+    fun getIsLogin(): Boolean{
+        return isLogin
+    }
+
+    fun getGoogleSignInClient(): GoogleSignInClient{
+        return googleSignInClient
+    }
+
+    // 사용자가 정상적으로 로그인한 후에 GoogleSignInAccount 개체에서 ID 토큰을 가져와서
+    // Firebase 사용자 인증 정보로 교환하고 Firebase 사용자 인증 정보를 사용해 Firebase에 인증합니다.
+    //activit = java.lang.ref.WeakReference(activity).get()
+    fun firebaseAuthWithGoogle(acct: GoogleSignInAccount, context: Activity, callback: () -> Unit) {//리스너 중복클릭 못 하게 해야됨!!!(메모리 릭)
+        //로그인 -> isAuth -false-> addAuth(db추가)
+        //                -true->
+        //isAuth 있으면 닉네임 가져옴 없으면 닉네임 초기값 저장
+        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        mAuth.signInWithCredential(credential)
+            .addOnCompleteListener(
+                context!!,
+                OnCompleteListener<AuthResult?> { task ->
+                    if (task.isSuccessful) {//닉네이 제외하고 정보 저장
+                        currentUser = mAuth.currentUser
+                        // 로그인 성공
+                        Toast.makeText(
+                            context,
+                            "로그인 성공",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        isLogin = true
+                        userEntity.profileImage = currentUser!!.photoUrl.toString()
+                        userEntity.email = currentUser!!.email!!
+                        userEntity.uid = currentUser!!.uid
+
+                        callback()
+
+                    } else {
+                        // 로그인 실패
+                        Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                })
+
+    }
+
+
+    fun signUp(email: String, password: String, context: Activity){//회원가입
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(context!!){ result ->
+            if (result.isSuccessful){
+                currentUser = mAuth.currentUser
+            }else{
+                Log.w(ContentValues.TAG, "createUserWithEmail:failure", result.getException());
+                Toast.makeText(
+                    context, "Authentication failed.",
+                    Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    fun signIn(email: String, password: String, context: Activity){//로그인
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(context!!){ result ->
+            if (result.isSuccessful){
+                currentUser = mAuth.currentUser
+            }else{
+                Log.w(ContentValues.TAG, "signInWithEmail:failure", result.getException());
+                Toast.makeText(
+                    context, "Authentication failed.",
+                    Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    fun signOut(){
+        mAuth.signOut()
+        isLogin = false
+        currentUser = null
+        userEntity = UserEntity()
+    }
+
 }

@@ -1,7 +1,6 @@
 package com.project.sharingrestaurants.ui.on
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,8 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -28,14 +25,11 @@ import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnAdapter
 import com.project.sharingrestaurants.custom.CustomDialog
 import com.project.sharingrestaurants.databinding.FragOnlineMemoBinding
-import com.project.sharingrestaurants.firebase.BoardEntity
-import com.project.sharingrestaurants.firebase.FBLogin
 import com.project.sharingrestaurants.ui.MainActivity
 import com.project.sharingrestaurants.viewmodel.OnLineViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 
 class FragmentOnLineMemo : Fragment() {
-    //뷰페이저2 구현
     private val viewModel: OnLineViewModel by lazy {//프래그먼트 객체가 사라질때까지 유지
         ViewModelProvider(this, ViewModelFactory(MyApplication.REPOSITORY)).get(
             OnLineViewModel::class.java
@@ -124,9 +118,8 @@ class FragmentOnLineMemo : Fragment() {
         }
 
         if (viewModel.getIsLogin() == true) {
-            Log.d("url값은ㅇ", viewModel.getAuth().photoUrl.value.toString())
             Glide.with(this)
-                .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
                 .into(binding.imageView)
                 .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
         }
@@ -138,7 +131,7 @@ class FragmentOnLineMemo : Fragment() {
             loginDialog = CustomDialog(activity)
             loginDialog.signOnClick {
                 val signInIntent: Intent =
-                    viewModel.getAuth().googleSignInClient!!.signInIntent //구글로그인 페이지로 가는 인텐트 객체
+                    viewModel.getGoogleSignInClient().signInIntent //구글로그인 페이지로 가는 인텐트 객체
 
                 startActivityForResult(signInIntent, 100) //Google Sign In flow 시작
             }
@@ -161,10 +154,10 @@ class FragmentOnLineMemo : Fragment() {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.signIn(account, java.lang.ref.WeakReference(activity).get()) {
                     viewModel.addFBAuth(viewLifecycleOwner)//db회원 정보 저장 및 불러오기
-                    Log.d("url값은", viewModel.getAuth().photoUrl.value.toString())
+                    Log.d("url값은", viewModel.getAuth().profileImage)
                     loginDialog.dismiss()
                     Glide.with(this)
-                        .load(viewModel.getAuth().photoUrl.value)//첫번째 사진만 보여준다
+                        .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
                         .skipMemoryCache(true)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .into(binding.imageView)

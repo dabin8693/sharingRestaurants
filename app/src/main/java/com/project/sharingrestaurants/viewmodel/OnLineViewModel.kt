@@ -1,19 +1,17 @@
 package com.project.sharingrestaurants.viewmodel
 
 import android.app.Activity
-import android.net.Uri
 import androidx.lifecycle.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.storage.StorageReference
-import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.FBAuth
-import com.project.sharingrestaurants.firebase.FBLogin
-import com.project.sharingrestaurants.room.ItemEntity
+import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.DataTrans
 
-class OnLineViewModel(private val repository: ItemRepository, private val login: FBLogin): ViewModel() {
+class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
     //private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     val currentLatitude: MutableLiveData<Double> = MutableLiveData()
@@ -29,12 +27,12 @@ class OnLineViewModel(private val repository: ItemRepository, private val login:
     }
 
     fun signIn(account: GoogleSignInAccount, activity: Activity?, callback: () -> Unit) {
-        login.firebaseAuthWithGoogle(account, activity!!, callback)//FBLogin()이거 Factory로 받아오게 변경
+        repository.signInGoogle(account, activity!!, callback)//FBLogin()이거 Factory로 받아오게 변경
     }
     fun getIsLogin(): Boolean {
-        return repository.getAuth().isLogin.value!!
+        return repository.getIsLogin()
     }
-    fun getAuth(): FBAuth {
+    fun getAuth(): UserEntity {
         return repository.getAuth()
     }
 
@@ -44,6 +42,10 @@ class OnLineViewModel(private val repository: ItemRepository, private val login:
                 repository.addFBAuth()//회원정보 추가
             }
         }
+    }
+
+    fun getGoogleSignInClient(): GoogleSignInClient {
+        return repository.getGoogleSignInClient()
     }
 
     fun getStorageRef(): StorageReference{

@@ -4,11 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.storage.StorageReference
-import com.project.sharingrestaurants.MyApplication
-import com.project.sharingrestaurants.data.OffDetailItem
 import com.project.sharingrestaurants.firebase.BoardEntity
-import com.project.sharingrestaurants.firebase.FBAuth
-import com.project.sharingrestaurants.room.ItemEntity
+import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +16,12 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
     val nicknamMap: MutableMap<String, String> = hashMapOf()//key - email, value - nickname
     var isRecomment: Boolean = false//이게 true면 추천수 불러올때 추가로 1더하기
 
-    fun getAuth(): FBAuth {
+    fun getAuth(): UserEntity {
         return repository.getAuth()
+    }
+
+    fun getIsLogin(): Boolean{
+        return repository.getIsLogin()
     }
 
     fun getStorageRef(): StorageReference{
