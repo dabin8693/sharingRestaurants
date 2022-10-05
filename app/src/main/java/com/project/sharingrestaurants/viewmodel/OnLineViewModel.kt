@@ -1,6 +1,7 @@
 package com.project.sharingrestaurants.viewmodel
 
 import android.app.Activity
+import android.util.Log
 import androidx.core.os.trace
 import androidx.lifecycle.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -25,7 +26,7 @@ class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
         CoroutineScope(Dispatchers.Main).launch {
             val boardList = repository.getBoardList() as ArrayList
             val countList = repository.getCountList()
-            val newBoardList = boardList.clone() as ArrayList<BoardEntity>
+            var newBoardList = boardList.clone() as ArrayList<BoardEntity>
             var a = 0
             for (board in boardList){
                 var b = 0
@@ -41,7 +42,8 @@ class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
                     }
                 }
                 if (b == 0){//해당 글에 해당하는 count가 없으면 목록 리스트에서 해당 글 삭제
-                    newBoardList.removeAt(a)
+                    newBoardList.removeAt(a)//삭제하면 인덱스가 하나 줄음
+                    a--
                 }
                 a++
             }

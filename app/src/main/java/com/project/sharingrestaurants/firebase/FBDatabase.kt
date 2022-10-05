@@ -4,6 +4,7 @@ package com.project.sharingrestaurants.firebase
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.getField
@@ -12,6 +13,7 @@ import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
+import java.time.LocalDateTime
 import java.util.*
 
 
@@ -36,14 +38,15 @@ class FBDatabase {
             val documentRef: DocumentReference = fbDatabase.collection("board").document()
             boardMap.replace("documentId", documentRef.id)//api24이상
             documentRef.set(boardMap).await()
-            val timestamp: Date = fbDatabase.collection("board").document(documentRef.id).get().await().data!!.get("timestamp") as Date
-            return addCount(documentRef.id, timestamp)
-        }catch (e: Exception){
+            val time = fbDatabase.collection("board").document(documentRef.id).get().await().data!!.get("timestamp") as Timestamp
+            return addCount(documentRef.id, time.toDate())
+        }catch (e: Exception){//Timestamp = Timestamp(seconds=1664997712, nanoseconds=650000000)
             return false
         }
     }
 
-    private suspend fun addCount(boardId: String, timestamp: Date): Boolean{
+    suspend fun addCount(boardId: String, timestamp: Date): Boolean{
+        //Timestamp.toDate = Thu Oct 06 04:21:52 GMT+09:00 2022
         try {
             fbDatabase.collection("count").document(boardId)
                 .set(CountEntity(boardId, timestamp, 0, 0, 0, listOf())).await()

@@ -195,7 +195,6 @@ class OnItemAddActivity : AppCompatActivity() {
                 it.priority = item.priority
             }
             list.add(boardEntity)//head
-            list.add("")//edit
             for (index in 0 until (item.body.size-1)){//총 인덱스-1 개
                 list.add(item.body.get(index))
                 list.add(item.image.get(index))
