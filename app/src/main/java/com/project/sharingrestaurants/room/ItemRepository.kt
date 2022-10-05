@@ -111,7 +111,7 @@ class ItemRepository(application: MyApplication) {
         fbDatabase.addAuth(getAuth())
     }
 
-    suspend fun addFBComment(commentMap: MutableMap<String, Any>){
+    suspend fun addComment(commentMap: MutableMap<String, Any>){
         fbDatabase.addComment(commentMap)
     }
 
@@ -119,19 +119,35 @@ class ItemRepository(application: MyApplication) {
         fbDatabase.addReply(replyMap)
     }
 
-    suspend fun getFBList(): List<BoardEntity>{
-        return fbDatabase.getBoard()
+    suspend fun getBoardList(): List<BoardEntity>{
+        return fbDatabase.getBoardList()
     }
 
-    suspend fun getFBNicknameAuth(email: String): String{
+    suspend fun getCountList(): List<CountEntity>{
+        return fbDatabase.getCountList()
+    }
+
+    suspend fun getBoard(boardId: String): BoardEntity{
+        return fbDatabase.getBoard(boardId)
+    }
+
+    suspend fun getUserInform(email: String): BoardEntity{
+        return fbDatabase.getUser(email)
+    }
+
+    suspend fun getCount(boardId: String): CountEntity{
+        return fbDatabase.getCount(boardId)
+    }
+
+    suspend fun getNicknameAuth(email: String): String{
         return fbDatabase.getNicknameAuth(email)
     }
 
-    suspend fun getFBCommentList(boardId: String): List<CommentEntity>{
+    suspend fun getCommentList(boardId: String): List<CommentEntity>{
         return fbDatabase.getComment(boardId)
     }
 
-    suspend fun getFBReplyList(boardId: String): List<ReplyEntity>{
+    suspend fun getReplyList(boardId: String): List<ReplyEntity>{
         return fbDatabase.getReply(boardId)
     }
 

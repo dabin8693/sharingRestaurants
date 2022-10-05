@@ -24,6 +24,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
     private var commentsSize: Int = 0
     private lateinit var binding: ViewDataBinding
     private lateinit var context: Context
+    private lateinit var head: ViewHolder
 
     init {
         viewTypeList.add("head")
@@ -52,7 +53,8 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
         when (viewType) {
             0 -> {//head
                 binding = OnDetailHeadBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                return ViewHolder(binding, viewType)
+                head = ViewHolder(binding, viewType)
+                return head
             }
             1 -> {//text
                 binding = OffItemTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -88,19 +90,12 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
     }
 /////////////////////////////////////////////////////
     //비동기 호출
-    fun setBodyItem(item: BoardEntity){
-        entity.look = item.look//조회수
+    fun setUserItem(item: BoardEntity){
         entity.profileImage = item.profileImage//프로필 이미지
         entity.nickname = item.nickname//프로필 닉네임
-        entity.comments = item.comments//댓글 수
-        notifyDataSetChanged()
-        //notifyItemChanged(0)
-    }
-
-    fun setLookItem(item: BoardEntity){
-        entity.look = item.look//조회수
-        entity.comments = item.comments//댓글 수
-        notifyDataSetChanged()
+        if (::head.isInitialized){
+            head.bind(0)//position값은 상관 없음
+        }
         //notifyItemChanged(0)
     }
 

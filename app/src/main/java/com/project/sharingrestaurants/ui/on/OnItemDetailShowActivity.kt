@@ -32,6 +32,7 @@ class OnItemDetailShowActivity : AppCompatActivity() {
         item = intent.getSerializableExtra("BoardEntity") as BoardEntity
         viewModel.incrementLook(item.documentId)
         if (viewModel.getIsLogin()) {
+            viewModel.nicknameMap.set(viewModel.getAuth().email!!, viewModel.getAuth().nickname)
             if (item.uid.equals(viewModel.getAuth().uid)) {//내가 작성한 글일 경우
                 binding.insert.visibility = View.VISIBLE
                 binding.delete.visibility = View.VISIBLE
@@ -49,19 +50,14 @@ class OnItemDetailShowActivity : AppCompatActivity() {
         }
 
         if (viewModel.getIsLogin()) {
-            viewModel.nicknameMap.set(viewModel.getAuth().email!!, viewModel.getAuth().nickname)
             if (!item.uid.equals(viewModel.getAuth().uid)) {//내가 작성한 글이 아닐경우
-                viewModel.getLoadBodyData().observe(this) {
-                    adapter.setBodyItem(it)
-                }
-            }else{
-                viewModel.getLoadLookData().observe(this) {
-                    adapter.setLookItem(it)
+                viewModel.getBoardUser(item.email).observe(this) {
+                    adapter.setUserItem(it)//닉네임, 프로필이미지 가져오기
                 }
             }
         }
-        viewModel.getLoadCommentData().observe(this){
-            adapter.setCommentItem(it)
+        viewModel.getLoadCommentData(item.documentId).observe(this){
+            adapter.setCommentItem(it)//댓글 목록 가져오기
         }
     }
 

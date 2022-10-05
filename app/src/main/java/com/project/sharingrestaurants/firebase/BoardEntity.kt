@@ -17,11 +17,11 @@ data class BoardEntity(
     var thumb: String = "",//firestore경로는 다 처음에 '/'가 들어가 있어서 substring(1)하고 사용해야 된다.
     var latitude: Double =0.0,//위도
     var longitude: Double =0.0,//경도
-    var look: Int = 0,//조회수
 //위는 파이어스토어 board컬렉션 필드
     var comments: Int =0,//댓글 수//count컬렉션
+    var look: Int = 0,//조회수
     var like: Int =0,//추천 수//count컬렉션
-    var likeUsers: List<String> = listOf(),
+    var likeUsers: List<String> = listOf(),//추천 유저 목록//count컬렉션
     var nickname: String ="",//auth컬렉션
     var profileImage: String =""//auth컬렉션
 ): Serializable

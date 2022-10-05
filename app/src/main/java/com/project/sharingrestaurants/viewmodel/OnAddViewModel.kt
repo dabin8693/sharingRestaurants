@@ -293,7 +293,6 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                     "thumb" to uploadThumImagePath,
                     "latitude" to itemLatitude,
                     "longitude" to itemLongitude,
-                    "look" to 0
                 )
             )
             isSuccess.value = bool
@@ -317,7 +316,6 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                     "thumb" to uploadThumImagePath,
                     "latitude" to itemLatitude,
                     "longitude" to itemLongitude,
-                    "look" to 0
                 )
             )
             isSuccess.value = bool

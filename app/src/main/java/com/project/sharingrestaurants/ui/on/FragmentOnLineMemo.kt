@@ -26,6 +26,9 @@ import com.project.sharingrestaurants.ui.MainActivity
 import com.project.sharingrestaurants.util.RunTimePermissionCheck
 import com.project.sharingrestaurants.viewmodel.OnLineViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FragmentOnLineMemo : Fragment() {
     private val viewModel: OnLineViewModel by lazy {//main에서 프래그먼트 객체 = null되기전까지 유지됨 //ondestoy되어도 트랜젝션에서 replace되면 데이터 복구됨
@@ -55,11 +58,18 @@ class FragmentOnLineMemo : Fragment() {
     ) {//뷰 초기화
         super.onViewCreated(view, savedInstanceState)
         onAdapter = OnAdapter(
-            { item ->
-                val intent =
-                    Intent(activity, OnItemDetailShowActivity::class.java)//onClick
-                intent.putExtra("BoardEntity", item)
-                startActivity(intent)
+            { documentId ->
+                CoroutineScope(Dispatchers.Main).launch {
+                    val item = viewModel.getBoard(documentId)
+                    if (!item.documentId.equals("")) {
+                        val intent =
+                            Intent(activity, OnItemDetailShowActivity::class.java)//onClick
+                        intent.putExtra("BoardEntity", item)
+                        startActivity(intent)
+                    }else{
+                        //삭제된 글
+                    }
+                }
             },
             viewModel.currentLatitude.value!!,
             viewModel.currentLongitude.value!!,

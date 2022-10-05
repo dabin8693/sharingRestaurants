@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.firebase.BoardEntity
+import com.project.sharingrestaurants.firebase.CommentEntity
+import com.project.sharingrestaurants.firebase.ReplyEntity
 import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import kotlinx.coroutines.CoroutineScope
@@ -20,39 +22,75 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
         return repository.getAuth()
     }
 
-    fun getIsLogin(): Boolean{
+    fun getIsLogin(): Boolean {
         return repository.getIsLogin()
     }
 
-    fun getStorageRef(): StorageReference{
+    fun getStorageRef(): StorageReference {
         return repository.getFBStorageRef()
     }
 
-    fun getLoadBodyData(): LiveData<BoardEntity>{//프로필 이미지, 닉네임, 조회수, 댓글수
+    fun getBoardUser(email: String): LiveData<BoardEntity> {//프로필 이미지, 닉네임, 조회수, 댓글수
         val liveData: MutableLiveData<BoardEntity> = MutableLiveData()
         CoroutineScope(Dispatchers.Main).launch {
-
+            val boardEntity = repository.getUserInform(email)
+            if (boardEntity.nickname.equals("")) {
+                //실패
+            } else {
+                nicknameMap.set(email, boardEntity.nickname)
+                liveData.value = boardEntity
+            }
         }
         return liveData
     }
-    fun getLoadLookData(): LiveData<BoardEntity>{//조회수, 댓글수
-        val liveData: MutableLiveData<BoardEntity> = MutableLiveData()
-        CoroutineScope(Dispatchers.Main).launch {
 
-            //liveData.postValue()
-        }
-        return liveData
-    }
-    fun getLoadCommentData(): LiveData<List<Any>>{//댓글, 답글 //Any = CommentEntity, ReplyEntity
+
+    fun getLoadCommentData(boardId: String): LiveData<List<Any>> {//댓글, 답글 //Any = CommentEntity, ReplyEntity
         val liveData: MutableLiveData<List<Any>> = MutableLiveData()
         CoroutineScope(Dispatchers.Main).launch {
+            val replyList = repository.getReplyList(boardId) as ArrayList
+            val commentList = repository.getCommentList(boardId) as ArrayList
+            var a = 0
+            for (comment in commentList) {//닉네임 불러오고 저장
+                if (nicknameMap.get(comment.email) == null) {
+                    val user = repository.getUserInform(comment.email)
+                    comment.nickname = user.nickname
+                    comment.profileImage = user.profileImage
+                    commentList.set(a, comment)
+                    nicknameMap.set(comment.email, user.nickname)
+                }
+                a++
+            }
+            var b = 0
+            for (reply in replyList) {//닉네임 불러오고 저장
+                if (nicknameMap.get(reply.email) == null) {
+                    val user = repository.getUserInform(reply.email)
+                    reply.nickname = user.nickname
+                    reply.profileImage = user.profileImage
+                    replyList.set(b, reply)
+                    nicknameMap.set(reply.email, user.nickname)
+                }
+                b++
+            }
+            val allComment: ArrayList<Any> = ArrayList()
+            allComment.addAll(commentList)
+            var index = 0
+            for (comment in commentList) {//댓글 답글 합치기
+                for (reply in replyList) {
+                    if (comment.email.equals(reply.commentId)) {
+                        index++
+                        allComment.add(index, reply)
+                    }
+                }
+                index++
+            }
 
-            //liveData.postValue()
+            liveData.value = allComment
         }
         return liveData
     }
 
-    fun incrementLook(boardId: String){
+    fun incrementLook(boardId: String) {
         CoroutineScope(Dispatchers.Main).launch {
             repository.incrementLook(boardId)
         }

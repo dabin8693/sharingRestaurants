@@ -7,10 +7,12 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.getField
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
+import java.util.*
 
 
 class FBDatabase {
@@ -34,16 +36,17 @@ class FBDatabase {
             val documentRef: DocumentReference = fbDatabase.collection("board").document()
             boardMap.replace("documentId", documentRef.id)//api24이상
             documentRef.set(boardMap).await()
-            return addCount(documentRef.id)
+            val timestamp: Date = fbDatabase.collection("board").document(documentRef.id).get().await().data!!.get("timestamp") as Date
+            return addCount(documentRef.id, timestamp)
         }catch (e: Exception){
             return false
         }
     }
 
-    private suspend fun addCount(boardId: String): Boolean{
+    private suspend fun addCount(boardId: String, timestamp: Date): Boolean{
         try {
             fbDatabase.collection("count").document(boardId)
-                .set(CountEntity(boardId, 0, 0, listOf())).await()
+                .set(CountEntity(boardId, timestamp, 0, 0, 0, listOf())).await()
             return true
         }catch (e: Exception){
             return false
@@ -166,12 +169,50 @@ class FBDatabase {
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     //get
-    suspend fun getBoard(): List<BoardEntity> {
+    suspend fun getBoardList(): List<BoardEntity> {
         try {
             return fbDatabase.collection("board").orderBy("timestamp", Query.Direction.DESCENDING).get()
                 .await().toObjects<BoardEntity>()
         }catch (e: Exception){
             return emptyList()
+        }
+    }
+
+    suspend fun getCountList(): List<CountEntity>{
+        try {
+            return fbDatabase.collection("count").orderBy("timestamp", Query.Direction.DESCENDING).get().await().toObjects<CountEntity>()
+        }catch (e: Exception){
+            return emptyList()
+        }
+    }
+
+    suspend fun getBoard(boardId: String): BoardEntity{
+        try {
+            return fbDatabase.collection("board").document(boardId).get().await().toObject<BoardEntity>()!!
+        }catch (e: Exception){
+            return BoardEntity()
+        }
+    }
+
+    suspend fun getCount(boardId: String): CountEntity{
+        try {
+            return fbDatabase.collection("count").document(boardId).get().await().toObject<CountEntity>()!!
+        }catch (e: Exception){
+            return CountEntity()
+        }
+    }
+
+    suspend fun getUser(email: String): BoardEntity{
+        try {
+            val snapshot = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
+            val boardEntity = BoardEntity()
+            for (data in snapshot){
+                boardEntity.profileImage = data.data.get("image") as String
+                boardEntity.nickname = data.data.get("nickname") as String
+            }
+            return boardEntity
+        }catch (e: Exception){
+            return BoardEntity()
         }
     }
     //댓글목록을 먼저 다 불러오고 그 다음 답글목록을 전부 불러온다 댓글list에 답글list를 삽입 삽입 순서는 답글 TimeStamp순서로 삽입 위치 결정 방법은 답글 필드의 댓글documentId기준
@@ -203,9 +244,9 @@ class FBDatabase {
         try {
             //중복 호출 방지하기 위해 viewmodel에서 회원정보들을 hashMap(key:email, value:nickname)으로 저장하고 없으면 호출하는식으로
             //fragment, detailactivy가 hashmap을 공유하고 fragment가 체인지 되기전까지 유지 그 이후는 다시 최신화
-            val task = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
+            val snapshot = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
             var nickname: String = ""
-            for (data in task) {
+            for (data in snapshot) {
                 nickname = data.data.get("nickname") as String//닉네임 가져오기
             }
             return nickname

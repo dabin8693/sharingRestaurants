@@ -27,7 +27,7 @@ import com.project.sharingrestaurants.viewmodel.OffLineViewModel
 import com.project.sharingrestaurants.viewmodel.OnLineViewModel
 
 
-class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Double, var currentLongitude: Double, val storageRef: StorageReference) :  RecyclerView.Adapter<OnAdapter.ViewHolder>(){
+class OnAdapter(val itemClick: (String) -> Unit, var currentLatitude: Double, var currentLongitude: Double, val storageRef: StorageReference) :  RecyclerView.Adapter<OnAdapter.ViewHolder>(){
     private var items: List<BoardEntity> = listOf()
     private val viewHolderList: ArrayList<OnAdapter.ViewHolder> = ArrayList()
     private lateinit var context: Context
@@ -87,7 +87,7 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
             }
 
             itemView.setOnClickListener {
-                itemClick(item)
+                itemClick(item.documentId)
             }
 
 
