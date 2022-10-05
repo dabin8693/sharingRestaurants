@@ -53,10 +53,14 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
     }
 
     fun incrementLook(boardId: String){
-        repository.incrementLook(boardId)
+        CoroutineScope(Dispatchers.Main).launch {
+            repository.incrementLook(boardId)
+        }
     }
 
     fun incrementLike(boardId: String) {
-        repository.incrementLike(boardId)
+        CoroutineScope(Dispatchers.Main).launch {
+            repository.incrementLike(boardId)
+        }
     }
 }
