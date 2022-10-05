@@ -39,7 +39,7 @@ class OnItemAddActivity : AppCompatActivity() {
         initStart()
 
         if (intent != null && intent.hasExtra("BoardEntity")) {
-            //off detail에서 넘어온 경우
+            //on detail에서 넘어온 경우
             val item: BoardEntity = intent.getSerializableExtra("BoardEntity") as BoardEntity
             applyExistingInfo(item)
         }else{

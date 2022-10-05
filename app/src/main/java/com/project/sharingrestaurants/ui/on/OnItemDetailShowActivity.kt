@@ -1,5 +1,6 @@
 package com.project.sharingrestaurants.ui.on
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -14,6 +15,9 @@ import com.project.sharingrestaurants.databinding.ActivityOnItemDetailShowBindin
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.viewmodel.OnDetailViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class OnItemDetailShowActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOnItemDetailShowBinding
@@ -58,6 +62,19 @@ class OnItemDetailShowActivity : AppCompatActivity() {
         }
         viewModel.getLoadCommentData(item.documentId).observe(this){
             adapter.setCommentItem(it)//댓글 목록 가져오기
+        }
+
+        binding.insert.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                val item = viewModel.getBoard(item.documentId)
+                val intent = Intent(this@OnItemDetailShowActivity, OnItemAddActivity::class.java)
+                intent.putExtra("BoardEntity", item)
+                startActivity(intent)
+            }
+        }
+
+        binding.delete.setOnClickListener {
+            //remove
         }
     }
 

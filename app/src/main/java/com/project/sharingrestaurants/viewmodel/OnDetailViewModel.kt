@@ -30,7 +30,11 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
         return repository.getFBStorageRef()
     }
 
-    fun getBoardUser(email: String): LiveData<BoardEntity> {//프로필 이미지, 닉네임, 조회수, 댓글수
+    suspend fun getBoard(boardId: String): BoardEntity{
+        return repository.getBoard(boardId)
+    }
+
+    fun getBoardUser(email: String): LiveData<BoardEntity> {//프로필 이미지, 닉네임
         val liveData: MutableLiveData<BoardEntity> = MutableLiveData()
         CoroutineScope(Dispatchers.Main).launch {
             val boardEntity = repository.getUserInform(email)
