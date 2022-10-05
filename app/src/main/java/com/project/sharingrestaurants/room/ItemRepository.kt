@@ -79,6 +79,14 @@ class ItemRepository(application: MyApplication) {
         return fbDatabase.insertNicknameAuth(getAuth().uid, nickname)
     }
 
+    suspend fun insertComment(commentMap: MutableMap<String, Any>): Boolean{
+        return fbDatabase.insertComment(commentMap)
+    }
+
+    suspend fun insertReply(replyMap: MutableMap<String, Any>): Boolean{
+        return fbDatabase.insertReply(replyMap)
+    }
+
     suspend fun incrementLook(boardId: String){
         fbDatabase.incrementLook(boardId)
     }
@@ -87,16 +95,28 @@ class ItemRepository(application: MyApplication) {
         fbDatabase.incrementLike(boardId)
     }
 
+    suspend fun updateLikeUsers(boardId: String, users: List<String>){
+        fbDatabase.updateLikeUsers(boardId, users)
+    }
+
+    suspend fun incrementComments(boardId: String){
+        fbDatabase.incrementComments(boardId)
+    }
+
+    suspend fun decrementComments(boardId: String){
+        fbDatabase.decrementComments(boardId)
+    }
+
     suspend fun addFBAuth(){
         fbDatabase.addAuth(getAuth())
     }
 
-    suspend fun addFBComment(commentMap: MutableMap<String, Any>, boardId: String){
-        fbDatabase.addComment(commentMap, boardId)
+    suspend fun addFBComment(commentMap: MutableMap<String, Any>){
+        fbDatabase.addComment(commentMap)
     }
 
-    suspend fun addReply(replyMap: MutableMap<String, Any>, boardId: String){
-        fbDatabase.addReply(replyMap, boardId)
+    suspend fun addReply(replyMap: MutableMap<String, Any>){
+        fbDatabase.addReply(replyMap)
     }
 
     suspend fun getFBList(): List<BoardEntity>{

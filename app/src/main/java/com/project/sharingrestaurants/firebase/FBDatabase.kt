@@ -4,11 +4,9 @@ package com.project.sharingrestaurants.firebase
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.getField
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -29,7 +27,8 @@ class FBDatabase {
             return INSTANCE ?: FBDatabase()//null이면  재생성
         }
     }
-
+////////////////////////////////////////////////////////////////////////////////////////////
+    //add
     suspend fun addBoard(boardMap: MutableMap<String, Any>): Boolean {
         try {
             val documentRef: DocumentReference = fbDatabase.collection("board").document()
@@ -82,20 +81,21 @@ class FBDatabase {
         }
     }
 
-    suspend fun addComment(commentMap: MutableMap<String, Any>, boardId: String) {//해당글에 댓글
+    suspend fun addComment(commentMap: MutableMap<String, Any>) {//해당글에 댓글
         val documentRef: DocumentReference =
-            fbDatabase.collection("board").document(boardId).collection("comment").document()
+            fbDatabase.collection("board").document(commentMap.get("boardId").toString()).collection("comment").document()
         commentMap.replace("documentId", documentRef.id)
         documentRef.set(commentMap).await()
     }
 
-    suspend fun addReply(replyMap: MutableMap<String, Any>, boardId: String) {//해당글에 댓글
+    suspend fun addReply(replyMap: MutableMap<String, Any>) {//해당글에 댓글
         val documentRef: DocumentReference =
-            fbDatabase.collection("board").document(boardId).collection("reply").document()
+            fbDatabase.collection("board").document(replyMap.get("boardId").toString()).collection("reply").document()
         replyMap.replace("documentId", documentRef.id)
         documentRef.set(replyMap).await()
     }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //insert
     suspend fun insertBoard(boardMap: MutableMap<String, Any>): Boolean {
         try {
             fbDatabase.collection("board").document(boardMap.get("documentId").toString())
@@ -106,14 +106,54 @@ class FBDatabase {
         }
     }
 
+    suspend fun insertComment(commentMap: MutableMap<String, Any>): Boolean {
+        try {
+            fbDatabase.collection("board").document(commentMap.get("boardId").toString()).collection("comment").document(commentMap.get("documentId").toString())
+                .update(commentMap).await()
+            return true
+        }catch (e: Exception){
+            return false
+        }
+    }
+
+    suspend fun insertReply(replyMap: MutableMap<String, Any>): Boolean {
+        try {
+            fbDatabase.collection("board").document(replyMap.get("boardId").toString()).collection("reply").document(replyMap.get("documentId").toString())
+                .update(replyMap).await()
+            return true
+        }catch (e: Exception){
+            return false
+        }
+    }
+
     suspend fun incrementLook(boardId: String){//boardId = documentId
         fbDatabase.collection("count").document(boardId)
-            .update("look",FieldValue.increment(1)).await()//조회수 증가
+            .update("look",FieldValue.increment(1)).await()//조회 수 증가
     }
 
     suspend fun incrementLike(boardId: String) {//like = 추천
         fbDatabase.collection("count").document(boardId)
-            .update("like",FieldValue.increment(1)).await()//추천수 증가
+            .update("like",FieldValue.increment(1)).await()//추천 수 증가
+    }
+
+    suspend fun updateLikeUsers(boardId: String, users: List<String>){
+        fbDatabase.collection("count").document(boardId)
+            .update("likeUsers", users).await()//추천 유저 목록 업데이트
+    }
+
+    suspend fun incrementComments(boardId: String){
+        fbDatabase.collection("count").document(boardId)
+            .update("comments",FieldValue.increment(1)).await()//댓글 수 증가
+    }
+
+    suspend fun decrementComments(boardId: String){//댓글 삭제되면 "삭제된 댓글입니다."메시지 띄우기
+        val documentRef: DocumentReference = fbDatabase.collection("count").document(boardId)
+        //감소 기능은 따로 없어서 트랜젝션 걸고 1,값 조회 2.값 내리기
+        fbDatabase.runTransaction {
+            val snapshot: DocumentSnapshot = it.get(documentRef)
+            val comments = (snapshot.data!!.get("comments") as Int) - 1
+            it.update(documentRef, "comments", comments)
+        }.await()//댓글 수 감소
     }
 
     suspend fun insertNicknameAuth(uid: String, nickname: String): Boolean {
@@ -124,7 +164,8 @@ class FBDatabase {
             return false
         }
     }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    //get
     suspend fun getBoard(): List<BoardEntity> {
         try {
             return fbDatabase.collection("board").orderBy("timestamp", Query.Direction.DESCENDING).get()
