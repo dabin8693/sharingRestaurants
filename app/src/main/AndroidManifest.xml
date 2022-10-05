@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SharingRestaurants">
         <activity
-            android:name=".ui.off.ShowMapActivity"
+            android:name=".ui.ShowMapActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
 

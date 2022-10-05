@@ -6,17 +6,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.firebase.BoardEntity
-import com.project.sharingrestaurants.firebase.FBAuth
 import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.DataTrans
 
 class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
-    //private val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     val currentLatitude: MutableLiveData<Double> = MutableLiveData()
     val currentLongitude: MutableLiveData<Double> = MutableLiveData()
-    val itemEdit: MutableLiveData<String> = MutableLiveData()
 
     fun getList(): LiveData<List<BoardEntity>>{
         return repository.getFBList()
@@ -27,7 +24,7 @@ class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
     }
 
     fun signIn(account: GoogleSignInAccount, activity: Activity?, callback: () -> Unit) {
-        repository.signInGoogle(account, activity!!, callback)//FBLogin()이거 Factory로 받아오게 변경
+        repository.signInGoogle(account, activity!!, callback)
     }
     fun getIsLogin(): Boolean {
         return repository.getIsLogin()

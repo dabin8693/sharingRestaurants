@@ -33,7 +33,6 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
         }
         viewTypeList.add("text")
         viewTypeList.add("footer")
-        Log.d("ㅌㅌinit",viewTypeList.size.toString())
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -85,7 +84,6 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
     }
 
     override fun getItemCount(): Int {
-        Log.d("ㅌㅌ사이즈",viewTypeList.size.toString())
         return viewTypeList.size
     }
 /////////////////////////////////////////////////////
@@ -95,13 +93,15 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
         entity.profileImage = item.profileImage//프로필 이미지
         entity.nickname = item.nickname//프로필 닉네임
         entity.comments = item.comments//댓글 수
-        notifyItemChanged(0)
+        notifyDataSetChanged()
+        //notifyItemChanged(0)
     }
 
     fun setLookItem(item: BoardEntity){
         entity.look = item.look//조회수
         entity.comments = item.comments//댓글 수
-        notifyItemChanged(0)
+        notifyDataSetChanged()
+        //notifyItemChanged(0)
     }
 
     fun setCommentItem(commentItems: List<Any>) {
@@ -115,7 +115,8 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
             }
         }
         commentsSize = viewTypeList.size - size
-        notifyItemRangeChanged(size, commentItems.size)
+        notifyDataSetChanged()
+        //notifyItemRangeChanged(size, commentItems.size)
     }
     //비동기 호출
 /////////////////////////////////////////////////////
@@ -123,7 +124,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
 
         fun bind(position: Int){
             when(viewType){
-                0 -> {
+                0 -> {//head
                     binding as OnDetailHeadBinding
                     binding.title.text = entity.tilte
                     binding.locate.text = entity.locate
@@ -149,11 +150,11 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                     binding.time.text = format.format(entity.timestamp)
                     binding.look.text = entity.look.toString()//나중에 비동기 초기화
                 }
-                1 -> {
+                1 -> {//text
                     binding as OffItemTextBinding
                     binding.title.text = entity.body.get((position-1)/2)//1,3,5,7 //0,1,2,3
                 }
-                2 -> {
+                2 -> {//image
                     binding as OffItemImageBinding
                     Glide.with(itemView)
                         .load(viewModel.getStorageRef().child(entity.image.get((position/2)-1).substring(1)))//2,4,6,8 //0,1,2,3
@@ -169,26 +170,26 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                             )
                         )
                 }
-                3 -> {
+                3 -> {//footer
                     binding as OnDetailFooterBinding
-                    binding.recomment.setOnClickListener {
-                        viewModel.incrementRecommendsBoard(entity.documentId)
-                        entity.recommends++
-                        binding.recommend.text = entity.recommends.toString()
+                    binding.like.setOnClickListener {
+                        viewModel.incrementLike(entity.documentId)
+                        entity.like++
+                        binding.likenum.text = entity.like.toString()
                         viewModel.isRecomment = true
                         it.isClickable = false
                     }//추천클릭
-                    binding.recommend.text = entity.recommends.toString()
+                    binding.likenum.text = entity.like.toString()
                     binding.comments.text = entity.comments.toString()//나중에 비동기 초기화
                     binding.send.setOnClickListener {  }//댓글 전송 클릭
                 }
-                4 -> {
+                4 -> {//댓글
                     binding as OnDetailCommentBinding
                     val firstCommentPosition: Int = viewTypeList.size - commentsSize
                     val commentEntity: CommentEntity = commentItems.get(position-firstCommentPosition) as CommentEntity
                     binding.profilenickname.text = commentEntity.nickname //uid비교
                     Glide.with(itemView)//uid비교
-                        .load(viewModel.getStorageRef().child(commentEntity.profileImage.substring(1)))
+                        .load(commentEntity.profileImage)
                         .override(360,640)
                         .into(binding.profileimage)
                         .onLoadFailed(
@@ -205,13 +206,13 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                     binding.insertbutton.visibility = View.GONE //uid비교
                     binding.deletebutton.visibility = View.GONE //uid비교
                 }
-                5 -> {
+                5 -> {//답글
                     binding as OnDetailReplyBinding
                     val firstCommentPosition: Int = viewTypeList.size - commentsSize
                     val replyEntity: ReplyEntity = commentItems.get(position-firstCommentPosition) as ReplyEntity
                     binding.profilenickname.text = replyEntity.nickname //uid비교
                     Glide.with(itemView)//uid비교
-                        .load(viewModel.getStorageRef().child(replyEntity.profileImage.substring(1)))
+                        .load(replyEntity.profileImage)
                         .override(360,640)
                         .into(binding.profileimage)
                         .onLoadFailed(

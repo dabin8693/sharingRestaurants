@@ -11,8 +11,9 @@ import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.ConstValue.DELIMITER
 import java.lang.StringBuilder
 
+//Activity나 Fragmemt 또는 View의 Context를 참조해서는 안된다.(메모리 누수)(애플리케이션 context 사용)
+//viewmodel은 view(xml, activity, fragment)를 의존하면 안됨 view와 독립적이어야 한다.
 class OffAddViewModel(private val repository: ItemRepository): ViewModel() {
-    //val repository : ItemRepository = MyApplication.REPOSITORY//나중에 di사용 Application클래스에서 의존성 관리
 
     val itemId: MutableLiveData<Long> = MutableLiveData()//프라이머 키
     val itemTitle: MutableLiveData<String> = MutableLiveData()

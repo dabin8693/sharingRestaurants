@@ -1,4 +1,4 @@
-package com.project.sharingrestaurants.ui.off
+package com.project.sharingrestaurants.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -11,13 +11,10 @@ import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.gun0912.tedpermission.rx3.TedPermission
-
 import com.naver.maps.geometry.LatLng
 import com.project.sharingrestaurants.R
 import com.naver.maps.map.*
@@ -25,12 +22,12 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.project.sharingrestaurants.databinding.ActivityShowMapBinding
+import com.project.sharingrestaurants.ui.off.OffItemAddActivity
+import com.project.sharingrestaurants.util.RunTimePermissionCheck
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 
-//fab_tracking뷰 현재 위치 장소로 이동 기능 추가
-//위치 검색기능 추가
 class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityShowMapBinding
     private val mapView: MapView by lazy { binding.map }
@@ -50,7 +47,7 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         instanceMap = NaverMapSdk.getInstance(this)
         instanceMap.client = NaverMapSdk.NaverCloudPlatformClient("0t1amhii5n")
-        instanceMap.setOnAuthFailedListener { e -> Log.d("맵 에러",e.errorCode.toString()) }
+        instanceMap.setOnAuthFailedListener { e -> Log.d("맵 에러",e.errorCode) }
 
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
@@ -63,11 +60,9 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
         )
         binding.lifecycleOwner = this
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)//마지막으로 알려진 위치 가져옴
-        requestPermissions()
+        RunTimePermissionCheck.requestPermissions(this)
 
         binding.btnConfirm.setOnClickListener{
-            Log.d("위도1ㅇㅇㅎ",lastLongitude.toString())
-            Log.d("경도1ㅇㅇㅎ",lastLatitude.toString())
             val intent = Intent(this, OffItemAddActivity::class.java)
             intent.putExtra("address", binding.tvLocation.text.toString())
             intent.putExtra("longitude", lastLongitude)
@@ -75,28 +70,6 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
             setResult(RESULT_OK, intent)
             finish()
         }
-    }
-    // 위치권한 관련 요청
-    private fun requestPermissions() {
-        // 내장 위치 추적 기능 사용
-        //locationSource =
-            //FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
-        TedPermission.create()
-            .setRationaleTitle("위치권한 요청")
-            .setRationaleMessage("현재 위치로 이동하기 위해 위치권한이 필요합니다.") // "we need permission for read contact and find your location"
-            .setPermissions(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            //rxandroid
-            .request()
-            .subscribe({ tedPermissionResult ->
-                if (!tedPermissionResult.isGranted) {
-                    Toast.makeText(this,getString(R.string.location_permission_denied_msg),Toast.LENGTH_SHORT).show()
-                }
-            }) { throwable -> Log.e("AAAAAA", throwable.message.toString()) }
-
-
     }
 
     @SuppressLint("MissingPermission")
@@ -202,7 +175,7 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         currentLocation!!.longitude
                     )
                 )
-                Log.d("dd","위치2")
+
                 naverMap.moveCamera(cameraUpdate)
 
                 // 빨간색 마커 현재위치로 변경

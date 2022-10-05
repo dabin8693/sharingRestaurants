@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FieldValue
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.CameraWork.resizeBitmap
+import com.project.sharingrestaurants.util.ConstValue
 import com.project.sharingrestaurants.util.DataTrans.getTime
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
@@ -33,7 +34,6 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
     val textList: ArrayList<String> = ArrayList()//마지막 저장할때 담는다
 
     val documentId: MutableLiveData<String> = MutableLiveData()//insert
-    var recommends: Int = 0//insert
     lateinit var beforeImageList: List<String>//insert
     var isInserted: Boolean = false//수정창 - true 추가창 - false
 
@@ -51,7 +51,6 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
 
     fun setItem(item: BoardEntity) {
         documentId.value = item.documentId
-        recommends = item.recommends
         beforeImageList = item.image
         if (!item.locate.equals("")) {
             itemLocate.value = item.locate
@@ -266,23 +265,24 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         successList: ArrayList<Boolean>
     ) {
         CoroutineScope(Dispatchers.Main).launch {
+            //파이어베이스는 io처리를 내부적으로 스레드 생성해서 처리하기 때문에 내가 따로 작업 스레드안에서 호출 할 필요 없다.
             val value = repository.addImageFBStorage(uid, time, name, data)
             syncSave(value, liveData, imageTotal, successList)
-        }
+        }//파이어베이스 결과callback은 메인스레드로 호출됨 Synchronized필요없다
     }
 
-    @Synchronized
+    //@Synchronized
     private fun syncSave(
         path: String,
         liveData: MutableLiveData<Boolean>,
         imageTotal: Int,
         successList: ArrayList<Boolean>
     ) {
-        if (path == "FALSE") {
-            uploadSuccess.postValue(false)
+        if (path == ConstValue.FALSE) {
+            uploadSuccess.value = false
             successList.add(false)
         } else {
-            uploadSuccess.postValue(true)
+            uploadSuccess.value = false
             successList.add(true)
         }
         if (successList.size == imageTotal) {//모든 사진처리가 끝났을때(실패나 성공)
@@ -293,9 +293,9 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                 }
             }
             if (count == 0) {//실패가 한나도 없으면
-                liveData.postValue(true)
+                liveData.value = true
             } else {
-                liveData.postValue(false)
+                liveData.value = false
             }
         }
     }
@@ -314,7 +314,6 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                 "body" to textList,
                 "image" to imageUri,
                 "thumb" to uploadThumImagePath,
-                "recommends" to 0,//recommends
                 "latitude" to itemLatitude,
                 "longitude" to itemLongitude,
                 "look" to 0
@@ -336,7 +335,6 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                 "body" to textList,
                 "image" to imageUri,
                 "thumb" to uploadThumImagePath,
-                "recommends" to recommends,//recommends
                 "latitude" to itemLatitude,
                 "longitude" to itemLongitude,
                 "look" to 0

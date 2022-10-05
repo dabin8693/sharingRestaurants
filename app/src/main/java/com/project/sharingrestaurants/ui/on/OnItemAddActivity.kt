@@ -19,7 +19,7 @@ import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnAddAdapter
 import com.project.sharingrestaurants.databinding.ActivityOnItemAddBinding
 import com.project.sharingrestaurants.firebase.BoardEntity
-import com.project.sharingrestaurants.ui.off.ShowMapActivity
+import com.project.sharingrestaurants.ui.ShowMapActivity
 import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.viewmodel.OnAddViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
@@ -100,20 +100,14 @@ class OnItemAddActivity : AppCompatActivity() {
             this.setNegativeButton("NO") { _, _ -> }
             this.setPositiveButton("YES") { _, _ ->
                 for (index in 0 until Adapter.getItem().size){
-                    Log.d("탈출", index.toString())
-                    Log.d("탈출 라스트", Adapter.getItem().lastIndex.toString())
                     if (index == Adapter.getItem().lastIndex){//마지막 리니어레이아웃 제외
-                        Log.d("탈출1", index.toString())
                         break
                     }
                     if (index%2 == 0){
                         if (index != 0){//image
                             viewModel.imageList.add(Adapter.getItem().get(index).toString())
-                            Log.d("탈출2", index.toString())
                         }
-                        Log.d("탈출3", index.toString())
                     }else{//text
-                        Log.d("탈출4", index.toString())
                         viewModel.textList.add(Adapter.getItem().get(index).toString())
                     }
                 }
@@ -139,25 +133,21 @@ class OnItemAddActivity : AppCompatActivity() {
         }
     }
 
-    private val galleryCallBack: ActivityResultLauncher<Intent> = registerForActivityResult(//갤러리 앱
-        ActivityResultContracts.StartActivityForResult()//콜백함수를 하나로 통일하면 누가 호출했는지 구분을 못 함
+    private val galleryCallBack: ActivityResultLauncher<Intent> = registerForActivityResult(//갤러리 앱 //필드임
+        ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == RESULT_OK && it.data != null) {
             val intent: Intent = it.data!!
             val uri: Uri? = intent.data
-            //viewModel.imageList.add(uri.toString())//갤러리 uri//최대치만 확장하는거
-            //viewModel.textList.add("")//에디트텍스트 추가//최대치만 확장하는거
             Adapter.addImage("")//에디트텍스트 추가
             Adapter.addImage(uri.toString())//이미지뷰 추가
         }
     }
 
-    private val cameraCallBack: ActivityResultLauncher<Intent> = registerForActivityResult(//카메라 앱
+    private val cameraCallBack: ActivityResultLauncher<Intent> = registerForActivityResult(//카메라 앱 //필드임
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == RESULT_OK) {
-            //viewModel.imageList.add(viewModel.publicUri.toString())//공용저장소 uri//최대치만 확장하는거
-            //viewModel.textList.add("")//에디트텍스트 추가//최대치만 확장하는거
             Adapter.addImage("")//에디트텍스트 추가
             Adapter.addImage(viewModel.publicUri.toString())//이미지뷰 추가
         }else{//안찍고 나오거나 실패시
@@ -165,19 +155,14 @@ class OnItemAddActivity : AppCompatActivity() {
         }
     }
 
-    private val mapCallBack: ActivityResultLauncher<Intent> = registerForActivityResult(//갤러리 앱
-        ActivityResultContracts.StartActivityForResult()//콜백함수를 하나로 통일하면 누가 호출했는지 구분을 못 함
+    private val mapCallBack: ActivityResultLauncher<Intent> = registerForActivityResult(//네이버맵 //필드임
+        ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == RESULT_OK && it.data != null) {
-            //binding.showmap.text = it.data!!.getStringExtra("address")
-            //binding.showmap.background = null
             viewModel.itemLocate.value = it.data!!.getStringExtra("address")
             viewModel.mapDrawable.value = resources.getDrawable(R.drawable.empty,null)
-            //Adapter.mapSelected(BoardHeadEntity(viewModel.itemTitle.value!!, viewModel.itemPlace.value!!, it.data!!.getStringExtra("address")!!, viewModel.itemPriority.value!!))
             viewModel.itemLatitude = it.data!!.getDoubleExtra("latitude",0.0)
             viewModel.itemLongitude = it.data!!.getDoubleExtra("longitude",0.0)
-            Log.d("위도2ㅇㅇㅎ",viewModel.itemLatitude.toString())
-            Log.d("경도2ㅇㅇㅎ",viewModel.itemLongitude.toString())
         }
     }
 

@@ -12,8 +12,8 @@ data class ReplyEntity(//답글 board하위 컬렉션
     var commentID: String,//댓글 작성자 아이디(이메일)(상대)
     var timestamp: Date,
     var body: String,
-    //위는 파이어스토어 필드
-    var commentNickname: String ="",//댓글 작성자 닉네임(상대)
-    var nickname: String ="",
-    var profileImage: String =""
+    //위는 파이어스토어 reply컬렉션 필드
+    var commentNickname: String ="",//auth컬렉션 댓글 작성자 닉네임(상대)
+    var nickname: String ="",//auth컬렉션
+    var profileImage: String =""//auth컬렉션
 ): Serializable

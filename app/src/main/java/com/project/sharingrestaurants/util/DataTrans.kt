@@ -20,16 +20,13 @@ import kotlin.math.pow
 
 object DataTrans {
 
-    fun itemTrans(items: ItemEntity): OffItem{
+    fun itemTrans(items: ItemEntity): OffItem{//room Entity -> OffItem Entity
         val bodyArr = items.body.split(DELIMITER) as MutableList//없으면 인덱스2개
         val imageArr = items.imageURL.split(DELIMITER) as MutableList//없으면 인덱스1개
         bodyArr.removeAt(bodyArr.lastIndex)
         if (imageArr.size > 1) {//사이즈가 1개 이하일때 제거하면 에러 남
             imageArr.removeAt(imageArr.lastIndex)
         }
-        Log.d("data사이즈image",imageArr.size.toString())
-        Log.d("data사이즈body",bodyArr.size.toString())
-        Log.d("data사이즈image값",imageArr.get(0).toString())
         return OffItem(items.id!!, items.title, items.locate, items.place, items.priority, bodyArr, imageArr)
     }//body 최소 사이즈 1 //image 최소 사이즈 1
 
@@ -40,7 +37,7 @@ object DataTrans {
         return mFormat.format(mDate)
     }
 
-    fun requestLastLocation(activity: Activity): LiveData<gps> {
+    fun requestLastLocation(activity: Activity): LiveData<gps> {//현재위치
         val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity)
         val liveData: MutableLiveData<gps> = MutableLiveData()
         if (ActivityCompat.checkSelfPermission(
@@ -60,7 +57,7 @@ object DataTrans {
         return liveData
     }
 
-    fun calDist(lat1:Double, lon1:Double, lat2:Double, lon2:Double) : String{
+    fun calDist(lat1:Double, lon1:Double, lat2:Double, lon2:Double) : String{//두 점간의 직선거리
         val R = 6372.8 * 1000
         val dLat = Math.toRadians(lat2 - lat1)
         val dLon = Math.toRadians(lon2 - lon1)

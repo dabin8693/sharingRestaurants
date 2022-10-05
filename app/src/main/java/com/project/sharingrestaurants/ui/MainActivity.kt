@@ -1,15 +1,8 @@
 package com.project.sharingrestaurants.ui
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
@@ -37,12 +30,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragOff: FragmentOffLineMemo
     private lateinit var fragOn: FragmentOnLineMemo
     private lateinit var fragUser: FragmentUser
-    private lateinit var addCallBack: ActivityResultLauncher<Intent>
+    private lateinit var addCallBack: ActivityResultLauncher<Intent>//OnItemAdd액티비티에 대한 콜백
 
-    override fun onStart() {
-        super.onStart()
-        Log.d("초기화 온스타트", "ㅇㅇ")
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,22 +46,10 @@ class MainActivity : AppCompatActivity() {
         //transaction.addToBackStack(null)
         transaction.commit()//비동기 적용
         addCallBack = registerForActivityResult(//onresume이전에 콜백이 등록되어야 된다.
-            ActivityResultContracts.StartActivityForResult()//콜백함수를 하나로 통일하면 누가 호출했는지 구분을 못 함
+            ActivityResultContracts.StartActivityForResult()
         ) {
-            Log.d("콜백1","ㄴㅇㄹ")
-            fragOn.updateList()
+            fragOn.updateList()//리스트 초기화
         }
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        Log.d("리스타트 ㅁㅁ", "ㄴㅇㄹ")
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
     }
 
 
@@ -93,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun initStart() {
 
-        binding = DataBindingUtil.setContentView(
+        binding = DataBindingUtil.setContentView(//어노테이션 프로세서가 데이터바인딩클래스를 생성해줌
             this,
             R.layout.activity_main
         )//binding.viewModel에 viewmodel 담기전에 먼저 초기화
@@ -120,21 +97,14 @@ class MainActivity : AppCompatActivity() {
             transaction.replace(R.id.Fragcontainer, fragOn, "On")
             //transaction.addToBackStack(null)
             transaction.commit()
-        }else{
+        }else{//같은 프래그먼트일 경우 replace가 안됨 그래서 list만 따로 초기화
             fragOn.updateList()
         }
         viewModel.setOnDrawable(this)
     }
 
-    fun upShow() {
+    fun likeShow() {
         //추천글 보는 프래그먼트
-        //FBAuth.signOut()
-        //val auth: AuthEntity = AuthEntity("구글이메일","닉네임",DataTrans.getTime())
-        //val board: BoardEntity = BoardEntity("구글이메일1",DataTrans.getTime(),"제목","치킨집","경기도 수원시", 3.5F, "본문1","이미지주소",3,5,10.5,20.7)
-        //val comment: CommentEntity = CommentEntity("구글이메일2","202201","202202",DataTrans.getTime(),"댓글내용1")
-        //FBDatabase.setAuth(auth)
-        //FBDatabase.setBoard(board)
-        //FBDatabase.setComment(comment)
         viewModel.setUpDrawable(this)
     }
 

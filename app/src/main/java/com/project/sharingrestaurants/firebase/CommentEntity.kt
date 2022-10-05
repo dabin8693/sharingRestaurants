@@ -1,7 +1,5 @@
 package com.project.sharingrestaurants.firebase
 
-import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
 import java.util.*
 
@@ -12,7 +10,7 @@ data class CommentEntity(//댓글 board하위 컬렉션
     var boardId: String,//본문글의 documentId
     var timestamp: Date,
     var body: String,
-    //위는 파이어스토어 필드
-    var nickname: String ="",
-    var profileImage: String =""
+    //위는 파이어스토어 comment컬렉션 필드
+    var nickname: String ="",//auth컬렉션
+    var profileImage: String =""//auth컬렉션
 ): Serializable

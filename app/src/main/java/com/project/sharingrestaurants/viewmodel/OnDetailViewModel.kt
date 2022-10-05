@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
 
-    val nicknamMap: MutableMap<String, String> = hashMapOf()//key - email, value - nickname
+    val nicknameMap: MutableMap<String, String> = hashMapOf()//key - email, value - nickname
     var isRecomment: Boolean = false//이게 true면 추천수 불러올때 추가로 1더하기
 
     fun getAuth(): UserEntity {
@@ -30,15 +30,14 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
 
     fun getLoadBodyData(): LiveData<BoardEntity>{//프로필 이미지, 닉네임, 조회수, 댓글수
         val liveData: MutableLiveData<BoardEntity> = MutableLiveData()
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
 
-            //liveData.postValue()
         }
         return liveData
     }
     fun getLoadLookData(): LiveData<BoardEntity>{//조회수, 댓글수
         val liveData: MutableLiveData<BoardEntity> = MutableLiveData()
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
 
             //liveData.postValue()
         }
@@ -46,18 +45,18 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
     }
     fun getLoadCommentData(): LiveData<List<Any>>{//댓글, 답글 //Any = CommentEntity, ReplyEntity
         val liveData: MutableLiveData<List<Any>> = MutableLiveData()
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
 
             //liveData.postValue()
         }
         return liveData
     }
 
-    fun incrementLookBoard(boardId: String){
-        repository.incrementLookBoard(boardId)
+    fun incrementLook(boardId: String){
+        repository.incrementLook(boardId)
     }
 
-    fun incrementRecommendsBoard(boardId: String) {
-        repository.incrementRecommendsBoard(boardId)
+    fun incrementLike(boardId: String) {
+        repository.incrementLike(boardId)
     }
 }

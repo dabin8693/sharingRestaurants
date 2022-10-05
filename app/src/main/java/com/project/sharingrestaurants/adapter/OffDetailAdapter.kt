@@ -1,6 +1,5 @@
 package com.project.sharingrestaurants.adapter
 
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -78,7 +77,7 @@ class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
         this.items = array
         notifyDataSetChanged()
     }
-//list -> arraylist x //arraylist -> list o //list -> mutablelist o
+
     fun setItem(items: OffItem) {
         val array = ArrayList<String>()
         array.add(items.title)
@@ -100,7 +99,6 @@ class OffDetailAdapter : RecyclerView.Adapter<OffDetailAdapter.ViewHolder>() {
         val binding = binding
 
         fun bind(item: String) {//type이 4,5 뷰홀더는 이후 포지션에서 재활용 됨 //0,1,2,3는 포지션이 0,1,2,3일 때만 재활용됨 그래서 뷰 속성 수정했을때 안 바꿔도 됨
-            Log.d("뷰홀더",viewType.toString())
             when (viewType) {
                 0 -> {
                     val temp = binding as OffItemTextBinding

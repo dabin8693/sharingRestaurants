@@ -16,7 +16,7 @@
 
 
             <ImageView
-                android:id="@+id/recomment"
+                android:id="@+id/like"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/social_network_24"
@@ -28,14 +28,14 @@
             </ImageView>
 
             <TextView
-                android:id="@+id/recommend"
+                android:id="@+id/likenum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:text="0"
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/recomment"
+                app:layout_constraintStart_toEndOf="@+id/like"
                 app:layout_constraintTop_toTopOf="parent">
 
             </TextView>

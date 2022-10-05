@@ -5,14 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.TextView
-import androidx.databinding.DataBindingUtil
-import com.project.sharingrestaurants.R//수동으로
 import com.project.sharingrestaurants.databinding.SpinnerInnerViewBinding
 import com.project.sharingrestaurants.databinding.SpinnerOuterViewBinding
 
 
-class CustomSpinner(context: Context, list: List<String>) : BaseAdapter() {//안씀
+class SortSpinner(context: Context, list: List<String>) : BaseAdapter() {//안씀
     lateinit var text: String
     val list = list
     val context = context

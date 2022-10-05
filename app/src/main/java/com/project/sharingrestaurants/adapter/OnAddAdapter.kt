@@ -22,8 +22,8 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
     private lateinit var binding: ViewDataBinding
     private lateinit var context: Context
     private lateinit var lastEdit: EditText
-    private var focusEditPosition: Int// 수정에서 넘어올때 한번 더 초기화
-    private var focusImagePosition: Int// 사진 롱클릭시 업데이트
+    private var focusEditPosition: Int//수정에서 넘어올때 한번 더 초기화
+    private var focusImagePosition: Int//사진 롱클릭시 업데이트
 
     init {
         focusEditPosition = 1
@@ -95,6 +95,7 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
         //Log.d("어뎁터포지션2/",focusEditPosition.value.toString())
         this.items.add(focusEditPosition +1, string)//마지막 인덱스는 계속 linear가 있어야 됨 //밀려서 들어감
         notifyDataSetChanged()
+        //notifyItemRangeChanged(focusEditPosition + 1, items.size - (focusEditPosition + 1))
     }
 
     //fun getPosition(): LiveData<Int> = focusEditPosition
@@ -106,6 +107,7 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
         this.items.removeAt(position)//이미지 삭제
         this.items.removeAt(position)//에디트텍스트 삭제
         notifyDataSetChanged()
+        //notifyItemRangeChanged(position,items.size - position)
     }
 
     inner class ViewHolder(val binding: ViewDataBinding, val viewType: Int) : RecyclerView.ViewHolder(binding.root) {//edit텍스트는 클릭리스너 말고 포커스체인지 리스너로 해야 한번터치로 응답함
@@ -162,7 +164,7 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
 
                     })
                     binding.edit.setOnFocusChangeListener{ _, _ ->
-                        if (adapterPosition > 0) {//간혹 사진추가화 -1이 나올때 있음
+                        if (adapterPosition > 0) {//간혹 사진추가할때 -1이 나올때 있음
                             focusEditPosition = adapterPosition
                         }
                     }
@@ -187,11 +189,9 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
                     }
                     binding.edittitle.setOnFocusChangeListener{ _, _ ->
                         focusEditPosition = 1
-                        Log.d("어뎁터포지션1/",focusEditPosition.toString())
                     }
                     binding.editplace.setOnFocusChangeListener{ _, _ ->
                         focusEditPosition = 1
-                        Log.d("어뎁터포지션11/",focusEditPosition.toString())
                     }
                 }
                 3 -> {//linear

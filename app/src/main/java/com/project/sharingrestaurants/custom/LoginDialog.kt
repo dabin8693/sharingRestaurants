@@ -7,7 +7,7 @@ import android.widget.Button
 import com.google.android.gms.common.SignInButton
 import com.project.sharingrestaurants.R
 
-class CustomDialog(activity: Activity) : Dialog(activity) {
+class LoginDialog(activity: Activity) : Dialog(activity) {//로그인
     private val signbutton: SignInButton
     private val finishbutton: Button
 

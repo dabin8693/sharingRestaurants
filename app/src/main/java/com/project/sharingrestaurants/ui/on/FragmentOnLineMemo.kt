@@ -1,13 +1,11 @@
 package com.project.sharingrestaurants.ui.on
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,34 +17,33 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.gun0912.tedpermission.rx3.TedPermission
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnAdapter
-import com.project.sharingrestaurants.custom.CustomDialog
+import com.project.sharingrestaurants.custom.LoginDialog
 import com.project.sharingrestaurants.databinding.FragOnlineMemoBinding
 import com.project.sharingrestaurants.ui.MainActivity
+import com.project.sharingrestaurants.util.RunTimePermissionCheck
 import com.project.sharingrestaurants.viewmodel.OnLineViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 
 class FragmentOnLineMemo : Fragment() {
-    private val viewModel: OnLineViewModel by lazy {//프래그먼트 객체가 사라질때까지 유지
+    private val viewModel: OnLineViewModel by lazy {//main에서 프래그먼트 객체 = null되기전까지 유지됨 //ondestoy되어도 트랜젝션에서 replace되면 데이터 복구됨
         ViewModelProvider(this, ViewModelFactory(MyApplication.REPOSITORY)).get(
             OnLineViewModel::class.java
         )
     }
     private lateinit var binding: FragOnlineMemoBinding
     private lateinit var onAdapter: OnAdapter
-    private lateinit var loginDialog: CustomDialog
+    private lateinit var loginDialog: LoginDialog
     private lateinit var activity: MainActivity
 
 
-    override fun onCreateView(//레이아웃 인플레이트 하는곳 //액티비티의 onstart랑 비슷하다
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("생명주기", "onCreateView")
         initStart(inflater, container, savedInstanceState)
         return binding.root
     }
@@ -55,9 +52,8 @@ class FragmentOnLineMemo : Fragment() {
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
-    ) {//뷰 초기화, livedata옵저버, recyclerview, viewpager2, adapter초기화
+    ) {//뷰 초기화
         super.onViewCreated(view, savedInstanceState)
-        Log.d("생명주기", "onViewCreated")
         onAdapter = OnAdapter(
             { item ->
                 val intent =
@@ -78,18 +74,16 @@ class FragmentOnLineMemo : Fragment() {
         viewModel.getList().observe(viewLifecycleOwner) { list ->
             //최신순으로 초기화
             //실시간변경x 정렬 스피너 이벤트 여부 or 프레그먼트 최초 초기화 될때만 호출
-            Log.d("리스트초기화", list.toString())
             onAdapter.setItems(list)
         }
 
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fun updateList() {//livedata말고 코루틴으로 처리
+    fun updateList() {
         viewModel.getList().observe(viewLifecycleOwner) { list ->
             //최신순으로 초기화
             //실시간변경x 정렬 스피너 이벤트 여부 or 프레그먼트 최초 초기화 될때만 호출
-            Log.d("리스트초기화", list.toString())
             onAdapter.setItems(list)
         }
     }
@@ -105,7 +99,7 @@ class FragmentOnLineMemo : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         activity = requireActivity() as MainActivity
 
-        requestPermissions()//위치 권한
+        RunTimePermissionCheck.requestPermissions(activity)//위치 권한
         viewModel.currentLatitude.value = 0.0
         viewModel.currentLongitude.value = 0.0
         viewModel.getCurrentGPS(activity).observe(viewLifecycleOwner) {
@@ -128,7 +122,7 @@ class FragmentOnLineMemo : Fragment() {
 
     fun loginShow() {
         if (viewModel.getIsLogin() == false) {
-            loginDialog = CustomDialog(activity)
+            loginDialog = LoginDialog(activity)
             loginDialog.signOnClick {
                 val signInIntent: Intent =
                     viewModel.getGoogleSignInClient().signInIntent //구글로그인 페이지로 가는 인텐트 객체
@@ -154,7 +148,6 @@ class FragmentOnLineMemo : Fragment() {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.signIn(account, java.lang.ref.WeakReference(activity).get()) {
                     viewModel.addFBAuth(viewLifecycleOwner)//db회원 정보 저장 및 불러오기
-                    Log.d("url값은", viewModel.getAuth().profileImage)
                     loginDialog.dismiss()
                     Glide.with(this)
                         .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
@@ -177,32 +170,6 @@ class FragmentOnLineMemo : Fragment() {
     }
 
 
-    // 위치권한 관련 요청
-    private fun requestPermissions() {
-        // 내장 위치 추적 기능 사용
-        //locationSource =
-        //FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
-        TedPermission.create()
-            .setRationaleTitle("위치권한 요청")
-            .setRationaleMessage("현재 위치로 이동하기 위해 위치권한이 필요합니다.") // "we need permission for read contact and find your location"
-            .setPermissions(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            //rxandroid
-            .request()
-            .subscribe({ tedPermissionResult ->
-                if (!tedPermissionResult.isGranted) {
-                    Toast.makeText(
-                        requireActivity(),
-                        getString(R.string.location_permission_denied_msg),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }) { throwable -> Log.e("AAAAAA", throwable.message.toString()) }
-
-
-    }
 }
 
 

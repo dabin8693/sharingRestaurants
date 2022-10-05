@@ -37,7 +37,6 @@ object CameraWork {//애플리케이션 context
         var height = bitmap.height
         var width = bitmap.width
         newBitmap = Bitmap.createScaledBitmap(bitmap, width / size, height / size, true)//filter: 픽셀형태 조정
-        Log.d("리사이즈1", "ㅇㅇ")
         return newBitmap
     }
 
@@ -46,7 +45,6 @@ object CameraWork {//애플리케이션 context
         val values = ContentValues().apply {
             //viewModel.imageFileNameList.add(imageFileName)
             pictureName = getTime() + ".jpg"
-            Log.d("미디어스토어저장1", pictureName)
             put(MediaStore.Images.Media.DISPLAY_NAME, pictureName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/restaurant")

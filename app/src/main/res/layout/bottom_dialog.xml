@@ -6,7 +6,7 @@
     <data>
         <variable
             name="buttomDialog"
-            type="com.project.sharingrestaurants.custom.ButtomSheetDialog" />
+            type="com.project.sharingrestaurants.custom.SortButtomSheetDialog" />
     </data>
     <LinearLayout
         android:id="@+id/buttomSheetParent"

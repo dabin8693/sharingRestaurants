@@ -30,7 +30,7 @@ class OnItemDetailShowActivity : AppCompatActivity() {
 
         initStart()
         item = intent.getSerializableExtra("BoardEntity") as BoardEntity
-        viewModel.incrementLookBoard(item.documentId)
+        viewModel.incrementLook(item.documentId)
         if (viewModel.getIsLogin()) {
             if (item.uid.equals(viewModel.getAuth().uid)) {//내가 작성한 글일 경우
                 binding.insert.visibility = View.VISIBLE
@@ -47,9 +47,9 @@ class OnItemDetailShowActivity : AppCompatActivity() {
                 LinearLayoutManager(this@OnItemDetailShowActivity, RecyclerView.VERTICAL, false)
             this.setHasFixedSize(true)//사이즈 측정이 필요없다 판단돼면 내부적으로 measure안한다
         }
-        //adapter.notifyDataSetChanged()
+
         if (viewModel.getIsLogin()) {
-            viewModel.nicknamMap.set(viewModel.getAuth().email!!, viewModel.getAuth().nickname)
+            viewModel.nicknameMap.set(viewModel.getAuth().email!!, viewModel.getAuth().nickname)
             if (!item.uid.equals(viewModel.getAuth().uid)) {//내가 작성한 글이 아닐경우
                 viewModel.getLoadBodyData().observe(this) {
                     adapter.setBodyItem(it)

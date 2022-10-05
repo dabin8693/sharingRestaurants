@@ -4,15 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.databinding.BottomDialogBinding
-import com.project.sharingrestaurants.viewmodel.OffLineViewModel
 
 
-class ButtomSheetDialog(val initialValue: String,val itemClick: (a: String) -> Unit) : BottomSheetDialogFragment() {
+class SortButtomSheetDialog(val initialValue: String, val itemClick: (a: String) -> Unit) : BottomSheetDialogFragment() {//off프래그먼트 정렬버튼클릭시
     lateinit var binding: BottomDialogBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

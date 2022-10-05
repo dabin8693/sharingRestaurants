@@ -1,11 +1,8 @@
 package com.project.sharingrestaurants.firebase
 
-import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
-import java.util.*
 
-data class UserEntity(
+data class UserEntity(//auth컬렉션
     var uid: String ="",
     var email: String ="",
     var nickname: String ="",

@@ -1,16 +1,10 @@
 package com.project.sharingrestaurants.room
 
 import android.app.Activity
-import android.content.ContentResolver
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.firebase.*
@@ -19,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class ItemRepository(application: MyApplication) {//나중에 di사용 Application클래스에서 의존성 관리
+class ItemRepository(application: MyApplication) {
     private val itemDatabase = ItemDatabase.getInstance(application)
     private val itemDao = itemDatabase.dao()
     private val Auth: FBAuth = FBAuth.getInstance(application)//파이어베이스 중에 제일 먼저 초기화
@@ -29,7 +23,7 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
     companion object{
         private var INSTANCE: ItemRepository? = null
 
-        fun getInstance(): ItemRepository {//스레드 경합없음으로 synchronized필요없음
+        fun getInstance(): ItemRepository {//synchronized필요없음
             if (INSTANCE == null){//중복 생성 방지
                 INSTANCE = ItemRepository(MyApplication.INSTANCE)
             }
@@ -37,25 +31,15 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
         }
     }
 
-    fun getList(): LiveData<List<ItemEntity>>{//room은 livedata로 반환하면 내부적으로 work스레드에서 call(쿼리처리함수)함수를 처리하고 결과값을 postvalue로 전달함
+    fun getList(): LiveData<List<ItemEntity>>{//room은 반환값을 livedata로 하면 내부적으로 work스레드에서 call(쿼리처리함수)함수를 처리하고 결과값을 postvalue로 전달함
         return itemDao.getList()//따로 io스레드가 필요없다.
     }
 
     fun searchTitle(query: String?): LiveData<List<ItemEntity>>{
-        if (query != null) {
-            Log.d("초기화 쿼리타이틀",query)
-        }else{
-            Log.d("초기화 쿼리타이틀","널임")
-        }
         return itemDao.searchByTitle(query)
     }
 
     fun searchTitleOrBody(query: String?): LiveData<List<ItemEntity>>{
-        if (query != null) {
-            Log.d("초기화 쿼리타이틀바디",query)
-        }else{
-            Log.d("초기화 쿼리타이틀바디","널임")
-        }
         return itemDao.searchByTitleOrPlace(query)
     }
 
@@ -95,12 +79,12 @@ class ItemRepository(application: MyApplication) {//나중에 di사용 Applicati
         return fbDatabase.insertNicknameAuth(getAuth().nickname, nickname)
     }
 
-    fun incrementLookBoard(boardId: String){
-        fbDatabase.incrementLookBoard(boardId)
+    fun incrementLook(boardId: String){
+        fbDatabase.incrementLook(boardId)
     }
 
-    fun incrementRecommendsBoard(boardId: String) {
-        fbDatabase.incrementRecommendsBoard(boardId)
+    fun incrementLike(boardId: String) {
+        fbDatabase.incrementLike(boardId)
     }
 
     fun addFBAuth(){

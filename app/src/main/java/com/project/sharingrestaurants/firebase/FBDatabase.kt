@@ -1,24 +1,16 @@
 package com.project.sharingrestaurants.firebase
 
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
-
-import kotlin.collections.ArrayList
 
 
 class FBDatabase {
@@ -28,7 +20,7 @@ class FBDatabase {
     companion object {
         private var INSTANCE: FBDatabase? = null
 
-        fun getInstance(): FBDatabase {//스레드 경합없음으로 synchronized필요없음
+        fun getInstance(): FBDatabase {//synchronized필요없음
             if (INSTANCE == null) {//중복 생성 방지
                 INSTANCE = FBDatabase()
             }
@@ -82,16 +74,16 @@ class FBDatabase {
         return liveData
     }
 
-    fun incrementLookBoard(boardId: String){//boardId = documentId
-        fbDatabase.collection("board").document(boardId)
+    fun incrementLook(boardId: String){//boardId = documentId
+        fbDatabase.collection("count").document(boardId)
             .update("look",FieldValue.increment(1))//조회수 증가
             .addOnSuccessListener {  }
             .addOnFailureListener {  }
     }
 
-    fun incrementRecommendsBoard(boardId: String) {//recommends = 추천
-        fbDatabase.collection("board").document(boardId)
-            .update("recommends",FieldValue.increment(1))//추천수 증가
+    fun incrementLike(boardId: String) {//like = 추천
+        fbDatabase.collection("count").document(boardId)
+            .update("like",FieldValue.increment(1))//추천수 증가
             .addOnSuccessListener {  }
             .addOnFailureListener {  }
     }

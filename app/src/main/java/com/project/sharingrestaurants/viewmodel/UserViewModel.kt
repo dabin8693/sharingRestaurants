@@ -1,7 +1,6 @@
 package com.project.sharingrestaurants.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.project.sharingrestaurants.firebase.FBAuth
 import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemRepository
 

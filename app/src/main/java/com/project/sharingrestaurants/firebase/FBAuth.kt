@@ -1,12 +1,9 @@
 package com.project.sharingrestaurants.firebase
 
 import android.app.Activity
-import android.app.Application
 import android.content.ContentValues
-import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -18,7 +15,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
-import com.project.sharingrestaurants.room.ItemRepository
 
 class FBAuth(val context: MyApplication) {
 
@@ -33,7 +29,7 @@ class FBAuth(val context: MyApplication) {
     companion object{
         private var INSTANCE: FBAuth? = null
 
-        fun getInstance(context: MyApplication): FBAuth {//스레드 경합없음으로 synchronized필요없음
+        fun getInstance(context: MyApplication): FBAuth {//synchronized필요없음
             if (INSTANCE == null){//중복 생성 방지
                 INSTANCE = FBAuth(context)
             }

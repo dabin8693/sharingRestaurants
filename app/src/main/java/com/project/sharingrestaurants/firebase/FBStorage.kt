@@ -1,28 +1,10 @@
 package com.project.sharingrestaurants.firebase
 
-import android.content.ContentResolver
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
-import android.util.Log
-import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import com.project.sharingrestaurants.ui.off.OffItemAddActivity
-import com.project.sharingrestaurants.util.ConstValue.DELIMITER
-import com.project.sharingrestaurants.util.ConstValue.FALSE
-import com.project.sharingrestaurants.util.DataTrans
-import com.project.sharingrestaurants.util.DataTrans.getTime
 import kotlinx.coroutines.tasks.await
-import java.io.ByteArrayOutputStream
 import java.lang.Exception
-import java.lang.StringBuilder
 
 class FBStorage {
     private val storage = Firebase.storage("gs://restaurantapp-3152b.appspot.com")

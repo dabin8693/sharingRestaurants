@@ -44,7 +44,6 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {//뷰홀더에 데이터 바인딩
         holder.bind(items[position])
-        Log.d("바인드 뷰홀더","ㅇㅇ")
     }
 
     fun distChanged(currentLatitude: Double, currentLongitude: Double){//위치 가져오기 비동기 처리 끝난후 호출됨
@@ -57,27 +56,22 @@ class OnAdapter(val itemClick: (BoardEntity) -> Unit, var currentLatitude: Doubl
 
 
     fun setItems(items: List<BoardEntity>) {//아이템 체인지 이벤트 보내기
-        Log.d("셋아이템","ㅇㅇ")
         this.items = items
         notifyDataSetChanged()
     }
 
     inner class ViewHolder(private val binding: OnItemBinding) : RecyclerView.ViewHolder(binding.root){
         lateinit var item: BoardEntity
-        fun bind(item: BoardEntity) {//뷰홀더에 데이터 바인딩
+        fun bind(item: BoardEntity) {
             // 아이템 상세 정보로 이동
-            Log.d("바인드 뷰홀더22","ㅇㅇ")
             binding.title.setText(item.tilte)
-            binding.number.setText(item.recommends.toString())
+            binding.likenum.setText(item.like.toString())
             binding.place.setText(item.place)
             binding.ratingBar.rating = item.priority
-            if(!item.thumb.equals("")) {//null체크는 필요없음
-                Log.d("뷰홀더 썸네일ㅁㅁ", item.thumb.substring(1))
-                Log.d("ㅁㅁ", "성공")
+            if(!item.thumb.equals("")) {//null체크는 필요없음 //string초기값은 = ""로 처리함
                 Glide.with(itemView)
                     //캐시 쓸때 참조카운터로 캐시를 유지해서 캐시 허용옵션으로 적용하면 프래그먼트 재로딩시 이미지 호출 안됨(캐시가 비워져서)
                     //application context를 써도 캐싱 실패함
-                //glide
                     .load(storageRef.child(item.thumb.substring(1)))//첫번째 사진만 보여준다
                     .skipMemoryCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)

@@ -5,7 +5,6 @@ import androidx.arch.core.util.Function
 import androidx.lifecycle.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.project.sharingrestaurants.firebase.FBAuth
 import com.project.sharingrestaurants.firebase.UserEntity
 import com.project.sharingrestaurants.room.ItemEntity
 import com.project.sharingrestaurants.room.ItemRepository

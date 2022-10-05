@@ -27,11 +27,11 @@ import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.BitmapImageItem
 import com.project.sharingrestaurants.data.OffItem
 import com.project.sharingrestaurants.databinding.ActivityOffItemAddBinding
+import com.project.sharingrestaurants.ui.ShowMapActivity
 import com.project.sharingrestaurants.util.CameraWork
 import com.project.sharingrestaurants.viewmodel.OffAddViewModel
 import com.project.sharingrestaurants.viewmodel.ViewModelFactory
 
-//화면 고정설정
 class OffItemAddActivity : AppCompatActivity() {
     lateinit var binding: ActivityOffItemAddBinding
     val viewModel: OffAddViewModel by lazy {
@@ -172,8 +172,6 @@ class OffItemAddActivity : AppCompatActivity() {
             binding.showmap.background = null
             viewModel.itemLatitude = it.data!!.getDoubleExtra("latitude",0.0)
             viewModel.itemLongitude = it.data!!.getDoubleExtra("longitude",0.0)
-            Log.d("위도2ㅇㅇㅎ",viewModel.itemLatitude.toString())
-            Log.d("경도2ㅇㅇㅎ",viewModel.itemLongitude.toString())
         }
     }
 
@@ -182,20 +180,16 @@ class OffItemAddActivity : AppCompatActivity() {
             val source = ImageDecoder.createSource(contentResolver, uri!!)
             ImageDecoder.decodeBitmap(source).let {
                 var bitmap = CameraWork.resizeBitmap(it, 2)//0-0 1-2 2-4 3-6
-                //viewModel.imageBitmapOrStringList.add(getViewPosition()/2,bitmap)
                 if (code == "gallery") {//imageBitmapOrStringList변수는 이미지만 저장해서 getViewPosition보다 position이 2배 작다.
                     viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, CameraWork.getTime() + ".jpg"))
-                    //viewModel.imageFileNameList.add(cameraWork.getTime() + ".jpg")
                 }else if (code == "camera"){
                     viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, viewModel.publicName))
-                    //viewModel.imageFileNameList.add(viewModel.pictureName)
                 }
                 addViewAuto(getViewPosition(), bitmap)
             }
         } else {
             MediaStore.Images.Media.getBitmap(contentResolver, uri!!)?.let {
                 var bitmap = CameraWork.resizeBitmap(it, 2)
-                //viewModel.imageBitmapOrStringList.add(getViewPosition()/2,bitmap)
                 if (code == "gallery") {
                     viewModel.addImageBitmap(getViewPosition()/2, BitmapImageItem(bitmap, CameraWork.getTime() + ".jpg"))
                 }else if (code == "camera"){
@@ -219,7 +213,6 @@ class OffItemAddActivity : AppCompatActivity() {
         editText.background = null
         editText.layoutParams = layoutParam
         editText.setOnFocusChangeListener(focusEvent)
-        //editText.background = null
         editText.id = 100 + position
 
         viewModel.viewList!!.add(position , editText)//현재 포지션보다 뒤에 추가

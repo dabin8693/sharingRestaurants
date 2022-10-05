@@ -1,7 +1,6 @@
 package com.project.sharingrestaurants
 
 import android.app.Application
-import android.content.SharedPreferences
 import com.bumptech.glide.Glide
 import com.project.sharingrestaurants.room.ItemRepository
 
