@@ -1,8 +1,6 @@
 package com.project.sharingrestaurants.viewmodel
 
 import android.app.Activity
-import android.util.Log
-import androidx.core.os.trace
 import androidx.lifecycle.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -21,34 +19,41 @@ class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
     val currentLatitude: MutableLiveData<Double> = MutableLiveData()
     val currentLongitude: MutableLiveData<Double> = MutableLiveData()
 
-    fun getList(): LiveData<List<BoardEntity>>{
+    fun getList(lifecycle: LifecycleOwner): LiveData<List<BoardEntity>>{
         val liveData: MutableLiveData<List<BoardEntity>> = MutableLiveData()
+        var isChanged: Boolean = false
+        repository.isChangedBoard().observe(lifecycle){
+            isChanged = true
+        }
+        repository.isChangedCount().observe(lifecycle){
+            isChanged = true
+        }
         CoroutineScope(Dispatchers.Main).launch {
-            val boardList = repository.getBoardList() as ArrayList
-            val countList = repository.getCountList()
-            var newBoardList = boardList.clone() as ArrayList<BoardEntity>
-            var a = 0
-            for (board in boardList){
-                var b = 0
-                for (count in countList) {
-                    if (board.documentId.equals(count.boardId)) {
-                        val count = countList.get(a)
+            var boardList: MutableList<BoardEntity>
+            var countList: List<CountEntity>
+            while (true){
+                isChanged = false
+                boardList = repository.getBoardList().toMutableList()
+                countList = repository.getCountList()
+                if (isChanged == false){
+                    var board: BoardEntity
+                    var count: CountEntity
+                    for (index in 0 until boardList.size){
+                        board = boardList.get(index)
+                        count = countList.get(index)
                         board.like = count.like
                         board.likeUsers = count.likeUsers
                         board.look = count.look
                         board.comments = count.comments
-                        b++
-                        break
+                        boardList.set(index, board)
                     }
+                    liveData.value = boardList
+                    break
                 }
-                if (b == 0){//해당 글에 해당하는 count가 없으면 목록 리스트에서 해당 글 삭제
-                    newBoardList.removeAt(a)//삭제하면 인덱스가 하나 줄음
-                    a--
-                }
-                a++
             }
-            liveData.value = newBoardList
+
         }
+
         return liveData
     }
 

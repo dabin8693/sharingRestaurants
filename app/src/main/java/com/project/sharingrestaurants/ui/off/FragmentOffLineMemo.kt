@@ -145,6 +145,8 @@ class FragmentOffLineMemo : Fragment() {
         if (viewModel.getIsLogin() == true) {
             Glide.with(this)
                 .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(binding.imageView)
                 .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
         }
@@ -228,7 +230,7 @@ class FragmentOffLineMemo : Fragment() {
                     Glide.with(this)
                         .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
                         .skipMemoryCache(true)
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(binding.imageView)
                         .onLoadFailed(
                             ResourcesCompat.getDrawable(

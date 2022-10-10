@@ -1,6 +1,7 @@
 package com.project.sharingrestaurants.room
 
 import android.app.Activity
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -66,6 +67,13 @@ class ItemRepository(application: MyApplication) {
     //room
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //firestore database
+    fun isChangedBoard(): LiveData<Int>{
+        return fbDatabase.isChangedBoard()
+    }
+
+    fun isChangedCount(): LiveData<Int>{
+        return fbDatabase.isChangedCount()
+    }
 
     suspend fun addFBBoard(boardMap: MutableMap<String, Any>): Boolean{
         return fbDatabase.addBoard(boardMap)
@@ -158,6 +166,10 @@ class ItemRepository(application: MyApplication) {
 
     suspend fun addImageFBStorage(uid: String, time: String, name: String, data: ByteArray): String{
         return fbStorage.addImage(uid, time, name, data)
+    }
+
+    suspend fun getThumImage(path: String): ByteArray {
+        return fbStorage.getThumImage(path)
     }
     //firestore storage
     //////////////////////////////////////////////////////////////////////////////////////////////////////

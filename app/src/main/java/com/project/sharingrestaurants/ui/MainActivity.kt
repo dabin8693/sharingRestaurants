@@ -52,6 +52,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        if(supportFragmentManager.findFragmentById(R.id.Fragcontainer) == fragOn) {
+            fragOn.updateList()
+        }
+    }
+
 
     override fun onBackPressed() {
         //super.onBackPressed()//빽키 앱 종료 안되게

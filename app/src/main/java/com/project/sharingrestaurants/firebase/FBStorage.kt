@@ -1,5 +1,9 @@
 package com.project.sharingrestaurants.firebase
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
@@ -34,6 +38,15 @@ class FBStorage {
             return path.path
         } catch (e: Exception) {
             return ConstValue.FALSE
+        }
+    }
+
+    suspend fun getThumImage(path: String): ByteArray{
+        try {
+            return storageRef.child(path).getBytes(2048*2048).await()
+        }catch (e: Exception){
+            Log.d("에러getThumImage",e.toString())
+            return ByteArray(1)
         }
     }
 }

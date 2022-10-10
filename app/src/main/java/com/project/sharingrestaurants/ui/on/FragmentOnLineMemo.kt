@@ -81,7 +81,7 @@ class FragmentOnLineMemo : Fragment() {
                 LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             this.setHasFixedSize(true)//사이즈 측정이 필요없다 판단돼면 내부적으로 measure안한다
         }
-        viewModel.getList().observe(viewLifecycleOwner) { list ->
+        viewModel.getList(viewLifecycleOwner).observe(viewLifecycleOwner) { list ->
             //최신순으로 초기화
             //실시간변경x 정렬 스피너 이벤트 여부 or 프레그먼트 최초 초기화 될때만 호출
             onAdapter.setItems(list)
@@ -91,7 +91,7 @@ class FragmentOnLineMemo : Fragment() {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun updateList() {
-        viewModel.getList().observe(viewLifecycleOwner) { list ->
+        viewModel.getList(viewLifecycleOwner).observe(viewLifecycleOwner) { list ->
             //최신순으로 초기화
             //실시간변경x 정렬 스피너 이벤트 여부 or 프레그먼트 최초 초기화 될때만 호출
             onAdapter.setItems(list)
@@ -123,7 +123,9 @@ class FragmentOnLineMemo : Fragment() {
 
         if (viewModel.getIsLogin() == true) {
             Glide.with(this)
-                .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
+                .load(viewModel.getAuth().profileImage)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(binding.imageView)
                 .onLoadFailed(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, null))
         }
@@ -162,7 +164,7 @@ class FragmentOnLineMemo : Fragment() {
                     Glide.with(this)
                         .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
                         .skipMemoryCache(true)
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(binding.imageView)
                         .onLoadFailed(
                             ResourcesCompat.getDrawable(

@@ -2,6 +2,7 @@ package com.project.sharingrestaurants.viewmodel
 
 import android.content.ContentResolver
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -14,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.storage.StorageReference
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.room.ItemRepository
 import com.project.sharingrestaurants.util.CameraWork.resizeBitmap
@@ -48,7 +50,9 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
     private var uploadThumImagePath: String = ""//파이어스토리지uri
     val uploadSuccess: MutableLiveData<Boolean> = MutableLiveData()
 
-
+    fun getStorageRef(): StorageReference {
+        return repository.getFBStorageRef()
+    }
 
     fun setItem(item: BoardEntity) {
         documentId.value = item.documentId
@@ -61,6 +65,7 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         itemPlace.value = item.place
         itemLatitude = item.latitude
         itemLongitude = item.longitude
+        uploadThumImagePath = item.thumb
     }
 
     fun upLoad(activity: FragmentActivity, contentResolver: ContentResolver): LiveData<Boolean> {
@@ -80,8 +85,10 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
     ) {
         if (imageList.size == 0) {//이미지 없을때
             imageList.add("")
+            Log.d("ㅇㅇ","이미지o")
         }
         if (imageList[0].equals("")) {//이미지 없을때
+            Log.d("ㅇㅇ","저장")
             dbSave(imageList, isSuccess)
         } else {//있으면 파이어스토리지 -> 파이어스토어
             imageSavedPath(
@@ -103,25 +110,32 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         activity: FragmentActivity,
         contentResolver: ContentResolver, isSuccess: MutableLiveData<Boolean>
     ) {
+        Log.d("ㅇㅇ","insert")
         if (imageList.size == 0) {//이미지 없을때
             imageList.add("")
+            Log.d("ㅇㅇ","insert사진x")
         }
         if (imageList[0].equals("")) {//이미지 없을때
+            Log.d("ㅇㅇ","insert사진xㄱㄱ")
             dbInsert(imageList, isSuccess)
         } else {//있으면 파이어스토리지 -> 파이어스토어
             if (isChanged()) {//사진 변경됨
+                Log.d("ㅇㅇ","insert사진변경")
                 imageSavedPath(
                     imageList,
                     repository.getAuth().uid,
                     contentResolver
                 ).observe(activity) { bool ->
+                    Log.d("ㅇㅇ","insert사진변경 옵저버")
                     if (bool) {
                         dbInsert(uploadImagePath, isSuccess)
+                        Log.d("ㅇㅇ","insert사진변경 옵저버 true")
                     } else {
                         isSuccess.value = false
                     }
                 }
             } else {//사진 변경x
+                Log.d("ㅇㅇ","insert사진변경x")
                 dbInsert(imageList, isSuccess)
             }
         }
@@ -166,41 +180,106 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                 num++
             }
         }
-        val imageTotal: Int = imageArr.size - num//파이어스토리지에 저장할 총 이미지 갯수
+        var imageTotal: Int = imageArr.size - num//파이어스토리지에 저장할 총 이미지 갯수
+        if (isInserted) {//수정일 경우
+            if (!imageArr.get(0).equals(beforeImageList.get(0))) {//첫번째 이미지가 수정전이랑 다를경우
+                imageTotal = imageArr.size - num + 1//파이어스토리지에 저장할 총 이미지 갯수 + 새로운 썸네일
+            }
+        }
 
-        for (image in imageArr) {
-            if (image.contains(uid)) {//파이어스토리지에 이미 저장된 이미지
-                uploadImagePath.add(image)//저장하지 않고 기존 경로 그대로
-            } else {
-                if (imageArr.indexOf(image) == 0) {
-                    val imageName = "0" + imageArr.indexOf(image)
-                    val pathAbs =
-                        repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                    uploadImagePath.add(pathAbs.path)
-                    var data = bitmapUpload(image.toUri(), contentResolver)
-                    addImageFBStorage(uid, time, imageName, data, liveData, imageTotal, successList)
-                    val thumbName = "thumbnail"
-                    val thumbPathAbs =
-                        repository.getFBStorageRef().child(uid).child(time).child(thumbName)
-                    uploadThumImagePath = thumbPathAbs.path
-                    data = thumBitmapUpload(image.toUri(), contentResolver)
-                    addImageFBStorage(uid, time, thumbName, data, liveData, imageTotal, successList)
-                } else if (imageArr.indexOf(image) < 10) {
-                    val imageName = "0" + imageArr.indexOf(image)
-                    val pathAbs =
-                        repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                    uploadImagePath.add(pathAbs.path)
-                    val data = bitmapUpload(image.toUri(), contentResolver)
-                    addImageFBStorage(uid, time, imageName, data, liveData, imageTotal, successList)
-                } else if (imageArr.indexOf(image) < 100) {
-                    val imageName = imageArr.indexOf(image).toString()
-                    val pathAbs =
-                        repository.getFBStorageRef().child(uid).child(time).child(imageName)
-                    uploadImagePath.add(pathAbs.path)
-                    val data = bitmapUpload(image.toUri(), contentResolver)
-                    addImageFBStorage(uid, time, imageName, data, liveData, imageTotal, successList)
+        CoroutineScope(Dispatchers.Main).launch {
+            for (image in imageArr) {
+                if (image.contains(uid)) {//파이어스토리지에 이미 저장된 이미지
+                    if (imageArr.indexOf(image) == 0) {//첫번째 이미지가 수정전이랑 다를경우
+                        if (!imageArr.get(0).equals(beforeImageList.get(0))) {//썸네일 변경
+                            val thumbName = "thumbnail"
+                            val thumbPathAbs =
+                                repository.getFBStorageRef().child(uid).child(time).child(thumbName)
+                            uploadThumImagePath = thumbPathAbs.path//새로 저장할 썸네일 주소
+                            val byte = async { getThumImage(imageArr.get(0).substring(1)) }.await()//코루틴 호출
+                            var bitmap = BitmapFactory.decodeByteArray(byte, 0, byte.size)
+                            val baos = ByteArrayOutputStream()
+                            bitmap = resizeBitmap(bitmap, 4)
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                            val data = baos.toByteArray()//기존 파이어스토리지에 저장된 이미지를 다시 다운받고 리사이징후 썸네일로 업로드
+                            addImageFBStorage(
+                                uid,
+                                time,
+                                thumbName,
+                                data,
+                                liveData,
+                                imageTotal,
+                                successList
+                            )
+                        }
+                    }
+                    uploadImagePath.add(image)//저장하지 않고 기존 경로 그대로
+                } else {//파이어스토리지에 사진이 없는 경우
+                    if (imageArr.indexOf(image) == 0) {
+                        val imageName = "0" + imageArr.indexOf(image)
+                        val pathAbs =
+                            repository.getFBStorageRef().child(uid).child(time).child(imageName)
+                        uploadImagePath.add(pathAbs.path)
+                        var data = bitmapUpload(image.toUri(), contentResolver)
+                        addImageFBStorage(
+                            uid,
+                            time,
+                            imageName,
+                            data,
+                            liveData,
+                            imageTotal,
+                            successList
+                        )
+                        val thumbName = "thumbnail"
+                        val thumbPathAbs =
+                            repository.getFBStorageRef().child(uid).child(time).child(thumbName)
+                        uploadThumImagePath = thumbPathAbs.path
+                        data = thumBitmapUpload(image.toUri(), contentResolver)
+                        addImageFBStorage(
+                            uid,
+                            time,
+                            thumbName,
+                            data,
+                            liveData,
+                            imageTotal,
+                            successList
+                        )
+                    } else if (imageArr.indexOf(image) < 10) {
+                        val imageName = "0" + imageArr.indexOf(image)
+                        val pathAbs =
+                            repository.getFBStorageRef().child(uid).child(time).child(imageName)
+                        uploadImagePath.add(pathAbs.path)
+                        val data = bitmapUpload(image.toUri(), contentResolver)
+                        addImageFBStorage(
+                            uid,
+                            time,
+                            imageName,
+                            data,
+                            liveData,
+                            imageTotal,
+                            successList
+                        )
+                    } else if (imageArr.indexOf(image) < 100) {
+                        val imageName = imageArr.indexOf(image).toString()
+                        val pathAbs =
+                            repository.getFBStorageRef().child(uid).child(time).child(imageName)
+                        uploadImagePath.add(pathAbs.path)
+                        val data = bitmapUpload(image.toUri(), contentResolver)
+                        addImageFBStorage(
+                            uid,
+                            time,
+                            imageName,
+                            data,
+                            liveData,
+                            imageTotal,
+                            successList
+                        )
+                    }
                 }
             }
+        }
+        if (imageTotal == 0){
+            liveData.value = true
         }
         return liveData
     }
@@ -277,6 +356,10 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         }
     }
 
+    private suspend fun getThumImage(path: String): ByteArray{
+        return repository.getThumImage(path)
+    }
+
     private fun dbSave(imageUri: ArrayList<String>, isSuccess: MutableLiveData<Boolean>) {
         CoroutineScope(Dispatchers.Main).launch {
             val bool: Boolean = repository.addFBBoard(
@@ -304,7 +387,7 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
         CoroutineScope(Dispatchers.Main).launch {
             val bool: Boolean = repository.insertFBBoard(
                 hashMapOf(
-                    "documentId" to documentId,//데이터베이스 호출부분에서 추가
+                    "documentId" to documentId.value!!,//데이터베이스 호출부분에서 추가
                     "timestamp" to FieldValue.serverTimestamp(),
                     "uid" to repository.getAuth().uid,
                     "email" to repository.getAuth().email,

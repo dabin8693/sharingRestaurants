@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.databinding.FragUserBinding
 import com.project.sharingrestaurants.viewmodel.UserViewModel
@@ -39,7 +40,9 @@ class FragmentUser: Fragment() {
         binding.idemail.setText("dabin75783239@gmail.com")
         binding.nickname.setText("식객")
         Glide.with(this)
-            .load(viewModel.getAuth().profileImage)//첫번째 사진만 보여준다
+            .load(viewModel.getAuth().profileImage)
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .override(210,210)
             .into(binding.profileimage)
     }

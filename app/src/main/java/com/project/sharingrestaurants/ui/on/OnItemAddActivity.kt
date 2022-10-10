@@ -115,6 +115,7 @@ class OnItemAddActivity : AppCompatActivity() {
                 //progressStart(viewModel.uploadSuccess)
                 viewModel.upLoad(this@OnItemAddActivity, contentResolver).observe(this@OnItemAddActivity){
                     if (true){
+                        Log.d("ㅇㅇ","저장성공")
                         setResult(RESULT_OK)
                         finish()
                     }else{

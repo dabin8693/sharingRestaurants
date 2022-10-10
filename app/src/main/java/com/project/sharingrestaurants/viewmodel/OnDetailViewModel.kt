@@ -1,9 +1,15 @@
 package com.project.sharingrestaurants.viewmodel
 
+import android.app.Activity
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.StorageReference
+import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.firebase.BoardEntity
 import com.project.sharingrestaurants.firebase.CommentEntity
 import com.project.sharingrestaurants.firebase.ReplyEntity
@@ -15,8 +21,20 @@ import kotlinx.coroutines.launch
 
 class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
 
+    val likeDrawable: MutableLiveData<Drawable> = MutableLiveData()
+    val itemComment: MutableLiveData<String> = MutableLiveData()
+    val comment: MutableLiveData<Boolean> = MutableLiveData()
     val nicknameMap: MutableMap<String, String> = hashMapOf()//key - email, value - nickname
-    var isRecomment: Boolean = false//이게 true면 추천수 불러올때 추가로 1더하기
+    val profileImageMap: MutableMap<String, String> = hashMapOf()//key - email, value - profileImage
+    var isLike: Boolean = false
+
+    fun setLikeDrawable(context: Context, bool: Boolean){//true = 이미 추천함
+        if (!bool) {//추천x
+            likeDrawable.value = context.resources.getDrawable(R.drawable.like2, null)
+        }else{
+            likeDrawable.value = context.resources.getDrawable(R.drawable.like, null)
+        }
+    }
 
     fun getAuth(): UserEntity {
         return repository.getAuth()
@@ -42,12 +60,16 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
                 //실패
             } else {
                 nicknameMap.set(email, boardEntity.nickname)
+                profileImageMap.set(email, boardEntity.profileImage)
                 liveData.value = boardEntity
             }
         }
         return liveData
     }
 
+    fun getCommentObserver(): LiveData<Boolean>{
+        return comment
+    }
 
     fun getLoadCommentData(boardId: String): LiveData<List<Any>> {//댓글, 답글 //Any = CommentEntity, ReplyEntity
         val liveData: MutableLiveData<List<Any>> = MutableLiveData()
@@ -56,23 +78,33 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
             val commentList = repository.getCommentList(boardId) as ArrayList
             var a = 0
             for (comment in commentList) {//닉네임 불러오고 저장
-                if (nicknameMap.get(comment.email) == null) {
+                if (!nicknameMap.containsKey(comment.email)) {//없으면
                     val user = repository.getUserInform(comment.email)
                     comment.nickname = user.nickname
                     comment.profileImage = user.profileImage
                     commentList.set(a, comment)
                     nicknameMap.set(comment.email, user.nickname)
+                    profileImageMap.set(comment.email, user.profileImage)
+                }else{
+                    comment.nickname = nicknameMap.get(comment.email).toString()
+                    comment.profileImage = profileImageMap.get(comment.email).toString()
+                    commentList.set(a, comment)
                 }
                 a++
             }
             var b = 0
             for (reply in replyList) {//닉네임 불러오고 저장
-                if (nicknameMap.get(reply.email) == null) {
+                if (!nicknameMap.containsKey(reply.email)) {
                     val user = repository.getUserInform(reply.email)
                     reply.nickname = user.nickname
                     reply.profileImage = user.profileImage
                     replyList.set(b, reply)
                     nicknameMap.set(reply.email, user.nickname)
+                    profileImageMap.set(reply.email, user.profileImage)
+                }else{
+                    reply.nickname = nicknameMap.get(reply.email).toString()
+                    reply.profileImage = profileImageMap.get(reply.email).toString()
+                    replyList.set(a, reply)
                 }
                 b++
             }
@@ -103,6 +135,29 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
     fun incrementLike(boardId: String) {
         CoroutineScope(Dispatchers.Main).launch {
             repository.incrementLike(boardId)
+        }
+    }
+
+    fun updateLikeUsers(boardId: String, users :List<String>){
+        CoroutineScope(Dispatchers.Main).launch {
+            repository.updateLikeUsers(boardId, users)
+        }
+    }
+
+    fun addComment(boardId: String){
+        CoroutineScope(Dispatchers.Main).launch {
+            repository.addComment(
+                hashMapOf(
+                    "documentId" to "",
+                    "uid" to getAuth().uid,
+                    "email" to getAuth().email,
+                    "boardId" to boardId,
+                    "timestamp" to FieldValue.serverTimestamp(),
+                    "body" to (itemComment.value ?: ""),
+                    "isDelete" to false,
+                )
+            )
+            comment.value = true
         }
     }
 }

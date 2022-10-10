@@ -9,8 +9,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:padding="3dp"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         android:id="@+id/on_item"
         android:layout_width="match_parent"
         android:layout_height="66dp">

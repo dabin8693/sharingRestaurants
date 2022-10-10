@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -18,9 +19,9 @@ import com.project.sharingrestaurants.firebase.ReplyEntity
 import com.project.sharingrestaurants.viewmodel.OnDetailViewModel
 import java.text.SimpleDateFormat
 
-class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailViewModel) : RecyclerView.Adapter<OnDetailAdapter.ViewHolder>() {
+class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailViewModel, var isLike: Boolean, val lifecycleOwner: LifecycleOwner) : RecyclerView.Adapter<OnDetailAdapter.ViewHolder>() {
     private val viewTypeList: ArrayList<String> = ArrayList()
-    private lateinit var commentItems: List<Any>//CommentEntity, ReplyEntity
+    private var commentItems: List<Any> = emptyList()//CommentEntity, ReplyEntity
     private var commentsSize: Int = 0
     private lateinit var binding: ViewDataBinding
     private lateinit var context: Context
@@ -66,6 +67,8 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
             }
             3 -> {//footer
                 binding = OnDetailFooterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                (binding as OnDetailFooterBinding).viewModel = viewModel
+                binding.lifecycleOwner = lifecycleOwner
                 return ViewHolder(binding, viewType)
             }
             4 -> {//comment
@@ -100,7 +103,8 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
     }
 
     fun setCommentItem(commentItems: List<Any>) {
-        val size: Int = viewTypeList.size
+        Log.d("댓글사이즈",commentItems.size.toString())
+        val size: Int = viewTypeList.size - this.commentItems.size//처음 초기화가 아닐수도 있어서 commentItems.size를 빼준다
         this.commentItems = commentItems//댓글,답글 데이터 담기
         for (obj in commentItems) {
             if (obj is CommentEntity){
@@ -126,10 +130,10 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                     binding.place.text = entity.place
                     binding.rating.rating = entity.priority
                     if (!entity.profileImage.equals("")) {
-                        Glide.with(itemView)//uid비교 //나중에 비동기 초기화
+                        Glide.with(itemView)
                             .load(entity.profileImage)
                             .skipMemoryCache(true)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .override(360, 640)
                             .into(binding.profileimage)
                             .onLoadFailed(
@@ -140,7 +144,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                                 )
                             )
                     }
-                    binding.profilenickname.text = entity.nickname//uid비교//나중에 비동기 초기화
+                    binding.profilenickname.text = entity.nickname
                     val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
                     binding.time.text = format.format(entity.timestamp)
                     binding.look.text = entity.look.toString()//나중에 비동기 초기화
@@ -154,7 +158,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                     Glide.with(itemView)
                         .load(viewModel.getStorageRef().child(entity.image.get((position/2)-1).substring(1)))//2,4,6,8 //0,1,2,3
                         .skipMemoryCache(true)
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .override(360,640)
                         .into(binding.image)
                         .onLoadFailed(
@@ -167,63 +171,101 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                 }
                 3 -> {//footer
                     binding as OnDetailFooterBinding
-                    binding.like.setOnClickListener {
-                        viewModel.incrementLike(entity.documentId)
-                        entity.like++
-                        binding.likenum.text = entity.like.toString()
-                        viewModel.isRecomment = true
-                        it.isClickable = false
-                    }//추천클릭
+                    if (!isLike) {
+                        binding.like.setOnClickListener {
+                            viewModel.incrementLike(entity.documentId)
+                            val users: MutableList<String> = entity.likeUsers.toMutableList()
+                            users.add(viewModel.getAuth().email)
+                            entity.likeUsers = users
+                            viewModel.updateLikeUsers(entity.documentId, entity.likeUsers)
+                            entity.like++
+                            binding.likenum.text = entity.like.toString()
+                            viewModel.isLike = true
+                            isLike = true
+                            viewModel.setLikeDrawable(context, true)
+                            it.isClickable = false
+                        }//추천클릭
+                    }
                     binding.likenum.text = entity.like.toString()
-                    binding.comments.text = entity.comments.toString()//나중에 비동기 초기화
-                    binding.send.setOnClickListener {  }//댓글 전송 클릭
+                    binding.comments.text = entity.comments.toString()
+                    binding.send.setOnClickListener {
+                        viewModel.addComment(entity.documentId)
+                    }//댓글 전송 클릭
                 }
                 4 -> {//댓글
                     binding as OnDetailCommentBinding
                     val firstCommentPosition: Int = viewTypeList.size - commentsSize
                     val commentEntity: CommentEntity = commentItems.get(position-firstCommentPosition) as CommentEntity
-                    binding.profilenickname.text = commentEntity.nickname //uid비교
-                    Glide.with(itemView)//uid비교
-                        .load(commentEntity.profileImage)
-                        .override(360,640)
-                        .into(binding.profileimage)
-                        .onLoadFailed(
-                            ResourcesCompat.getDrawable(
-                                context.resources,
-                                R.mipmap.ic_launcher,
-                                null
+                    if (!commentEntity.isDelete) {
+                        binding.profilenickname.text = commentEntity.nickname
+                        Log.d("프로필이미지",commentEntity.profileImage)
+                        Glide.with(itemView)//uid비교
+                            .load(commentEntity.profileImage)
+                            .skipMemoryCache(true)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .override(360, 640)
+                            .into(binding.profileimage)
+                            .onLoadFailed(
+                                ResourcesCompat.getDrawable(
+                                    context.resources,
+                                    R.mipmap.ic_launcher,
+                                    null
+                                )
                             )
-                        )
-                    binding.body.text = commentEntity.body
-                    val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-                    binding.time.text = format.format(commentEntity.timestamp)
-                    binding.replybutton.visibility = View.VISIBLE //uid비교
-                    binding.insertbutton.visibility = View.GONE //uid비교
-                    binding.deletebutton.visibility = View.GONE //uid비교
+                        binding.body.text = commentEntity.body
+                        val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
+                        binding.time.text = format.format(commentEntity.timestamp)
+                        if (commentEntity.email.equals(viewModel.getAuth().email)) {//내가 작성한 댓글이면
+                            binding.replybutton.visibility = View.GONE
+                            binding.insertbutton.visibility = View.VISIBLE
+                            binding.deletebutton.visibility = View.VISIBLE
+                        }
+                    }else{
+                        binding.time.visibility = View.GONE
+                        binding.profilenickname.visibility = View.GONE
+                        binding.profileimage.visibility = View.GONE
+                        binding.replybutton.visibility = View.GONE
+                        binding.insertbutton.visibility = View.GONE
+                        binding.deletebutton.visibility = View.GONE
+                    }
                 }
                 5 -> {//답글
                     binding as OnDetailReplyBinding
                     val firstCommentPosition: Int = viewTypeList.size - commentsSize
                     val replyEntity: ReplyEntity = commentItems.get(position-firstCommentPosition) as ReplyEntity
-                    binding.profilenickname.text = replyEntity.nickname //uid비교
-                    Glide.with(itemView)//uid비교
-                        .load(replyEntity.profileImage)
-                        .override(360,640)
-                        .into(binding.profileimage)
-                        .onLoadFailed(
-                            ResourcesCompat.getDrawable(
-                                context.resources,
-                                R.mipmap.ic_launcher,
-                                null
+                    if (!replyEntity.isDelete) {
+                        binding.profilenickname.text = replyEntity.nickname //uid비교
+                        Glide.with(itemView)//uid비교
+                            .load(replyEntity.profileImage)
+                            .skipMemoryCache(true)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .override(360, 640)
+                            .into(binding.profileimage)
+                            .onLoadFailed(
+                                ResourcesCompat.getDrawable(
+                                    context.resources,
+                                    R.mipmap.ic_launcher,
+                                    null
+                                )
                             )
-                        )
-                    binding.yournickname.text = "@"+replyEntity.commentNickname
-                    binding.body.text = replyEntity.body
-                    val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-                    binding.time.text = format.format(replyEntity.timestamp)
-                    binding.replybutton.visibility = View.VISIBLE //uid비교
-                    binding.insertbutton.visibility = View.GONE //uid비교
-                    binding.deletebutton.visibility = View.GONE //uid비교
+                        binding.yournickname.text = "@" + replyEntity.commentNickname
+                        binding.body.text = replyEntity.body
+                        val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
+                        binding.time.text = format.format(replyEntity.timestamp)
+                        if (replyEntity.email.equals(viewModel.getAuth().email)) {
+                            binding.replybutton.visibility = View.GONE
+                            binding.insertbutton.visibility = View.VISIBLE
+                            binding.deletebutton.visibility = View.VISIBLE
+                        }
+                    }else{
+                        binding.time.visibility = View.GONE
+                        binding.profilenickname.visibility = View.GONE
+                        binding.profileimage.visibility = View.GONE
+                        binding.yournickname.visibility = View.GONE
+                        binding.replybutton.visibility = View.GONE
+                        binding.insertbutton.visibility = View.GONE
+                        binding.deletebutton.visibility = View.GONE
+                    }
                 }
             }
         }

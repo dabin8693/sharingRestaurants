@@ -7,11 +7,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.databinding.*
 import com.project.sharingrestaurants.firebase.BoardEntity
@@ -171,10 +173,36 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
                 }
                 1 -> {//image
                     binding as OffItemImageBinding
-                    Glide.with(itemView)
-                        .load((item as String).toUri()).override(360,640)
-                        .into(binding.image)
-                    binding.image.setOnLongClickListener{
+                    //content://media/external/images/media/8778
+                    ///4cWSu6Uq2uNEuLykGj1cmh4mS112/20221011010049/00
+                    if (item.toString().contains("content:")) {
+                        Glide.with(itemView)
+                            .load((item as String).toUri()).override(360, 640)
+                            .skipMemoryCache(true)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(binding.image)
+                            .onLoadFailed(
+                                ResourcesCompat.getDrawable(
+                                    context.resources,
+                                    R.mipmap.ic_launcher,
+                                    null
+                                )
+                            )
+                    }else{
+                        Glide.with(itemView)
+                            .load(viewModel.getStorageRef().child(item.toString().substring(1))).override(360, 640)
+                            .skipMemoryCache(true)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(binding.image)
+                            .onLoadFailed(
+                                ResourcesCompat.getDrawable(
+                                    context.resources,
+                                    R.mipmap.ic_launcher,
+                                    null
+                                )
+                            )
+                    }
+                    binding.image.setOnLongClickListener {
                         focusImagePosition = adapterPosition
                         deleteImage(adapterPosition)
                         true
@@ -199,7 +227,6 @@ class OnAddAdapter(val deleteImage: (Int) -> Unit, val showMap: () -> Unit, val 
                     binding.focuselinear.setOnClickListener{//마지막 리니어 클릭시 마지막 에디트에 포커싱 주기 //에디트 텍스트 터지 범위 확장하기 위해
                         lastEdit.requestFocus()
                         focusEditPosition = items.lastIndex - 1//마지막 에디트
-                        Log.d("어뎁터포지션4/",focusEditPosition.toString())
                     }
                 }
             }

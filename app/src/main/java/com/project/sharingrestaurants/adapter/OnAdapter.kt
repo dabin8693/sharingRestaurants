@@ -74,7 +74,7 @@ class OnAdapter(val itemClick: (String) -> Unit, var currentLatitude: Double, va
                     //application context를 써도 캐싱 실패함
                     .load(storageRef.child(item.thumb.substring(1)))//첫번째 사진만 보여준다
                     .skipMemoryCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .override(180, 180)
                     .into(binding.picture)
                     .onLoadFailed(
