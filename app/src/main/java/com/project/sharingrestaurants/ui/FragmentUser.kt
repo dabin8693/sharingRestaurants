@@ -39,8 +39,8 @@ class FragmentUser: Fragment() {
             viewModel.signOut()
             (requireActivity() as MainActivity).offShow()
         }
-        binding.idemail.setText("dabin75783239@gmail.com")
-        binding.nickname.setText("식객")
+        binding.idemail.text = viewModel.getAuth().email
+        binding.nickname.text = viewModel.getAuth().nickname
         Glide.with(this)
             .load(viewModel.getAuth().profileImage)
             .skipMemoryCache(true)

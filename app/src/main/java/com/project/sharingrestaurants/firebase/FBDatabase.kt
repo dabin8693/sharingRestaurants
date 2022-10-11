@@ -212,7 +212,7 @@ class FBDatabase {
             return false
         }
     }
-
+//댓글 수 증가, 감소 기능 추가
 
     suspend fun incrementComments(boardId: String) {
         fbDatabase.collection("count").document(boardId)
