@@ -20,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OffAdapter
@@ -53,6 +54,7 @@ class FragmentOffLineMemo : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
+        getLifecycle().addObserver(LifecycleTest("fragOff"))
         initStart(inflater, container, savedInstanceState)//뷰모델, 바인딩 초기화
         return binding.root//데이터바인딩의 생명주기가 프래그먼트랑 같아서
         //백스택을 사용할 경우 ondestoryview에서 binding = null

@@ -49,9 +49,17 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
     private val uploadImagePath: ArrayList<String> = ArrayList()//파이어스토리지uri
     private var uploadThumImagePath: String = ""//파이어스토리지uri
     val uploadSuccess: MutableLiveData<Boolean> = MutableLiveData()
+    var writeBoardList: List<String> = emptyList()
 
     fun getStorageRef(): StorageReference {
         return repository.getFBStorageRef()
+    }
+
+
+    fun getWriteBoardListAuth() {
+        CoroutineScope(Dispatchers.Main).launch {
+            writeBoardList = repository.getWriteBoardListAuth(repository.getAuth().email)
+        }
     }
 
     fun setItem(item: BoardEntity) {
@@ -362,7 +370,8 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
 
     private fun dbSave(imageUri: ArrayList<String>, isSuccess: MutableLiveData<Boolean>) {
         CoroutineScope(Dispatchers.Main).launch {
-            val bool: Boolean = repository.addFBBoard(
+            var bool: Boolean = false
+            var boardId: String = repository.addFBBoard(
                 hashMapOf(
                     "documentId" to "",//데이터베이스 호출부분에서 추가
                     "timestamp" to FieldValue.serverTimestamp(),
@@ -379,6 +388,11 @@ class OnAddViewModel(private val repository: ItemRepository) : ViewModel() {
                     "longitude" to itemLongitude,
                 )
             )
+            if (!boardId.equals("")){
+                val list = writeBoardList.toMutableList()
+                list.add(boardId)
+                bool = repository.insertWriteBoardListAuth(list)
+            }
             isSuccess.value = bool
         }
     }

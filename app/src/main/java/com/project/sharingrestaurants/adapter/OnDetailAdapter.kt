@@ -19,7 +19,12 @@ import com.project.sharingrestaurants.firebase.ReplyEntity
 import com.project.sharingrestaurants.viewmodel.OnDetailViewModel
 import java.text.SimpleDateFormat
 
-class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailViewModel, var isLike: Boolean, val lifecycleOwner: LifecycleOwner) : RecyclerView.Adapter<OnDetailAdapter.ViewHolder>() {
+class OnDetailAdapter(
+    private val entity: BoardEntity,
+    val viewModel: OnDetailViewModel,
+    var isLike: Boolean,
+    val lifecycleOwner: LifecycleOwner
+) : RecyclerView.Adapter<OnDetailAdapter.ViewHolder>() {
     private val viewTypeList: ArrayList<String> = ArrayList()
     private var commentItems: List<Any> = emptyList()//CommentEntity, ReplyEntity
     private var commentsSize: Int = 0
@@ -29,7 +34,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
 
     init {
         viewTypeList.add("head")
-        for (index in 0 until (entity.body.size-1)){
+        for (index in 0 until (entity.body.size - 1)) {
             viewTypeList.add("text")
             viewTypeList.add("image")
         }
@@ -38,7 +43,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
     }
 
     override fun getItemViewType(position: Int): Int {
-        when(viewTypeList.get(position)){
+        when (viewTypeList.get(position)) {
             "head" -> return 0
             "text" -> return 1
             "image" -> return 2
@@ -53,30 +58,42 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
         context = parent.context
         when (viewType) {
             0 -> {//head
-                binding = OnDetailHeadBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                binding =
+                    OnDetailHeadBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 head = ViewHolder(binding, viewType)
                 return head
             }
             1 -> {//text
-                binding = OffItemTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                binding =
+                    OffItemTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return ViewHolder(binding, viewType)
             }
             2 -> {//image
-                binding = OffItemImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                binding =
+                    OffItemImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return ViewHolder(binding, viewType)
             }
             3 -> {//footer
-                binding = OnDetailFooterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                binding = OnDetailFooterBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
                 (binding as OnDetailFooterBinding).viewModel = viewModel
                 binding.lifecycleOwner = lifecycleOwner
                 return ViewHolder(binding, viewType)
             }
             4 -> {//comment
-                binding = OnDetailCommentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                binding = OnDetailCommentBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
                 return ViewHolder(binding, viewType)
             }
             5 -> {//reply
-                binding = OnDetailReplyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                binding =
+                    OnDetailReplyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return ViewHolder(binding, viewType)
             }
         }
@@ -91,25 +108,32 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
     override fun getItemCount(): Int {
         return viewTypeList.size
     }
-/////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////
     //비동기 호출
-    fun setUserItem(item: BoardEntity){
+    fun setUserItem(item: BoardEntity) {
         entity.profileImage = item.profileImage//프로필 이미지
         entity.nickname = item.nickname//프로필 닉네임
-        if (::head.isInitialized){
+        if (::head.isInitialized) {
             head.bind(0)//position값은 상관 없음
         }
         //notifyItemChanged(0)
     }
 
     fun setCommentItem(commentItems: List<Any>) {
-        Log.d("댓글사이즈",commentItems.size.toString())
-        val size: Int = viewTypeList.size - this.commentItems.size//처음 초기화가 아닐수도 있어서 commentItems.size를 빼준다
+        Log.d("댓글사이즈", commentItems.size.toString())
+        val size: Int =
+            viewTypeList.size - this.commentItems.size//처음 초기화가 아닐수도 있어서 commentItems.size를 빼준다
+        if (this.commentItems.size>0) {//이전 댓글이 있을 경우
+            for (i in 1..this.commentItems.size) {//이전 댓글들을 빼준다
+                this.viewTypeList.removeLast()
+            }
+        }
         this.commentItems = commentItems//댓글,답글 데이터 담기
         for (obj in commentItems) {
-            if (obj is CommentEntity){
+            if (obj is CommentEntity) {
                 viewTypeList.add("comment")
-            }else{
+            } else {
                 viewTypeList.add("reply")
             }
         }
@@ -117,12 +141,14 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
         notifyDataSetChanged()
         //notifyItemRangeChanged(size, commentItems.size)
     }
+
     //비동기 호출
 /////////////////////////////////////////////////////
-    inner class ViewHolder(val binding: ViewDataBinding, val viewType: Int): RecyclerView.ViewHolder(binding.root){
+    inner class ViewHolder(val binding: ViewDataBinding, val viewType: Int) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(position: Int){
-            when(viewType){
+        fun bind(position: Int) {
+            when (viewType) {
                 0 -> {//head
                     binding as OnDetailHeadBinding
                     binding.title.text = entity.tilte
@@ -151,15 +177,18 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                 }
                 1 -> {//text
                     binding as OffItemTextBinding
-                    binding.title.text = entity.body.get((position-1)/2)//1,3,5,7 //0,1,2,3
+                    binding.title.text = entity.body.get((position - 1) / 2)//1,3,5,7 //0,1,2,3
                 }
                 2 -> {//image
                     binding as OffItemImageBinding
                     Glide.with(itemView)
-                        .load(viewModel.getStorageRef().child(entity.image.get((position/2)-1).substring(1)))//2,4,6,8 //0,1,2,3
+                        .load(
+                            viewModel.getStorageRef()
+                                .child(entity.image.get((position / 2) - 1).substring(1))
+                        )//2,4,6,8 //0,1,2,3
                         .skipMemoryCache(true)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .override(360,640)
+                        .override(360, 640)
                         .into(binding.image)
                         .onLoadFailed(
                             ResourcesCompat.getDrawable(
@@ -171,34 +200,51 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                 }
                 3 -> {//footer
                     binding as OnDetailFooterBinding
-                    if (!isLike) {
+                    if (viewModel.getIsLogin()) {
                         binding.like.setOnClickListener {
-                            viewModel.incrementLike(entity.documentId)
-                            val users: MutableList<String> = entity.likeUsers.toMutableList()
-                            users.add(viewModel.getAuth().email)
-                            entity.likeUsers = users
-                            viewModel.updateLikeUsers(entity.documentId, entity.likeUsers)
-                            entity.like++
-                            binding.likenum.text = entity.like.toString()
-                            viewModel.isLike = true
-                            isLike = true
-                            viewModel.setLikeDrawable(context, true)
-                            it.isClickable = false
-                        }//추천클릭
+                            if (viewModel.likeIsUpdate.value == true) {
+                                if (!isLike) {
+                                    val users: MutableList<String> =
+                                        entity.likeUsers.toMutableList()
+                                    users.add(viewModel.getAuth().email)
+                                    entity.likeUsers = users
+                                    viewModel.incrementLike(entity.documentId, entity.likeUsers)
+                                    entity.like++
+                                    viewModel.likes.value = entity.like.toString()
+                                    viewModel.isLike = true
+                                    isLike = true
+                                    viewModel.setLikeDrawable(context, true)
+                                    //it.isClickable = false
+                                } else {
+                                    val users: MutableList<String> =
+                                        entity.likeUsers.toMutableList()
+                                    users.remove(viewModel.getAuth().email)
+                                    entity.likeUsers = users
+                                    viewModel.decrementLike(entity.documentId, entity.likeUsers)
+                                    entity.like--
+                                    viewModel.likes.value = entity.like.toString()
+                                    viewModel.isLike = false
+                                    isLike = false
+                                    viewModel.setLikeDrawable(context, false)
+                                }
+                            }//추천클릭
+                        }
+                        binding.send.setOnClickListener {
+                            viewModel.addComment(entity.documentId)
+                        }//댓글 전송 클릭
                     }
-                    binding.likenum.text = entity.like.toString()
-                    binding.comments.text = entity.comments.toString()
-                    binding.send.setOnClickListener {
-                        viewModel.addComment(entity.documentId)
-                    }//댓글 전송 클릭
+                    viewModel.likes.value = entity.like.toString()
+                    viewModel.comments.value = entity.comments.toString()
+
                 }
                 4 -> {//댓글
                     binding as OnDetailCommentBinding
                     val firstCommentPosition: Int = viewTypeList.size - commentsSize
-                    val commentEntity: CommentEntity = commentItems.get(position-firstCommentPosition) as CommentEntity
+                    val commentEntity: CommentEntity =
+                        commentItems.get(position - firstCommentPosition) as CommentEntity
                     if (!commentEntity.isDelete) {
                         binding.profilenickname.text = commentEntity.nickname
-                        Log.d("프로필이미지",commentEntity.profileImage)
+                        Log.d("프로필이미지", commentEntity.profileImage)
                         Glide.with(itemView)//uid비교
                             .load(commentEntity.profileImage)
                             .skipMemoryCache(true)
@@ -220,7 +266,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                             binding.insertbutton.visibility = View.VISIBLE
                             binding.deletebutton.visibility = View.VISIBLE
                         }
-                    }else{
+                    } else {
                         binding.time.visibility = View.GONE
                         binding.profilenickname.visibility = View.GONE
                         binding.profileimage.visibility = View.GONE
@@ -232,7 +278,8 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                 5 -> {//답글
                     binding as OnDetailReplyBinding
                     val firstCommentPosition: Int = viewTypeList.size - commentsSize
-                    val replyEntity: ReplyEntity = commentItems.get(position-firstCommentPosition) as ReplyEntity
+                    val replyEntity: ReplyEntity =
+                        commentItems.get(position - firstCommentPosition) as ReplyEntity
                     if (!replyEntity.isDelete) {
                         binding.profilenickname.text = replyEntity.nickname //uid비교
                         Glide.with(itemView)//uid비교
@@ -257,7 +304,7 @@ class OnDetailAdapter(private val entity: BoardEntity, val viewModel: OnDetailVi
                             binding.insertbutton.visibility = View.VISIBLE
                             binding.deletebutton.visibility = View.VISIBLE
                         }
-                    }else{
+                    } else {
                         binding.time.visibility = View.GONE
                         binding.profilenickname.visibility = View.GONE
                         binding.profileimage.visibility = View.GONE

@@ -23,21 +23,43 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
 
     val likeDrawable: MutableLiveData<Drawable> = MutableLiveData()
     val itemComment: MutableLiveData<String> = MutableLiveData()
+    val likes: MutableLiveData<String> = MutableLiveData()
+    val comments: MutableLiveData<String> = MutableLiveData()
+
     val comment: MutableLiveData<Boolean> = MutableLiveData()
     val nicknameMap: MutableMap<String, String> = hashMapOf()//key - email, value - nickname
     val profileImageMap: MutableMap<String, String> = hashMapOf()//key - email, value - profileImage
     var isLike: Boolean = false
+    val likeIsUpdate: MutableLiveData<Boolean> = MutableLiveData()
+    var writeCommentList: List<String> = emptyList()
+    var likeListAuth: List<String> = emptyList()
 
-    fun setLikeDrawable(context: Context, bool: Boolean){//true = 이미 추천함
+    init {
+        likeIsUpdate.value = true
+    }
+
+    fun setLikeDrawable(context: Context, bool: Boolean) {//true = 이미 추천함
         if (!bool) {//추천x
             likeDrawable.value = context.resources.getDrawable(R.drawable.like2, null)
-        }else{
+        } else {
             likeDrawable.value = context.resources.getDrawable(R.drawable.like, null)
         }
     }
 
     fun getAuth(): UserEntity {
         return repository.getAuth()
+    }
+
+    fun getWriteCommentList() {//로그인상태일때만 호출
+        CoroutineScope(Dispatchers.Main).launch {
+            writeCommentList = repository.getWriteCommentListAuth(getAuth().email)
+        }
+    }
+
+    fun getLikeListAuth() {//로그인상태일때만 호출
+        CoroutineScope(Dispatchers.Main).launch {
+            likeListAuth = repository.getLikeListAuth(getAuth().email)
+        }
     }
 
     fun getIsLogin(): Boolean {
@@ -48,7 +70,7 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
         return repository.getFBStorageRef()
     }
 
-    suspend fun getBoard(boardId: String): BoardEntity{
+    suspend fun getBoard(boardId: String): BoardEntity {
         return repository.getBoard(boardId)
     }
 
@@ -67,7 +89,7 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
         return liveData
     }
 
-    fun getCommentObserver(): LiveData<Boolean>{
+    fun getCommentObserver(): LiveData<Boolean> {
         return comment
     }
 
@@ -85,7 +107,7 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
                     commentList.set(a, comment)
                     nicknameMap.set(comment.email, user.nickname)
                     profileImageMap.set(comment.email, user.profileImage)
-                }else{
+                } else {
                     comment.nickname = nicknameMap.get(comment.email).toString()
                     comment.profileImage = profileImageMap.get(comment.email).toString()
                     commentList.set(a, comment)
@@ -101,7 +123,7 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
                     replyList.set(b, reply)
                     nicknameMap.set(reply.email, user.nickname)
                     profileImageMap.set(reply.email, user.profileImage)
-                }else{
+                } else {
                     reply.nickname = nicknameMap.get(reply.email).toString()
                     reply.profileImage = profileImageMap.get(reply.email).toString()
                     replyList.set(a, reply)
@@ -132,21 +154,55 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
         }
     }
 
-    fun incrementLike(boardId: String) {
+    fun incrementLike(boardId: String, users: List<String>) {
         CoroutineScope(Dispatchers.Main).launch {
-            repository.incrementLike(boardId)
+            var bool: Boolean = false
+            likeIsUpdate.value = false
+            bool = repository.incrementLike(boardId)
+            if (!bool) {
+                updateLikeUsers(boardId, users)
+            }
+            if (!bool) {
+                addLikeListAuth()
+            }
+            likeIsUpdate.value = bool
         }
     }
 
-    fun updateLikeUsers(boardId: String, users :List<String>){
+    fun decrementLike(boardId: String, users: List<String>) {
         CoroutineScope(Dispatchers.Main).launch {
-            repository.updateLikeUsers(boardId, users)
+            var bool: Boolean = false
+            likeIsUpdate.value = false
+            bool = repository.decrementLike(boardId)
+            if (!bool) {
+                bool = updateLikeUsers(boardId, users)
+            }
+            if (!bool) {
+                bool = removeLikeListAuth()
+            }
+            likeIsUpdate.value = bool
         }
     }
 
-    fun addComment(boardId: String){
+    private suspend fun updateLikeUsers(boardId: String, users: List<String>): Boolean {
+        return repository.updateLikeUsers(boardId, users)
+    }
+
+    private suspend fun addLikeListAuth() {
+        val list = likeListAuth.toMutableList()
+        list.add(getAuth().email)
+        repository.insertLikeListAuth(list)
+    }
+
+    private suspend fun removeLikeListAuth(): Boolean {
+        val list = likeListAuth.toMutableList()
+        list.remove(getAuth().email)
+        return repository.insertLikeListAuth(list)
+    }
+
+    fun addComment(boardId: String) {
         CoroutineScope(Dispatchers.Main).launch {
-            repository.addComment(
+            val commentId = repository.addComment(
                 hashMapOf(
                     "documentId" to "",
                     "uid" to getAuth().uid,
@@ -157,7 +213,16 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
                     "isDelete" to false,
                 )
             )
+            if (!commentId.equals("")) {
+                insertWriteCommentListAuth(commentId)
+            }
             comment.value = true
         }
+    }
+
+    private suspend fun insertWriteCommentListAuth(commentId: String) {//로그인상태일때만 호출
+        val list = writeCommentList.toMutableList()
+        list.add(commentId)
+        repository.insertWriteCommentListAuth(list)
     }
 }

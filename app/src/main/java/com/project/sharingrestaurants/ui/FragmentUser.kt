@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.databinding.FragUserBinding
 import com.project.sharingrestaurants.viewmodel.UserViewModel
@@ -26,6 +27,7 @@ class FragmentUser: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        getLifecycle().addObserver(LifecycleTest("fragUser"))
         initStart(inflater, container, savedInstanceState)
         return binding.root
     }

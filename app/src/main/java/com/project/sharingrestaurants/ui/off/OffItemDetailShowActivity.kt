@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OffDetailAdapter
@@ -26,7 +27,7 @@ class OffItemDetailShowActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        getLifecycle().addObserver(LifecycleTest("activityOffDetail"))
         ininStart()
         viewModel.item = intent.getSerializableExtra("ItemEntity") as ItemEntity
         viewModel.position = intent.getIntExtra("position",10000)

@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.data.BitmapImageItem
@@ -43,7 +44,7 @@ class OffItemAddActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        getLifecycle().addObserver(LifecycleTest("activityOffAdd"))
         initStart()
 
         if (intent != null && intent.hasExtra("OffDetailItem")) {

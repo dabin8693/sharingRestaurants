@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnDetailAdapter
@@ -34,7 +35,7 @@ class OnItemDetailShowActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        getLifecycle().addObserver(LifecycleTest("activityOnDetail"))
         initStart()
         item = intent.getSerializableExtra("BoardEntity") as BoardEntity
         viewModel.isLike = false
@@ -49,7 +50,9 @@ class OnItemDetailShowActivity : AppCompatActivity() {
             }
         }
         viewModel.incrementLook(item.documentId)//조회수 증가
-        if (viewModel.getIsLogin()) {
+        if (viewModel.getIsLogin()) {//로그인 상태일때 초기화
+            viewModel.getWriteCommentList()
+            viewModel.getLikeListAuth()
             viewModel.nicknameMap.set(viewModel.getAuth().email!!, viewModel.getAuth().nickname)
             viewModel.profileImageMap.set(viewModel.getAuth().email!!, viewModel.getAuth().profileImage)
             if (item.uid.equals(viewModel.getAuth().uid)) {//내가 작성한 글일 경우
@@ -98,7 +101,9 @@ class OnItemDetailShowActivity : AppCompatActivity() {
             //remove
         }
 
-
+        binding.back.setOnClickListener {
+            finish()
+        }
     }
 
     private fun initStart(){

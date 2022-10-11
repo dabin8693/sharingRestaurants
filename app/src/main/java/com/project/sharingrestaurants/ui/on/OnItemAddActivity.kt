@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnAddAdapter
@@ -35,7 +36,7 @@ class OnItemAddActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        getLifecycle().addObserver(LifecycleTest("activityOnAdd"))
         initStart()
 
         if (intent != null && intent.hasExtra("BoardEntity")) {
@@ -90,7 +91,7 @@ class OnItemAddActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_on_item_add)//binding.viewModel에 viewmodel 담기전에 먼저 초기화
         binding.viewModel = viewModel //xml에서 main뷰모델 데이터에 접근 가능하게
         binding.lifecycleOwner = this //이거 안쓰면 데이터바인딩 쓸때 xml이 데이터 관측 못 함
-
+        viewModel.getWriteBoardListAuth()
     }
 
     private fun addItem() {//등록

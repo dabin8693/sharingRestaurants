@@ -4,6 +4,7 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.storage.StorageReference
@@ -12,6 +13,7 @@ import com.project.sharingrestaurants.firebase.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 
 class ItemRepository(application: MyApplication) {
@@ -75,7 +77,7 @@ class ItemRepository(application: MyApplication) {
         return fbDatabase.isChangedCount()
     }
 
-    suspend fun addFBBoard(boardMap: MutableMap<String, Any>): Boolean{
+    suspend fun addFBBoard(boardMap: MutableMap<String, Any>): String{
         return fbDatabase.addBoard(boardMap)
     }
 
@@ -95,20 +97,36 @@ class ItemRepository(application: MyApplication) {
         return fbDatabase.insertReply(replyMap)
     }
 
+    suspend fun insertWriteBoardListAuth(list: List<String>): Boolean {//list안의 데이터 - board documentId
+        return fbDatabase.insertWriteBoardListAuth(getAuth().uid, list)
+    }
+
+    suspend fun insertWriteCommentListAuth(list: List<String>) {//list안의 데이터 - comment, reply documentId
+        fbDatabase.insertWriteCommentListAuth(getAuth().uid, list)
+    }
+
+    suspend fun insertLikeListAuth(list: List<String>): Boolean {//list안의 데이터 - board documentId
+        return fbDatabase.insertLikeListAuth(getAuth().uid, list)
+    }
+
     suspend fun incrementLook(boardId: String){
         fbDatabase.incrementLook(boardId)
     }
 
-    suspend fun incrementLike(boardId: String) {
-        fbDatabase.incrementLike(boardId)
+    suspend fun incrementLike(boardId: String): Boolean {
+        return fbDatabase.incrementLike(boardId)
     }
 
-    suspend fun updateLikeUsers(boardId: String, users: List<String>){
-        fbDatabase.updateLikeUsers(boardId, users)
+    suspend fun updateLikeUsers(boardId: String, users: List<String>): Boolean{
+        return fbDatabase.updateLikeUsers(boardId, users)
     }
 
     suspend fun incrementComments(boardId: String){
         fbDatabase.incrementComments(boardId)
+    }
+
+    suspend fun decrementLike(boardId: String): Boolean{
+        return fbDatabase.decrementLike(boardId)
     }
 
     suspend fun decrementComments(boardId: String){
@@ -119,8 +137,8 @@ class ItemRepository(application: MyApplication) {
         fbDatabase.addAuth(getAuth())
     }
 
-    suspend fun addComment(commentMap: MutableMap<String, Any>){
-        fbDatabase.addComment(commentMap)
+    suspend fun addComment(commentMap: MutableMap<String, Any>): String{
+        return fbDatabase.addComment(commentMap)
     }
 
     suspend fun addReply(replyMap: MutableMap<String, Any>){
@@ -149,6 +167,18 @@ class ItemRepository(application: MyApplication) {
 
     suspend fun getNicknameAuth(email: String): String{
         return fbDatabase.getNicknameAuth(email)
+    }
+
+    suspend fun getWriteBoardListAuth(email: String): List<String> {
+        return fbDatabase.getWriteBoardListAuth(email)
+    }
+
+    suspend fun getWriteCommentListAuth(email: String): List<String> {
+        return fbDatabase.getWriteCommentListAuth(email)
+    }
+
+    suspend fun getLikeListAuth(email: String): List<String> {
+        return fbDatabase.getLikeListAuth(email)
     }
 
     suspend fun getCommentList(boardId: String): List<CommentEntity>{

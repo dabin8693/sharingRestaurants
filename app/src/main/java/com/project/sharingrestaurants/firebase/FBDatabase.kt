@@ -81,17 +81,18 @@ class FBDatabase {
     }
 
     //add
-    suspend fun addBoard(boardMap: MutableMap<String, Any>): Boolean {
+    suspend fun addBoard(boardMap: MutableMap<String, Any>): String {
         try {
             val documentRef: DocumentReference = fbDatabase.collection("board").document()
             boardMap.replace("documentId", documentRef.id)//api24이상
             documentRef.set(boardMap).await()
             val time = fbDatabase.collection("board").document(documentRef.id).get()
                 .await().data!!.get("timestamp") as Timestamp
-            return addCount(documentRef.id, time.toDate())
+            addCount(documentRef.id, time.toDate())
+            return documentRef.id
         } catch (e: Exception) {//Timestamp = Timestamp(seconds=1664997712, nanoseconds=650000000)
             Log.d("에러addBoard",e.toString())
-            return false
+            return ""
         }
     }
 
@@ -133,18 +134,22 @@ class FBDatabase {
                     "email" to user.email,
                     "image" to user.profileImage,
                     "nickname" to user.nickname,//초기값은 이메일 앞부분이 들어가 있다
-                    "timestamp" to FieldValue.serverTimestamp()
+                    "timestamp" to FieldValue.serverTimestamp(),
+                    "likeList" to emptyList<String>(),//좋아요한 글 목록
+                    "commentList" to emptyList<String>(),//댓글, 답글 작성한 글 목록
+                    "boardList" to emptyList<String>()//작성한 글 목록
                 )
             )
         }
     }
 
-    suspend fun addComment(commentMap: MutableMap<String, Any>) {//해당글에 댓글
+    suspend fun addComment(commentMap: MutableMap<String, Any>): String {//해당글에 댓글
         val documentRef: DocumentReference =
             fbDatabase.collection("board").document(commentMap.get("boardId").toString())
                 .collection("comment").document()
         commentMap.replace("documentId", documentRef.id)
         documentRef.set(commentMap).await()
+        return documentRef.id
     }
 
     suspend fun addReply(replyMap: MutableMap<String, Any>) {//해당글에 댓글
@@ -197,19 +202,46 @@ class FBDatabase {
             .update("look", FieldValue.increment(1)).await()//조회 수 증가
     }
 
-    suspend fun incrementLike(boardId: String) {//like = 추천
-        fbDatabase.collection("count").document(boardId)
-            .update("like", FieldValue.increment(1)).await()//추천 수 증가
+    suspend fun incrementLike(boardId: String): Boolean {//like = 추천
+        try {
+            fbDatabase.collection("count").document(boardId)
+                .update("like", FieldValue.increment(1)).await()//추천 수 증가
+            return true
+        } catch (e: Exception){
+            Log.d("에러incrementLike",e.toString())
+            return false
+        }
     }
 
-    suspend fun updateLikeUsers(boardId: String, users: List<String>) {
-        fbDatabase.collection("count").document(boardId)
-            .update("likeUsers", users).await()//추천 유저 목록 업데이트
+    suspend fun updateLikeUsers(boardId: String, users: List<String>): Boolean {
+        try {
+            fbDatabase.collection("count").document(boardId)
+                .update("likeUsers", users).await()//추천 유저 목록 업데이트
+            return true
+        }catch (e: Exception){
+            Log.d("에러updateLikeUsers",e.toString())
+            return false
+        }
     }
 
     suspend fun incrementComments(boardId: String) {
         fbDatabase.collection("count").document(boardId)
             .update("comments", FieldValue.increment(1)).await()//댓글 수 증가
+    }
+
+    suspend fun decrementLike(boardId: String): Boolean {//like = 추천
+        val documentRef: DocumentReference = fbDatabase.collection("count").document(boardId)
+            try {
+                fbDatabase.runTransaction {
+                    val snapshot: DocumentSnapshot = it.get(documentRef)
+                    val likes = (snapshot.data!!.get("like") as Long) - 1
+                    it.update(documentRef, "like", likes)
+                }.await()
+                return true
+            }catch (e: Exception){
+                Log.d("에러decrementLike",e.toString())
+                return false
+            }
     }
 
     suspend fun decrementComments(boardId: String) {//댓글 삭제되면 "삭제된 댓글입니다."메시지 띄우기
@@ -218,7 +250,7 @@ class FBDatabase {
         try {
             fbDatabase.runTransaction {
                 val snapshot: DocumentSnapshot = it.get(documentRef)
-                val comments = (snapshot.data!!.get("comments") as Int) - 1
+                val comments = (snapshot.data!!.get("comments") as Long) - 1
                 it.update(documentRef, "comments", comments)
             }.await()//댓글 수 감소
         }catch (e: Exception){
@@ -232,6 +264,34 @@ class FBDatabase {
             return true
         } catch (e: Exception) {
             Log.d("에러insertNicknameAuth",e.toString())
+            return false
+        }
+    }
+
+    suspend fun insertWriteBoardListAuth(uid: String, list: List<String>): Boolean {//list안의 데이터 - board documentId
+        try {
+            fbDatabase.collection("auth").document(uid).update("boardList", list).await()
+            return true
+        } catch (e: Exception) {
+            Log.d("에러insertWriteBoardListAuth",e.toString())
+            return false
+        }
+    }
+
+    suspend fun insertWriteCommentListAuth(uid: String, list: List<String>) {//list안의 데이터 - comment, reply documentId
+        try {
+            fbDatabase.collection("auth").document(uid).update("commentList", list).await()
+        } catch (e: Exception) {
+            Log.d("에러insertWriteCommentListAuth",e.toString())
+        }
+    }
+
+    suspend fun insertLikeListAuth(uid: String, list: List<String>): Boolean {//list안의 데이터 - board documentId
+        try {
+            fbDatabase.collection("auth").document(uid).update("likeList", list).await()
+            return true
+        } catch (e: Exception) {
+            Log.d("insertLikeListAuth",e.toString())
             return false
         }
     }
@@ -279,7 +339,7 @@ class FBDatabase {
         }
     }
 
-    suspend fun getUser(email: String): BoardEntity {
+    suspend fun getUser(email: String): BoardEntity {//Auth컬렉션에서 다른유저 정보 불러올때
         try {
             val snapshot = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
             val boardEntity = BoardEntity()
@@ -301,7 +361,7 @@ class FBDatabase {
         try {
             val data: QuerySnapshot =
                 fbDatabase.collection("board").document(boardId).collection("comment")
-                    .orderBy("timestamp", Query.Direction.DESCENDING).get().await()
+                    .orderBy("timestamp", Query.Direction.ASCENDING).get().await()
             return data.toObjects<CommentEntity>() //비동기 처리후 옵저버 호출
         } catch (e: Exception) {
             Log.d("에러getComment",e.toString())
@@ -313,7 +373,7 @@ class FBDatabase {
         try {
             val data: QuerySnapshot =
                 fbDatabase.collection("board").document(boardId).collection("reply")
-                    .orderBy("timestamp", Query.Direction.DESCENDING).get().await()
+                    .orderBy("timestamp", Query.Direction.ASCENDING).get().await()
             return data.toObjects<ReplyEntity>()
         } catch (e: Exception) {
             Log.d("에러getReply",e.toString())
@@ -323,11 +383,9 @@ class FBDatabase {
 
     suspend fun getNicknameAuth(email: String): String {//회원 이메일로 닉네임 가져오기 //다른 유저들
         try {
-            //중복 호출 방지하기 위해 viewmodel에서 회원정보들을 hashMap(key:email, value:nickname)으로 저장하고 없으면 호출하는식으로
-            //fragment, detailactivy가 hashmap을 공유하고 fragment가 체인지 되기전까지 유지 그 이후는 다시 최신화
             val snapshot = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
             var nickname: String = ""
-            for (data in snapshot) {
+            for (data in snapshot) {//검색결과 데이터가 1개만 나와야됨
                 nickname = data.data.get("nickname") as String//닉네임 가져오기
             }
             return nickname
@@ -337,5 +395,45 @@ class FBDatabase {
         }
     }
 
+    suspend fun getWriteBoardListAuth(email: String): List<String> {
+        try {
+            val snapshot = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
+            var writeBoardList: List<String> = emptyList()
+            for (data in snapshot) {//검색결과 데이터가 1개만 나와야됨
+                writeBoardList = data.data.get("boardList") as List<String>//작성글 목록
+            }
+            return writeBoardList
+        } catch (e: Exception){
+            Log.d("에러getWriteBoardListAuth",e.toString())
+            return emptyList()
+        }
+    }
 
+    suspend fun getWriteCommentListAuth(email: String): List<String> {
+        try {
+            val snapshot = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
+            var writeCommentList: List<String> = emptyList()
+            for (data in snapshot) {//검색결과 데이터가 1개만 나와야됨
+                writeCommentList = data.data.get("commentList") as List<String>//작성글 목록
+            }
+            return writeCommentList
+        } catch (e: Exception){
+            Log.d("에러getWriteCommentListAuth",e.toString())
+            return emptyList()
+        }
+    }
+
+    suspend fun getLikeListAuth(email: String): List<String> {
+        try {
+            val snapshot = fbDatabase.collection("auth").whereEqualTo("email", email).get().await()
+            var likeList: List<String> = emptyList()
+            for (data in snapshot) {//검색결과 데이터가 1개만 나와야됨
+                likeList = data.data.get("likeList") as List<String>//작성글 목록
+            }
+            return likeList
+        } catch (e: Exception){
+            Log.d("에러getLikeListAuth",e.toString())
+            return emptyList()
+        }
+    }
 }

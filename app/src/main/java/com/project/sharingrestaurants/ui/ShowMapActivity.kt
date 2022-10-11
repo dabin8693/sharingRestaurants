@@ -21,6 +21,7 @@ import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.databinding.ActivityShowMapBinding
 import com.project.sharingrestaurants.ui.off.OffItemAddActivity
 import com.project.sharingrestaurants.util.RunTimePermissionCheck
@@ -42,7 +43,7 @@ class ShowMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        getLifecycle().addObserver(LifecycleTest("activityMap"))
         initStart()
 
         instanceMap = NaverMapSdk.getInstance(this)

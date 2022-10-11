@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.project.sharingrestaurants.LifecycleTest
 import com.project.sharingrestaurants.MyApplication
 import com.project.sharingrestaurants.R
 import com.project.sharingrestaurants.adapter.OnAdapter
@@ -47,6 +48,7 @@ class FragmentOnLineMemo : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        getLifecycle().addObserver(LifecycleTest("fragOn"))
         initStart(inflater, container, savedInstanceState)
         return binding.root
     }
@@ -57,6 +59,7 @@ class FragmentOnLineMemo : Fragment() {
         savedInstanceState: Bundle?
     ) {//뷰 초기화
         super.onViewCreated(view, savedInstanceState)
+
         onAdapter = OnAdapter(
             { documentId ->
                 CoroutineScope(Dispatchers.Main).launch {
