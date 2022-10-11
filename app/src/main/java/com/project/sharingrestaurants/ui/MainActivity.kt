@@ -138,8 +138,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, OffItemAddActivity::class.java)
             startActivity(intent)
         } else if (supportFragmentManager.findFragmentById(R.id.Fragcontainer) == fragOn) {
-            val intent = Intent(this, OnItemAddActivity::class.java)
-            addCallBack.launch(intent)
+            if (viewModel.getIsLogin()) {
+                val intent = Intent(this, OnItemAddActivity::class.java)
+                addCallBack.launch(intent)
+            }else{
+                fragOn.loginShow()
+            }
         } else {
 
         }

@@ -100,7 +100,7 @@ class FBDatabase {
         //Timestamp.toDate = Thu Oct 06 04:21:52 GMT+09:00 2022
         try {
             fbDatabase.collection("count").document(boardId)
-                .set(CountEntity(boardId, timestamp, 0, 0, 0, listOf())).await()
+                .set(CountEntity(boardId, timestamp, 0, 0, 0)).await()
             return true
         } catch (e: Exception) {
             Log.d("에러addCount",e.toString())
@@ -213,16 +213,6 @@ class FBDatabase {
         }
     }
 
-    suspend fun updateLikeUsers(boardId: String, users: List<String>): Boolean {
-        try {
-            fbDatabase.collection("count").document(boardId)
-                .update("likeUsers", users).await()//추천 유저 목록 업데이트
-            return true
-        }catch (e: Exception){
-            Log.d("에러updateLikeUsers",e.toString())
-            return false
-        }
-    }
 
     suspend fun incrementComments(boardId: String) {
         fbDatabase.collection("count").document(boardId)

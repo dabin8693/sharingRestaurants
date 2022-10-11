@@ -56,9 +56,22 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
         }
     }
 
-    fun getLikeListAuth() {//로그인상태일때만 호출
+    fun getLikeListAuth(context: Context) {//로그인상태일때만 호출
         CoroutineScope(Dispatchers.Main).launch {
             likeListAuth = repository.getLikeListAuth(getAuth().email)
+            likeViewInit(context)
+        }
+    }
+
+    private fun likeViewInit(context: Context){
+        for (user in likeListAuth){
+            if (getAuth().email.equals(user)){//추천한적 있다
+                isLike = true
+                setLikeDrawable(context,true)
+            }else{
+                isLike = false
+                setLikeDrawable(context,false)
+            }
         }
     }
 
@@ -154,39 +167,30 @@ class OnDetailViewModel(private val repository: ItemRepository) : ViewModel() {
         }
     }
 
-    fun incrementLike(boardId: String, users: List<String>) {
+    fun incrementLike(boardId: String) {
         CoroutineScope(Dispatchers.Main).launch {
             var bool: Boolean = false
             likeIsUpdate.value = false
             bool = repository.incrementLike(boardId)
-            if (!bool) {
-                updateLikeUsers(boardId, users)
-            }
-            if (!bool) {
+            if (bool) {
                 addLikeListAuth()
             }
             likeIsUpdate.value = bool
         }
     }
 
-    fun decrementLike(boardId: String, users: List<String>) {
+    fun decrementLike(boardId: String) {
         CoroutineScope(Dispatchers.Main).launch {
             var bool: Boolean = false
             likeIsUpdate.value = false
             bool = repository.decrementLike(boardId)
-            if (!bool) {
-                bool = updateLikeUsers(boardId, users)
-            }
-            if (!bool) {
+            if (bool) {
                 bool = removeLikeListAuth()
             }
             likeIsUpdate.value = bool
         }
     }
 
-    private suspend fun updateLikeUsers(boardId: String, users: List<String>): Boolean {
-        return repository.updateLikeUsers(boardId, users)
-    }
 
     private suspend fun addLikeListAuth() {
         val list = likeListAuth.toMutableList()

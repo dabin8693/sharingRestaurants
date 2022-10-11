@@ -42,7 +42,6 @@ class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
                         board = boardList.get(index)
                         count = countList.get(index)
                         board.like = count.like
-                        board.likeUsers = count.likeUsers
                         board.look = count.look
                         board.comments = count.comments
                         boardList.set(index, board)
@@ -63,7 +62,6 @@ class OnLineViewModel(private val repository: ItemRepository): ViewModel() {
         if (!board.equals("")) {
             if (!count.equals("")) {
                 board.like = count.like
-                board.likeUsers = count.likeUsers
                 board.look = count.look
                 board.comments = count.comments
                 return board

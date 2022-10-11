@@ -204,11 +204,7 @@ class OnDetailAdapter(
                         binding.like.setOnClickListener {
                             if (viewModel.likeIsUpdate.value == true) {
                                 if (!isLike) {
-                                    val users: MutableList<String> =
-                                        entity.likeUsers.toMutableList()
-                                    users.add(viewModel.getAuth().email)
-                                    entity.likeUsers = users
-                                    viewModel.incrementLike(entity.documentId, entity.likeUsers)
+                                    viewModel.incrementLike(entity.documentId)
                                     entity.like++
                                     viewModel.likes.value = entity.like.toString()
                                     viewModel.isLike = true
@@ -216,11 +212,7 @@ class OnDetailAdapter(
                                     viewModel.setLikeDrawable(context, true)
                                     //it.isClickable = false
                                 } else {
-                                    val users: MutableList<String> =
-                                        entity.likeUsers.toMutableList()
-                                    users.remove(viewModel.getAuth().email)
-                                    entity.likeUsers = users
-                                    viewModel.decrementLike(entity.documentId, entity.likeUsers)
+                                    viewModel.decrementLike(entity.documentId)
                                     entity.like--
                                     viewModel.likes.value = entity.like.toString()
                                     viewModel.isLike = false

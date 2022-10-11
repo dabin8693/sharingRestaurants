@@ -21,7 +21,6 @@ data class BoardEntity(
     var comments: Int =0,//댓글 수//count컬렉션
     var look: Int = 0,//조회수
     var like: Int =0,//추천 수//count컬렉션
-    var likeUsers: List<String> = listOf(),//추천 유저 목록//count컬렉션
     var nickname: String ="",//auth컬렉션
     var profileImage: String =""//auth컬렉션
 ): Serializable

@@ -117,9 +117,6 @@ class ItemRepository(application: MyApplication) {
         return fbDatabase.incrementLike(boardId)
     }
 
-    suspend fun updateLikeUsers(boardId: String, users: List<String>): Boolean{
-        return fbDatabase.updateLikeUsers(boardId, users)
-    }
 
     suspend fun incrementComments(boardId: String){
         fbDatabase.incrementComments(boardId)

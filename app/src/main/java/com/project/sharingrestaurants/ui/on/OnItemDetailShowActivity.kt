@@ -40,19 +40,11 @@ class OnItemDetailShowActivity : AppCompatActivity() {
         item = intent.getSerializableExtra("BoardEntity") as BoardEntity
         viewModel.isLike = false
         viewModel.setLikeDrawable(this,false)
-        for (user in item.likeUsers){
-            if (viewModel.getAuth().email.equals(user)){//추천한적 있다
-                viewModel.isLike = true
-                viewModel.setLikeDrawable(this,true)
-            }else{
-                viewModel.isLike = false
-                viewModel.setLikeDrawable(this,false)
-            }
-        }
+
         viewModel.incrementLook(item.documentId)//조회수 증가
         if (viewModel.getIsLogin()) {//로그인 상태일때 초기화
             viewModel.getWriteCommentList()
-            viewModel.getLikeListAuth()
+            viewModel.getLikeListAuth(this)
             viewModel.nicknameMap.set(viewModel.getAuth().email!!, viewModel.getAuth().nickname)
             viewModel.profileImageMap.set(viewModel.getAuth().email!!, viewModel.getAuth().profileImage)
             if (item.uid.equals(viewModel.getAuth().uid)) {//내가 작성한 글일 경우
